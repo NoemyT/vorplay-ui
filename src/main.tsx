@@ -1,3 +1,4 @@
+// main.tsx or index.tsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -8,20 +9,18 @@ import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";
 import SignUp from "./pages/SignUp";
 import ErrorPage from "./pages/ErrorPage";
+import Scroll from "./components/ui/Scroll";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Home />,
+    element: <Scroll />, // ← apply global layout here
     errorElement: <ErrorPage />,
-  },
-  {
-    path: "/login",
-    element: <LogIn />,
-  },
-  {
-    path: "/signup",
-    element: <SignUp />,
+    children: [
+      { index: true, element: <Home /> },
+      { path: "login", element: <LogIn /> },
+      { path: "signup", element: <SignUp /> },
+    ],
   },
 ]);
 

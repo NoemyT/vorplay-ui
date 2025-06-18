@@ -7,13 +7,17 @@ import {
   TiGroup,
 } from "react-icons/ti";
 
-export default function Sidebar() {
+type SidebarProps = {
+  onSelectSection: (section: string) => void;
+};
+
+export default function Sidebar({ onSelectSection }: SidebarProps) {
   const navLinks = [
-    { name: "Reviews", href: "#", icon: TiStarFullOutline },
-    { name: "Favorites", href: "#", icon: TiHeartFullOutline },
-    { name: "Playlists", href: "#", icon: TiNotes },
-    { name: "History", href: "#", icon: TiArchive },
-    { name: "Follows", href: "#", icon: TiGroup },
+    { name: "reviews", icon: TiStarFullOutline },
+    { name: "favorites", icon: TiHeartFullOutline },
+    { name: "playlists", icon: TiNotes },
+    { name: "history", icon: TiArchive },
+    { name: "follows", icon: TiGroup },
   ];
 
   return (
@@ -29,7 +33,6 @@ export default function Sidebar() {
           bg-[#696969]/40 rounded-[20px]
           flex flex-col justify-between
           px-6 py-4
-          min-h-[calc(100vh-112px)]
           md:min-h-[calc(100vh-92px)]
         "
       >
@@ -45,26 +48,26 @@ export default function Sidebar() {
                 return (
                   <li
                     key={index}
-                    className="text-[#8a2be2] hover:text-[#6548D5] transition-colors duration-200 cursor-pointer group"
+                    onClick={() => onSelectSection(link.name.toLowerCase())}
+                    className="cursor-pointer text-[#8a2be2] hover:text-[#6548D5] group"
                   >
-                    <a
-                      href={link.href}
-                      className="flex items-center space-x-2 py-1"
-                    >
-                      <span className="text-base transition-transform duration-200 group-hover:scale-110 motion-reduce:transform-none">
+                    <div className="flex items-center space-x-2 py-1">
+                      <span className="text-base group-hover:scale-110">
                         <Icon />
                       </span>
-                      <span className="transition-transform duration-200 group-hover:translate-x-1 motion-reduce:transform-none">
-                        {link.name}
+                      <span className="group-hover:translate-x-1">
+                        <span>
+                          {link.name.charAt(0).toUpperCase() +
+                            link.name.slice(1)}
+                        </span>
                       </span>
-                    </a>
+                    </div>
                   </li>
                 );
               })}
             </ul>
           </nav>
         </div>
-
         <div className="text-center text-base text-[#292928] mt-6 shrink-0">
           &copy; {new Date().getFullYear()} Vorplay
         </div>
