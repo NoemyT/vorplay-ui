@@ -1,9 +1,46 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Card } from "../components/ui/Card";
+import { register } from "../lib/auth";
+import { useAuth } from "../context/authContext";
 
 import logo from "../assets/vorp.png";
 
 export default function SignUp() {
+  const navigate = useNavigate();
+  const { setUser } = useAuth();
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    if (password !== confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const data = await register(name.trim(), email.trim(), password);
+      // Persist auth
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setUser(data.user);
+      navigate("/"); // go to home
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen px-4">
       <Card className="flex flex-col w-full max-w-[500px] bg-[#696969]/40 rounded-[20px] p-6">
@@ -21,32 +58,43 @@ export default function SignUp() {
           </div>
         </div>
 
-        <form className="flex flex-col gap-5 w-full">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full">
           <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             type="text"
             placeholder="Username"
             className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none"
           />
           <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             type="text"
             placeholder="Email"
             className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none"
           />
           <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             type="password"
             placeholder="Password"
             className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none"
           />
           <input
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
             type="password"
             placeholder="Confirm Password"
             className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none"
           />
+
+          {error && <p className="text-center text-red-400">{error}</p>}
+
           <button
             type="submit"
             className="bg-[#8a2be2] text-white py-2.5 px-10 rounded-full font-semibold hover:bg-[#7a1fd1] transition w-fit self-center"
           >
-            Sign Up
+            {loading ? "Creating…" : "Sign Up"}
           </button>
         </form>
 

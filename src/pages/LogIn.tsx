@@ -1,9 +1,38 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { Card } from "../components/ui/Card";
+import { useAuth } from "../context/authContext";
+import { login } from "../lib/auth";
 
 import logo from "../assets/vorp.png";
 
 export default function LogIn() {
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      setLoading(true);
+      const data = await login(email.trim(), password);
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setUser(data.user);
+      navigate("/"); // Go to main page
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="flex items-center justify-center min-h-screen px-4">
       <Card className="flex flex-col w-full max-w-[500px] bg-[#696969]/40 rounded-[20px] p-6">
@@ -21,22 +50,29 @@ export default function LogIn() {
           </div>
         </div>
 
-        <form className="flex flex-col gap-5 w-full">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5 w-full">
           <input
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             type="text"
-            placeholder="Email or Username"
+            placeholder="Email"
             className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none"
           />
           <input
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             type="password"
             placeholder="Password"
             className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none"
           />
+
+          {error && <p className="text-center text-red-400">{error}</p>}
+
           <button
             type="submit"
             className="bg-[#8a2be2] text-white py-2.5 px-10 rounded-full font-semibold hover:bg-[#7a1fd1] transition w-fit self-center"
           >
-            Log In
+            {loading ? "Logging in…" : "Log In"}
           </button>
         </form>
 

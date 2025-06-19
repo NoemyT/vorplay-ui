@@ -1,5 +1,10 @@
 import { Card } from "../components/ui/Card";
-import Reviews from "./Reviews";
+import Reviews from "./content/Reviews";
+import Welcome from "./content/Welcome";
+import Favorites from "./content/Favorites";
+import History from "./content/History";
+import Playlists from "./content/Playlists";
+import Follows from "./content/Follows";
 
 type MainContentProps = {
   selectedSection: string;
@@ -10,8 +15,16 @@ export default function MainContent({ selectedSection }: MainContentProps) {
     switch (selectedSection.toLowerCase()) {
       case "reviews":
         return <Reviews />;
+      case "favorites":
+        return <Favorites />;
+      case "history":
+        return <History />;
+      case "playlists":
+        return <Playlists />;
+      case "follows":
+        return <Follows />;
       default:
-        return <div>Nothing Here Yet!</div>;
+        return <Welcome />;
     }
   };
 

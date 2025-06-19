@@ -1,5 +1,5 @@
 import { TiStarFullOutline } from "react-icons/ti";
-import { Card } from "../components/ui/Card";
+import { Card } from "../ui/Card";
 import { useEffect, useState } from "react";
 
 // Example data — replace with actual user data later
