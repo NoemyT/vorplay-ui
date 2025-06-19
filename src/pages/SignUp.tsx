@@ -33,7 +33,7 @@ export default function SignUp() {
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
       setUser(data.user);
-      navigate("/"); // go to home
+      navigate("/");
     } catch (err) {
       setError((err as Error).message);
     } finally {

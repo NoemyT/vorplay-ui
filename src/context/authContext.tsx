@@ -1,9 +1,11 @@
 import React, { createContext, useContext, useState } from "react";
 
-type User = {
+export type User = {
+  id: number;
   email: string;
   name?: string;
-  // Extend with other fields if your API returns more
+  profilePicture?: string;
+  createdAt?: string;
 };
 
 type AuthContextType = {

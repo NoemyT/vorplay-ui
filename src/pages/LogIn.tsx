@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card } from "../components/ui/Card";
 import { useAuth } from "../context/authContext";
-import { login } from "../lib/auth";
+import { login, fetchUserProfile } from "../lib/auth";
 
 import logo from "../assets/vorp.png";
 
@@ -23,9 +23,13 @@ export default function LogIn() {
       setLoading(true);
       const data = await login(email.trim(), password);
       localStorage.setItem("token", data.access_token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      setUser(data.user);
-      navigate("/"); // Go to main page
+
+      // Get full user profile
+      const fullUser = await fetchUserProfile(data.access_token);
+      setUser(fullUser);
+      localStorage.setItem("user", JSON.stringify(fullUser));
+
+      navigate("/");
     } catch (err) {
       setError((err as Error).message);
     } finally {

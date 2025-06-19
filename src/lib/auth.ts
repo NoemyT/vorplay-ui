@@ -1,6 +1,6 @@
-const API_BASE = import.meta.env.VITE_API_URL;
+import { type User } from "../context/authContext";
 
-export type User = { id: number; email: string };
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export async function login(email: string, password: string) {
   const res = await fetch(`${API_BASE}/auth/login`, {
@@ -20,7 +20,7 @@ export async function login(email: string, password: string) {
   return res.json() as Promise<{
     access_token: string;
     expires_in: number;
-    user: { id: number; email: string };
+    user: User;
   }>;
 }
 
@@ -43,4 +43,18 @@ export async function register(name: string, email: string, password: string) {
     expires_in: number;
     user: User;
   }>;
+}
+
+export async function fetchUserProfile(token: string) {
+  const res = await fetch(`${API_BASE}/users/me`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch user profile");
+  }
+
+  return res.json();
 }
