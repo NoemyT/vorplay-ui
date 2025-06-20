@@ -6,14 +6,14 @@ import SearchBar from "../components/SearchBar";
 
 type HeaderProps = {
   onSelectSection: (section: string) => void;
+  onSearch: (query: string) => void;
 };
 
-export default function Header({ onSelectSection }: HeaderProps) {
+export default function Header({ onSelectSection, onSearch }: HeaderProps) {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const navLink = { name: "account" };
 
   const handleLogout = () => {
     setUser(null);
@@ -53,9 +53,14 @@ export default function Header({ onSelectSection }: HeaderProps) {
           <span className="font-semibold">Vorplay</span>
         </div>
 
-        <SearchBar />
+        <SearchBar
+          onSearch={(query) => {
+            onSelectSection("results");
+            onSearch(query);
+          }}
+        />
 
-        <div className="flex items-center gap-4 flex-shrink-0 relative">
+        <div className="flex items-center gap-4 w-[200px] justify-end">
           {!user ? (
             <>
               <Link
@@ -90,9 +95,7 @@ export default function Header({ onSelectSection }: HeaderProps) {
                   <div className="absolute right-0 mt-2 bg-white text-black rounded-md shadow-lg w-36 text-sm">
                     <ul className="flex flex-col py-2">
                       <li
-                        onClick={() =>
-                          onSelectSection(navLink.name.toLowerCase())
-                        }
+                        onClick={() => onSelectSection("account")}
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       >
                         Account

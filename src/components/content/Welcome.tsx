@@ -35,7 +35,7 @@ export default function Welcome() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 w-full max-w-[800px]">
           <Card className="bg-white/5 rounded-[16px] p-6 h-[280px] text-white shadow-none flex flex-col justify-center items-center text-center gap-4">
             <CardHeader className="text-xl text-[#292928] mt-2">
-              Give a 💜 to your favorite songs
+              💜 your favorite songs
             </CardHeader>
 
             <div className="flex items-center w-full max-w-[200px] gap-2">
@@ -45,12 +45,12 @@ export default function Welcome() {
             </div>
 
             <CardHeader className="text-xl text-[#292928]">
-              Create playlists to fit your mood
+              Create playlists
             </CardHeader>
           </Card>
           <Card className="bg-white/5 rounded-[16px] p-6 h-[280px] text-white shadow-none flex flex-col justify-center items-center text-center gap-4">
             <CardHeader className="text-xl text-[#292928] mt-2">
-              Revisit songs you’ve played
+              Revisit songs
             </CardHeader>
 
             <div className="flex items-center w-full max-w-[200px] gap-2">
@@ -60,7 +60,7 @@ export default function Welcome() {
             </div>
 
             <CardHeader className="text-xl text-[#292928]">
-              Follow users and see their likes
+              Follow other users
             </CardHeader>
           </Card>
         </div>

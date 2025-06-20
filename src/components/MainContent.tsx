@@ -7,12 +7,17 @@ import Playlists from "./content/Playlists";
 import Follows from "./content/Follows";
 import MyAccount from "./content/MyAccount";
 import UserAccount from "./content/UserAccount";
+import Results from "./content/Result";
 
 type MainContentProps = {
   selectedSection: string;
+  searchQuery?: string;
 };
 
-export default function MainContent({ selectedSection }: MainContentProps) {
+export default function MainContent({
+  selectedSection,
+  searchQuery,
+}: MainContentProps) {
   const renderContent = () => {
     switch (selectedSection.toLowerCase()) {
       case "reviews":
@@ -29,6 +34,8 @@ export default function MainContent({ selectedSection }: MainContentProps) {
         return <MyAccount />;
       case "follower":
         return <UserAccount />;
+      case "results":
+        return <Results type="tracks" query={searchQuery ?? ""} />;
       default:
         return <Welcome />;
     }
@@ -50,7 +57,6 @@ export default function MainContent({ selectedSection }: MainContentProps) {
           flex flex-col flex-grow
           px-6 py-4 h-full
           min-h-[364px]
-          justify-center items-center
         "
       >
         <div className="overflow-y-auto flex-grow">{renderContent()}</div>

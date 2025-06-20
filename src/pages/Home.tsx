@@ -1,4 +1,5 @@
 import { useSearchParams } from "react-router-dom";
+import { useState } from "react";
 
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
@@ -6,7 +7,7 @@ import MainContent from "../components/MainContent";
 
 export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
-  //const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const section = searchParams.get("section") || "default";
 
@@ -16,10 +17,16 @@ export default function Home() {
 
   return (
     <>
-      <Header />
+      <Header
+        onSelectSection={handleSectionChange}
+        onSearch={(query) => {
+          setSearchQuery(query);
+          handleSectionChange("results");
+        }}
+      />
       <div>
         <Sidebar onSelectSection={handleSectionChange} />
-        <MainContent selectedSection={section} />
+        <MainContent selectedSection={section} searchQuery={searchQuery} />
       </div>
     </>
   );

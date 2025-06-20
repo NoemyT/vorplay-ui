@@ -21,6 +21,11 @@ export default function SignUp() {
     e.preventDefault();
     setError(null);
 
+    if (name.trim().length < 3 || name.trim().length > 15) {
+      setError("Username must be between 3 and 15 characters");
+      return;
+    }
+
     if (password !== confirm) {
       setError("Passwords do not match");
       return;
@@ -29,7 +34,6 @@ export default function SignUp() {
     try {
       setLoading(true);
       const data = await register(name.trim(), email.trim(), password);
-      // Persist auth
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user", JSON.stringify(data.user));
       setUser(data.user);
