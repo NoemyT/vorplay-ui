@@ -26,6 +26,7 @@ export default function Sidebar({ onSelectSection }: SidebarProps) {
         w-full px-4 mt-4
         md:fixed md:top-[82px] md:bottom-[10px] md:left-[5px]
         md:w-[284px] md:mt-0
+        overflow-y-auto
       "
     >
       <Card

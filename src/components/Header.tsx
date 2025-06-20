@@ -4,11 +4,16 @@ import { useAuth } from "../context/authContext";
 import logo from "../assets/vorp.png";
 import SearchBar from "../components/SearchBar";
 
-export default function Header() {
+type HeaderProps = {
+  onSelectSection: (section: string) => void;
+};
+
+export default function Header({ onSelectSection }: HeaderProps) {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const navLink = { name: "account" };
 
   const handleLogout = () => {
     setUser(null);
@@ -85,10 +90,9 @@ export default function Header() {
                   <div className="absolute right-0 mt-2 bg-white text-black rounded-md shadow-lg w-36 text-sm">
                     <ul className="flex flex-col py-2">
                       <li
-                        onClick={() => {
-                          navigate("/?section=account");
-                          setDropdownOpen(false);
-                        }}
+                        onClick={() =>
+                          onSelectSection(navLink.name.toLowerCase())
+                        }
                         className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                       >
                         Account

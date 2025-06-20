@@ -5,6 +5,8 @@ import Favorites from "./content/Favorites";
 import History from "./content/History";
 import Playlists from "./content/Playlists";
 import Follows from "./content/Follows";
+import MyAccount from "./content/MyAccount";
+import UserAccount from "./content/UserAccount";
 
 type MainContentProps = {
   selectedSection: string;
@@ -23,6 +25,10 @@ export default function MainContent({ selectedSection }: MainContentProps) {
         return <Playlists />;
       case "follows":
         return <Follows />;
+      case "account":
+        return <MyAccount />;
+      case "follower":
+        return <UserAccount />;
       default:
         return <Welcome />;
     }
@@ -44,6 +50,7 @@ export default function MainContent({ selectedSection }: MainContentProps) {
           flex flex-col flex-grow
           px-6 py-4 h-full
           min-h-[364px]
+          justify-center items-center
         "
       >
         <div className="overflow-y-auto flex-grow">{renderContent()}</div>
