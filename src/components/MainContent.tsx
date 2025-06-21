@@ -1,22 +1,25 @@
 import { Card } from "../components/ui/Card";
 import Reviews from "./content/Reviews";
-import Welcome from "./content/Welcome";
 import Favorites from "./content/Favorites";
 import History from "./content/History";
 import Playlists from "./content/Playlists";
 import Follows from "./content/Follows";
 import MyAccount from "./content/MyAccount";
 import UserAccount from "./content/UserAccount";
-import Results from "./content/Result";
+import Results from "./content/Results";
+import Albums from "./content/Albums";
+import Welcome from "./content/Welcome";
 
 type MainContentProps = {
   selectedSection: string;
   searchQuery?: string;
+  userId?: string; // Add userId prop for UserAccount
 };
 
 export default function MainContent({
   selectedSection,
   searchQuery,
+  userId,
 }: MainContentProps) {
   const renderContent = () => {
     switch (selectedSection.toLowerCase()) {
@@ -32,10 +35,16 @@ export default function MainContent({
         return <Follows />;
       case "account":
         return <MyAccount />;
-      case "follower":
-        return <UserAccount />;
+      case "user": // New case for UserAccount
+        return userId ? (
+          <UserAccount userId={userId} />
+        ) : (
+          <p className="text-white">User ID not provided.</p>
+        );
       case "results":
-        return <Results type="tracks" query={searchQuery ?? ""} />;
+        return <Results query={searchQuery ?? ""} />;
+      case "albums":
+        return <Albums query={searchQuery ?? ""} />;
       default:
         return <Welcome />;
     }

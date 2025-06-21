@@ -1,4 +1,4 @@
-import { type User } from "../context/authContext";
+import type { User } from "../context/authContext";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -56,5 +56,29 @@ export async function fetchUserProfile(token: string) {
     throw new Error("Failed to fetch user profile");
   }
 
-  return res.json();
+  return res.json() as Promise<User>;
+}
+
+// Define a type for the update payload that includes optional password
+type UpdateUserPayload = Partial<User> & { password?: string };
+
+export async function updateUserProfile(
+  token: string,
+  userData: UpdateUserPayload
+) {
+  const res = await fetch(`${API_BASE}/users/me`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(userData),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to update user profile");
+  }
+
+  return res.json() as Promise<User>;
 }

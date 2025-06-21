@@ -1,3 +1,5 @@
+"use client";
+
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/authContext";
@@ -45,22 +47,35 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
 
   return (
     <header className="w-full bg-black text-[#8a2be2] relative z-50">
-      <div className="w-full px-6 py-4 flex items-center justify-between relative h-[60px]">
+      <div className="w-full px-6 py-4 flex items-center relative h-[60px]">
+        {" "}
+        {/* Removed justify-between */}
+        {/* Left Section */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <Link to="/">
-            <img src={logo} alt="Logo" className="h-10 w-auto rounded-[20px]" />
+            <img
+              src={logo || "/placeholder.svg"}
+              alt="Logo"
+              className="h-10 w-auto rounded-[20px]"
+            />
           </Link>
           <span className="font-semibold">Vorplay</span>
         </div>
-
-        <SearchBar
-          onSearch={(query) => {
-            onSelectSection("results");
-            onSearch(query);
-          }}
-        />
-
-        <div className="flex items-center gap-4 w-[200px] justify-end">
+        {/* Search Bar (Centered) */}
+        <div className="flex-grow flex justify-center mx-4">
+          {" "}
+          {/* Added flex-grow and justify-center */}
+          <SearchBar
+            onSearch={(query) => {
+              onSelectSection("results");
+              onSearch(query);
+            }}
+          />
+        </div>
+        {/* Right Section */}
+        <div className="flex items-center gap-4 flex-shrink-0">
+          {" "}
+          {/* Removed w-[200px] and justify-end */}
           {!user ? (
             <>
               <Link

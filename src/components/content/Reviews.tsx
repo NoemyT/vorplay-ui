@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { TiStarFullOutline } from "react-icons/ti";
 import { FaTrashAlt } from "react-icons/fa";
@@ -21,10 +23,17 @@ type Review = {
 
 export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
-  useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
 
   useEffect(() => {
     async function fetchReviews() {
+      if (!user) {
+        setError("You must be logged in to view your reviews.");
+        setLoading(false);
+        return;
+      }
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(`${import.meta.env.VITE_API_URL}/reviews`, {
@@ -37,15 +46,18 @@ export default function Reviews() {
           const data = await res.json();
           setReviews(data);
         } else {
-          console.error("Failed to fetch reviews");
+          setError("Failed to fetch reviews. Please try again.");
         }
       } catch (err) {
+        setError("An unexpected error occurred while fetching reviews.");
         console.error("Error:", err);
+      } finally {
+        setLoading(false);
       }
     }
 
     fetchReviews();
-  }, []);
+  }, [user]);
 
   async function deleteReview(id: number) {
     const confirm = window.confirm(
@@ -65,11 +77,34 @@ export default function Reviews() {
       if (res.ok) {
         setReviews((prev) => prev.filter((r) => r.id !== id));
       } else {
-        alert("Failed to delete review.");
+        alert("Failed to delete review. Please try again.");
       }
     } catch (err) {
       console.error("Error:", err);
+      alert("An unexpected error occurred while deleting the review.");
     }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70">
+        <TiStarFullOutline size={48} className="mb-4 text-[#8a2be2]" />
+        <p className="text-lg">Loading your reviews...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70">
+        <TiStarFullOutline size={48} className="mb-4 text-red-400" />
+        <p className="text-lg">Oops! Something went wrong.</p>
+        <p className="text-sm text-red-300">{error}</p>
+        <p className="text-sm mt-2">
+          Please try refreshing the page or logging in again.
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -85,6 +120,7 @@ export default function Reviews() {
         <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70">
           <TiStarFullOutline size={48} className="mb-4 text-[#8a2be2]" />
           <p className="text-lg">You haven’t written any reviews yet.</p>
+          <p className="text-sm">Search for tracks and share your thoughts!</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
@@ -96,7 +132,7 @@ export default function Reviews() {
               {/* Trash icon */}
               <button
                 onClick={() => deleteReview(review.id)}
-                className="absolute top-3 right-3 text-red-400 hover:text-red-300"
+                className="absolute top-3 right-3 text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
               >
                 <FaTrashAlt size={16} />
               </button>
@@ -104,7 +140,7 @@ export default function Reviews() {
               {/* Top section: image + title */}
               <div className="flex gap-4 items-start">
                 <img
-                  src={review.coverUrl}
+                  src={review.coverUrl || "/placeholder.svg?height=64&width=64"}
                   alt="cover"
                   className="w-16 h-16 rounded-md object-cover"
                 />

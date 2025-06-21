@@ -1,3 +1,5 @@
+"use client";
+
 import { useSearchParams } from "react-router-dom";
 import { useState } from "react";
 
@@ -10,6 +12,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const section = searchParams.get("section") || "default";
+  const userId = searchParams.get("userId"); // Get userId from search params
 
   const handleSectionChange = (newSection: string) => {
     setSearchParams({ section: newSection.toLowerCase() });
@@ -21,12 +24,16 @@ export default function Home() {
         onSelectSection={handleSectionChange}
         onSearch={(query) => {
           setSearchQuery(query);
-          handleSectionChange("results");
+          setSearchParams({ section: "results", query: query }); // Update search params for results
         }}
       />
       <div>
         <Sidebar onSelectSection={handleSectionChange} />
-        <MainContent selectedSection={section} searchQuery={searchQuery} />
+        <MainContent
+          selectedSection={section}
+          searchQuery={searchQuery}
+          userId={userId ?? undefined}
+        />
       </div>
     </>
   );

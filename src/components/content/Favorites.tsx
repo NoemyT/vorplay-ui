@@ -1,7 +1,111 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { TiHeartFullOutline } from "react-icons/ti";
-//import { Card } from "../ui/Card";
+import { FaTrashAlt } from "react-icons/fa";
+import { Card } from "../ui/Card";
+import { useAuth } from "../../context/authContext";
+
+type Favorite = {
+  id: number;
+  trackId: number;
+  externalId: string;
+  title: string;
+  artist: { name?: string }; // Assuming artist has a name property
+  album: { name?: string }; // Assuming album has a name property
+  coverUrl: string;
+  createdAt: string;
+};
 
 export default function Favorites() {
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    async function fetchFavorites() {
+      if (!user) {
+        setError("You must be logged in to view your favorites.");
+        setLoading(false);
+        return;
+      }
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/favorites`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          setFavorites(data);
+        } else {
+          setError("Failed to fetch favorites. Please try again.");
+        }
+      } catch (err) {
+        setError("An unexpected error occurred while fetching favorites.");
+        console.error("Error:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchFavorites();
+  }, [user]);
+
+  async function deleteFavorite(trackId: number) {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to remove this from your favorites?"
+    );
+    if (!confirmDelete) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/favorites/${trackId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (res.ok) {
+        setFavorites((prev) => prev.filter((fav) => fav.trackId !== trackId));
+      } else {
+        alert("Failed to remove favorite. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("An unexpected error occurred while removing the favorite.");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70">
+        <TiHeartFullOutline size={48} className="mb-4 text-[#8a2be2]" />
+        <p className="text-lg">Loading your favorite tracks...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70">
+        <TiHeartFullOutline size={48} className="mb-4 text-red-400" />
+        <p className="text-lg">Oops! Something went wrong.</p>
+        <p className="text-sm text-red-300">{error}</p>
+        <p className="text-sm mt-2">
+          Please try refreshing the page or logging in again.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col w-full h-full">
       {/* Header */}
@@ -10,25 +114,56 @@ export default function Favorites() {
         <span>Favorites</span>
       </div>
 
-      {/* Reviews list or empty state
+      {/* Favorites list or empty state */}
       {favorites.length === 0 ? (
         <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70">
           <TiHeartFullOutline size={48} className="mb-4 text-[#8a2be2]" />
-          <p className="text-lg">You haven’t written any reviews yet.</p>
+          <p className="text-lg">You haven’t added any favorite tracks yet.</p>
+          <p className="text-sm">
+            Search for tracks and add them to your favorites!
+          </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
           {favorites.map((favorite) => (
             <Card
               key={favorite.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white"
+              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative"
             >
-              <h3 className="text-lg font-semibold mb-1">{favorite.title}</h3>
-              <p className="text-sm opacity-80">{favorite.content}</p>
+              {/* Trash icon */}
+              <button
+                onClick={() => deleteFavorite(favorite.trackId)}
+                className="absolute top-3 right-3 text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
+              >
+                <FaTrashAlt size={16} />
+              </button>
+
+              {/* Top section: image + title */}
+              <div className="flex gap-4 items-start">
+                <img
+                  src={
+                    favorite.coverUrl || "/placeholder.svg?height=64&width=64"
+                  }
+                  alt="cover"
+                  className="w-16 h-16 rounded-md object-cover"
+                />
+                <div className="flex flex-col">
+                  <h3 className="text-lg font-semibold">{favorite.title}</h3>
+                  <p className="text-sm text-white/70">
+                    {favorite.artist?.name || "Unknown artist"} •{" "}
+                    {favorite.album?.name || "Unknown album"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Date (optional) */}
+              <p className="text-xs text-white/50 mt-2">
+                Added on {new Date(favorite.createdAt).toLocaleDateString()}
+              </p>
             </Card>
           ))}
         </div>
-      )} */}
+      )}
     </div>
   );
 }
