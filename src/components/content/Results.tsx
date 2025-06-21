@@ -32,9 +32,9 @@ export default function Results({ query }: ResultsProps) {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<
-    "tracks" | "artists" | "users" | "albums"
-  >("tracks");
+  const [activeTab, setActiveTab] = useState<"tracks" | "artists" | "users">(
+    "tracks"
+  );
 
   useEffect(() => {
     if (!query) {
@@ -147,7 +147,10 @@ export default function Results({ query }: ResultsProps) {
           </button>
         ))}
       </div>
-      <div className="flex-grow overflow-y-auto pr-2">{renderContent()}</div>
+      {/* Added min-h-0 to ensure flex-grow behaves correctly within a flex column */}
+      <div className="flex-grow overflow-y-auto pr-2 min-h-0">
+        {renderContent()}
+      </div>
     </div>
   );
 }
