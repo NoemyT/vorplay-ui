@@ -8,7 +8,7 @@ import MyAccount from "./content/MyAccount";
 import UserAccount from "./content/UserAccount";
 import Results from "./content/Results";
 import Albums from "./content/Albums";
-import Welcome from "./content/Welcome";
+import Welcome from "./content/Welcome"; // Import Welcome component
 
 type MainContentProps = {
   selectedSection: string;
@@ -68,7 +68,8 @@ export default function MainContent({
           min-h-[364px]
         "
       >
-        <div className="overflow-y-auto flex-grow">{renderContent()}</div>
+        <div className="overflow-y-auto flex-grow">{renderContent()}</div>{" "}
+        {/* Added pt-4 for spacing */}
       </Card>
     </div>
   );

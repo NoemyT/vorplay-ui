@@ -5,17 +5,11 @@ import { TiHeartFullOutline } from "react-icons/ti";
 import { FaTrashAlt } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
-
-type Favorite = {
-  id: number;
-  trackId: number;
-  externalId: string;
-  title: string;
-  artist: { name?: string }; // Assuming artist has a name property
-  album: { name?: string }; // Assuming album has a name property
-  coverUrl: string;
-  createdAt: string;
-};
+import {
+  fetchUserFavorites,
+  removeFavorite,
+  type Favorite,
+} from "../../lib/api";
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -23,8 +17,30 @@ export default function Favorites() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
+  const refreshFavorites = async () => {
+    if (!user) return;
+
+    setLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("Authentication token missing.");
+
+      console.log("Refreshing favorites from server...");
+      const data = await fetchUserFavorites(token, user.id);
+      console.log("Fresh favorites data from server:", data);
+      setFavorites(data);
+      setError(null);
+      alert("Favorites refreshed!");
+    } catch (err) {
+      setError((err as Error).message || "Failed to refresh favorites.");
+      console.error("Error refreshing favorites:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    async function fetchFavorites() {
+    async function loadFavorites() {
       if (!user) {
         setError("You must be logged in to view your favorites.");
         setLoading(false);
@@ -32,30 +48,32 @@ export default function Favorites() {
       }
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/favorites`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setFavorites(data);
-        } else {
-          setError("Failed to fetch favorites. Please try again.");
+        if (!token) {
+          setError("Authentication token missing. Please log in again.");
+          setLoading(false);
+          return;
         }
+        const data = await fetchUserFavorites(token, user.id);
+        setFavorites(data);
+        setError(null);
       } catch (err) {
-        setError("An unexpected error occurred while fetching favorites.");
+        setError(
+          (err as Error).message ||
+            "Failed to fetch favorites. Please try again."
+        );
         console.error("Error:", err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchFavorites();
+    loadFavorites();
   }, [user]);
 
-  async function deleteFavorite(trackId: number) {
+  async function handleDeleteFavorite(favoriteId: number) {
+    console.log(`Attempting to delete favorite with ID: ${favoriteId}`);
+    console.log("Current favorites state:", favorites);
+
     const confirmDelete = window.confirm(
       "Are you sure you want to remove this from your favorites?"
     );
@@ -63,24 +81,43 @@ export default function Favorites() {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/favorites/${trackId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      if (!token) throw new Error("Authentication token missing.");
 
-      if (res.ok) {
-        setFavorites((prev) => prev.filter((fav) => fav.trackId !== trackId));
-      } else {
-        alert("Failed to remove favorite. Please try again.");
-      }
+      console.log(
+        `Making DELETE request to: ${
+          import.meta.env.VITE_API_URL
+        }/favorites/${favoriteId}`
+      );
+      await removeFavorite(token, favoriteId);
+
+      console.log(
+        `Successfully deleted favorite ${favoriteId}, updating state`
+      );
+      setFavorites((prev) => {
+        const updated = prev.filter((fav) => fav.id !== favoriteId);
+        console.log("Updated favorites after deletion:", updated);
+        return updated;
+      });
+
+      alert("Successfully removed from favorites!");
     } catch (err) {
-      console.error("Error:", err);
-      alert("An unexpected error occurred while removing the favorite.");
+      console.error("Error deleting favorite:", err);
+      const errorMessage =
+        (err as Error).message ||
+        "An unexpected error occurred while removing the favorite.";
+
+      // If the favorite doesn't exist on the server, remove it from local state anyway
+      if (errorMessage.includes("not found") || errorMessage.includes("404")) {
+        console.log("Favorite not found on server, removing from local state");
+        setFavorites((prev) => {
+          const updated = prev.filter((fav) => fav.id !== favoriteId);
+          console.log("Updated favorites after local removal:", updated);
+          return updated;
+        });
+        alert("Item was already removed from favorites.");
+      } else {
+        alert(errorMessage);
+      }
     }
   }
 
@@ -112,13 +149,20 @@ export default function Favorites() {
       <div className="flex items-center gap-2 mb-4 text-2xl font-bold text-white">
         <TiHeartFullOutline className="text-[#8a2be2]" size={28} />
         <span>Favorites</span>
+        <button
+          onClick={refreshFavorites}
+          className="ml-auto bg-[#8a2be2] text-white px-3 py-1 rounded-full text-sm hover:bg-[#7a1fd1] transition-colors"
+          disabled={loading}
+        >
+          {loading ? "Refreshing..." : "Refresh"}
+        </button>
       </div>
 
       {/* Favorites list or empty state */}
       {favorites.length === 0 ? (
         <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70">
           <TiHeartFullOutline size={48} className="mb-4 text-[#8a2be2]" />
-          <p className="text-lg">You haven’t added any favorite tracks yet.</p>
+          <p className="text-lg">You haven't added any favorite tracks yet.</p>
           <p className="text-sm">
             Search for tracks and add them to your favorites!
           </p>
@@ -132,7 +176,7 @@ export default function Favorites() {
             >
               {/* Trash icon */}
               <button
-                onClick={() => deleteFavorite(favorite.trackId)}
+                onClick={() => handleDeleteFavorite(favorite.id)}
                 className="absolute top-3 right-3 text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
               >
                 <FaTrashAlt size={16} />

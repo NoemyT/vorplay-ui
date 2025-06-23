@@ -31,7 +31,9 @@ export default function Results({ query }: ResultsProps) {
   const [artists, setArtists] = useState<ArtistSummaryDto[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [trackError, setTrackError] = useState<string | null>(null); // Specific error for tracks
+  const [artistError, setArtistError] = useState<string | null>(null); // Specific error for artists
+  const [userError, setUserError] = useState<string | null>(null); // Specific error for users
   const [activeTab, setActiveTab] = useState<"tracks" | "artists" | "users">(
     "tracks"
   );
@@ -41,53 +43,98 @@ export default function Results({ query }: ResultsProps) {
       setTracks([]);
       setArtists([]);
       setUsers([]);
-      setError(null);
+      setTrackError(null);
+      setArtistError(null);
+      setUserError(null);
       return;
     }
 
     setLoading(true);
-    setError(null);
+    setTrackError(null);
+    setArtistError(null);
+    setUserError(null);
 
     const fetchAllResults = async () => {
-      try {
-        const [tracksRes, artistsRes, usersRes] = await Promise.all([
-          fetch(
-            `${
-              import.meta.env.VITE_API_URL
-            }/tracks/search?query=${encodeURIComponent(query)}`
-          ),
-          fetch(
-            `${
-              import.meta.env.VITE_API_URL
-            }/artists/search?query=${encodeURIComponent(query)}`
-          ),
-          fetch(
-            `${
-              import.meta.env.VITE_API_URL
-            }/users/search?query=${encodeURIComponent(query)}`
-          ),
-        ]);
+      const trackPromise = fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/tracks/search?query=${encodeURIComponent(query)}`
+      );
+      const artistPromise = fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/artists/search?query=${encodeURIComponent(query)}`
+      );
+      const userPromise = fetch(
+        `${
+          import.meta.env.VITE_API_URL
+        }/users/search?query=${encodeURIComponent(query)}`
+      );
 
-        if (!tracksRes.ok)
-          throw new Error(`Error fetching tracks: ${tracksRes.status}`);
-        if (!artistsRes.ok)
-          throw new Error(`Error fetching artists: ${artistsRes.status}`);
-        if (!usersRes.ok)
-          throw new Error(`Error fetching users: ${usersRes.status}`);
+      const results = await Promise.allSettled([
+        trackPromise,
+        artistPromise,
+        userPromise,
+      ]);
 
-        const tracksData = await tracksRes.json();
-        const artistsData = await artistsRes.json();
-        const usersData = await usersRes.json();
-
-        setTracks(tracksData.items || []);
-        setArtists(artistsData.items || []);
-        setUsers(usersData || []); // Users endpoint returns array directly
-      } catch (err) {
-        if (err instanceof Error) setError(err.message);
-        else setError("Unknown error during search");
-      } finally {
-        setLoading(false);
+      // Process Tracks
+      if (results[0].status === "fulfilled") {
+        const tracksRes = results[0].value;
+        if (tracksRes.ok) {
+          const tracksData = await tracksRes.json();
+          setTracks(tracksData.items || []);
+        } else {
+          setTrackError(`Error fetching tracks: ${tracksRes.status}`);
+          setTracks([]);
+        }
+      } else {
+        setTrackError(
+          `Network error fetching tracks: ${
+            results[0].reason?.message || "Unknown error"
+          }`
+        );
+        setTracks([]);
       }
+
+      // Process Artists
+      if (results[1].status === "fulfilled") {
+        const artistsRes = results[1].value;
+        if (artistsRes.ok) {
+          const artistsData = await artistsRes.json();
+          setArtists(artistsData.items || []);
+        } else {
+          setArtistError(`Error fetching artists: ${artistsRes.status}`);
+          setArtists([]);
+        }
+      } else {
+        setArtistError(
+          `Network error fetching artists: ${
+            results[1].reason?.message || "Unknown error"
+          }`
+        );
+        setArtists([]);
+      }
+
+      // Process Users
+      if (results[2].status === "fulfilled") {
+        const usersRes = results[2].value;
+        if (usersRes.ok) {
+          const usersData = await usersRes.json();
+          setUsers(usersData || []);
+        } else {
+          setUserError(`Error fetching users: ${usersRes.status}`);
+          setUsers([]);
+        }
+      } else {
+        setUserError(
+          `Network error fetching users: ${
+            results[2].reason?.message || "Unknown error"
+          }`
+        );
+        setUsers([]);
+      }
+
+      setLoading(false);
     };
 
     fetchAllResults();
@@ -96,7 +143,6 @@ export default function Results({ query }: ResultsProps) {
   const renderContent = () => {
     if (loading)
       return <p className="text-white">Loading results for "{query}"...</p>;
-    if (error) return <p className="text-red-400">Error: {error}</p>;
     if (!query)
       return (
         <p className="text-white">
@@ -104,13 +150,26 @@ export default function Results({ query }: ResultsProps) {
         </p>
       );
 
+    // Display specific errors if they exist, otherwise render content
     switch (activeTab) {
       case "tracks":
-        return <Tracks tracks={tracks} query={query} />;
+        return trackError ? (
+          <p className="text-red-400">Error fetching tracks: {trackError}</p>
+        ) : (
+          <Tracks tracks={tracks} query={query} />
+        );
       case "artists":
-        return <Artists artists={artists} query={query} />;
+        return artistError ? (
+          <p className="text-red-400">Error fetching artists: {artistError}</p>
+        ) : (
+          <Artists artists={artists} query={query} />
+        );
       case "users":
-        return <Users users={users} query={query} />;
+        return userError ? (
+          <p className="text-red-400">Error fetching users: {userError}</p>
+        ) : (
+          <Users users={users} query={query} />
+        );
       default:
         return null;
     }
@@ -128,7 +187,8 @@ export default function Results({ query }: ResultsProps) {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex gap-4 mb-4 overflow-x-auto pb-2">
+      <div className="flex gap-4 mb-2 overflow-x-auto pb-1 flex-shrink-0">
+        {" "}
         {tabs.map((tab) => (
           <button
             key={tab.type}
@@ -147,7 +207,6 @@ export default function Results({ query }: ResultsProps) {
           </button>
         ))}
       </div>
-      {/* Added min-h-0 to ensure flex-grow behaves correctly within a flex column */}
       <div className="flex-grow overflow-y-auto pr-2 min-h-0">
         {renderContent()}
       </div>
