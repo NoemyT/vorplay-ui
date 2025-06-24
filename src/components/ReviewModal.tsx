@@ -5,16 +5,10 @@ import { useState, useEffect } from "react";
 import { FaStar, FaTimes } from "react-icons/fa";
 import { Card } from "./ui/Card";
 import { useAuth } from "../context/authContext";
-import {
-  createReview,
-  updateReview,
-  type Review,
-  type ReviewPayload,
-  type ReviewUpdatePayload,
-} from "../lib/api";
+import { createReview, type Review, type ReviewPayload } from "../lib/api"; // Removed deleteReviewApi as it's no longer used here
 
 type TrackDetails = {
-  id: string; // Spotify track ID
+  id: string; // Spotify track ID (string)
   title: string;
   artistNames: string[];
   albumName: string;
@@ -25,34 +19,34 @@ type ReviewModalProps = {
   isOpen: boolean;
   onClose: () => void;
   track: TrackDetails;
-  existingReview?: Review | null;
-  onReviewSubmitted: (review: Review) => void;
+  onReviewSubmitted: (newReview: Review) => void; // MODIFIED: Removed oldReviewId parameter
+  // REMOVED: existingReview prop is no longer needed here
 };
 
-const MAX_COMMENT_LENGTH = 250;
+const MAX_COMMENT_LENGTH = 150;
 
 export default function ReviewModal({
   isOpen,
   onClose,
   track,
-  existingReview,
   onReviewSubmitted,
 }: ReviewModalProps) {
   const { user } = useAuth();
-  const [rating, setRating] = useState(existingReview?.rating || 0);
-  const [comment, setComment] = useState(existingReview?.comment || "");
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (isOpen) {
-      setRating(existingReview?.rating || 0);
-      setComment(existingReview?.comment || "");
       setError(null);
       setSuccess(null);
+      // Always reset form for a new review, as existingReview prop is removed
+      setRating(0);
+      setComment("");
     }
-  }, [isOpen, existingReview]);
+  }, [isOpen]); // MODIFIED: Removed existingReview from dependencies
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,34 +74,16 @@ export default function ReviewModal({
     }
 
     try {
-      let submittedReview: Review;
-      if (existingReview) {
-        // Update existing review
-        const payload: ReviewUpdatePayload = {};
-        if (rating !== existingReview.rating) payload.rating = rating;
-        if (comment !== existingReview.comment) payload.comment = comment;
-
-        if (Object.keys(payload).length === 0) {
-          setSuccess("No changes to save.");
-          setLoading(false);
-          onClose();
-          return;
-        }
-
-        submittedReview = await updateReview(token, existingReview.id, payload);
-        setSuccess("Review updated successfully!");
-      } else {
-        // Create new review
-        const payload: ReviewPayload = {
-          trackId: track.id, // Changed from externalId to trackId
-          rating,
-          comment,
-        };
-        submittedReview = await createReview(token, payload);
-        setSuccess("Review submitted successfully!");
-      }
-      onReviewSubmitted(submittedReview);
-      setTimeout(onClose, 1500); // Close modal after a short delay
+      // REMOVED: No more delete logic here. This modal only creates new reviews.
+      const payload: ReviewPayload = {
+        id: track.id,
+        rating,
+        comment,
+      };
+      const submittedReview = await createReview(token, payload);
+      setSuccess("Review submitted successfully!");
+      onReviewSubmitted(submittedReview); // MODIFIED: Only pass newReview
+      setTimeout(onClose, 1500);
     } catch (err) {
       setError((err as Error).message || "Failed to submit review.");
       console.error("Review submission error:", err);
@@ -125,42 +101,30 @@ export default function ReviewModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <Card className="bg-neutral-800 rounded-[20px] p-6 w-full max-w-lg relative">
+      <Card className="bg-neutral-800 rounded-[20px] p-6 w-full max-w-sm relative flex flex-col max-h-[90vh]">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-white/70 hover:text-white"
         >
           <FaTimes size={20} />
         </button>
-
-        <h2 className="text-2xl font-bold text-white mb-4 text-center">
-          {existingReview ? "Edit Your Review" : "Write a Review"}
-        </h2>
-
-        <div className="flex items-center gap-4 mb-6">
-          <img
-            src={track.imageUrl || "/placeholder.svg?height=64&width=64"}
-            alt={track.albumName}
-            className="w-20 h-20 rounded-md object-cover flex-shrink-0"
-          />
-          <div className="flex-grow">
-            <h3 className="text-xl font-semibold text-white truncate">
-              {track.title}
-            </h3>{" "}
-            {/* Track title made more prominent */}
-            <p className="text-sm text-white/70 truncate">
-              {track.artistNames.join(", ")}
-            </p>
-          </div>
+        {/* Consolidated Song Information and Modal Title */}
+        <div className="flex flex-col items-center text-center mb-6 flex-shrink-0">
+          <h2 className="text-2xl font-bold text-white mb-1">{track.title}</h2>
+          <p className="text-base text-white/70">
+            {track.artistNames.join(", ")}
+          </p>
         </div>
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-4 overflow-y-auto pr-2"
+        >
           {/* Star Rating */}
           <div>
             <label className="block text-white text-sm font-medium mb-2">
               Your Rating:
             </label>
-            <div className="flex gap-1">
+            <div className="flex gap-1 justify-center">
               {Array.from({ length: 5 }).map((_, i) => (
                 <FaStar
                   key={i}
@@ -175,15 +139,13 @@ export default function ReviewModal({
               ))}
             </div>
           </div>
-
           {/* Comment */}
           <div>
             <label
               htmlFor="comment"
               className="block text-white text-sm font-medium mb-2"
             >
-              Your Review (Markdown supported, max {MAX_COMMENT_LENGTH}{" "}
-              characters):
+              Your Review (max {MAX_COMMENT_LENGTH} characters):
             </label>
             <textarea
               id="comment"
@@ -195,25 +157,21 @@ export default function ReviewModal({
               placeholder="Write your review here..."
               className="w-full p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none resize-none"
             />
-            <p className="text-right text-xs text-white/70">
+            <p className="text-right text-xs text-white/70 mt-1">
               {comment.length}/{MAX_COMMENT_LENGTH}
             </p>
           </div>
-
           {error && <p className="text-red-400 text-center">{error}</p>}
           {success && <p className="text-green-400 text-center">{success}</p>}
-
-          <button
-            type="submit"
-            className="bg-[#8a2be2] text-white py-2.5 px-10 rounded-full font-semibold hover:bg-[#7a1fd1] transition w-fit self-center"
-            disabled={loading}
-          >
-            {loading
-              ? "Submitting..."
-              : existingReview
-              ? "Update Review"
-              : "Submit Review"}
-          </button>
+          <div className="flex gap-3 justify-center mt-auto flex-shrink-0">
+            <button
+              type="submit"
+              className="bg-[#8a2be2] text-white py-2.5 px-8 rounded-full font-semibold hover:bg-[#7a1fd1] transition"
+              disabled={loading}
+            >
+              {loading ? "Processing..." : "Submit Review"}
+            </button>
+          </div>
         </form>
       </Card>
     </div>

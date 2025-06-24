@@ -59,7 +59,7 @@ export default function Favorites() {
       } catch (err) {
         setError(
           (err as Error).message ||
-            "Failed to fetch favorites. Please try again."
+            "Failed to fetch favorites. Please try again.",
         );
         console.error("Error:", err);
       } finally {
@@ -75,7 +75,7 @@ export default function Favorites() {
     console.log("Current favorites state:", favorites);
 
     const confirmDelete = window.confirm(
-      "Are you sure you want to remove this from your favorites?"
+      "Are you sure you want to remove this from your favorites?",
     );
     if (!confirmDelete) return;
 
@@ -86,12 +86,12 @@ export default function Favorites() {
       console.log(
         `Making DELETE request to: ${
           import.meta.env.VITE_API_URL
-        }/favorites/${favoriteId}`
+        }/favorites/${favoriteId}`,
       );
       await removeFavorite(token, favoriteId);
 
       console.log(
-        `Successfully deleted favorite ${favoriteId}, updating state`
+        `Successfully deleted favorite ${favoriteId}, updating state`,
       );
       setFavorites((prev) => {
         const updated = prev.filter((fav) => fav.id !== favoriteId);

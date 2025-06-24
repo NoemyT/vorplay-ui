@@ -1,12 +1,12 @@
 const API_BASE = import.meta.env.VITE_API_URL;
 
 export type Review = {
-  id: number;
-  trackId: string; // This is the external Spotify track ID
-  externalId: string; // Redundant, but kept for consistency if backend uses it
-  title: string; // Track title (from Spotify)
-  artist: { name?: string };
-  album: { name?: string };
+  id: number; // Database ID (number)
+  trackId: string; // Spotify track ID (string) - this is the external ID
+  externalId: string; // ADDED: This should be the Spotify track ID from the backend response
+  title: string; // Review title (user-provided)
+  artist: { name?: string } | string; // Can be an object with name, or just a string
+  album: { name?: string } | string; // Can be an object with name, or just a string
   coverUrl: string;
   rating: number;
   comment: string;
@@ -16,14 +16,10 @@ export type Review = {
 };
 
 export type ReviewPayload = {
-  trackId: string; // Changed to trackId to match backend expectation for Spotify ID
+  id: string; // Spotify track ID (string) - Backend expects 'id' for the external track ID
+  title: string; // Re-added title to payload type
   rating: number;
   comment: string;
-};
-
-export type ReviewUpdatePayload = {
-  rating?: number;
-  comment?: string;
 };
 
 export type Favorite = {
@@ -39,8 +35,10 @@ export type Favorite = {
 
 export async function createReview(
   token: string,
-  payload: ReviewPayload
+  payload: ReviewPayload,
 ): Promise<Review> {
+  console.log("API: Creating review with payload:", payload);
+
   const res = await fetch(`${API_BASE}/reviews`, {
     method: "POST",
     headers: {
@@ -50,38 +48,25 @@ export async function createReview(
     body: JSON.stringify(payload),
   });
 
+  console.log("API: Create review response status:", res.status);
+
   if (!res.ok) {
     const errorData = await res.json();
+    console.log("API: Create review error:", errorData);
     throw new Error(errorData.message || "Failed to create review.");
   }
-  return res.json();
-}
 
-export async function updateReview(
-  token: string,
-  reviewId: number,
-  payload: ReviewUpdatePayload
-): Promise<Review> {
-  const res = await fetch(`${API_BASE}/reviews/${reviewId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    const errorData = await res.json();
-    throw new Error(errorData.message || "Failed to update review.");
-  }
-  return res.json();
+  const result = await res.json();
+  console.log("API: Created review:", result);
+  return result;
 }
 
 export async function deleteReviewApi(
   token: string,
-  reviewId: number
+  reviewId: number,
 ): Promise<void> {
+  console.log("API: Deleting review with ID:", reviewId);
+
   const res = await fetch(`${API_BASE}/reviews/${reviewId}`, {
     method: "DELETE",
     headers: {
@@ -89,16 +74,26 @@ export async function deleteReviewApi(
     },
   });
 
+  console.log("API: Delete review response status:", res.status);
+
   if (!res.ok) {
-    const errorData = await res.json();
+    let errorData;
+    try {
+      errorData = await res.json();
+    } catch {
+      errorData = { message: `HTTP ${res.status}: ${res.statusText}` };
+    }
+    console.log("API: Remove favorite error data:", errorData);
     throw new Error(errorData.message || "Failed to delete review.");
   }
+
+  console.log("API: Successfully deleted review");
   return;
 }
 
 export async function fetchUserReviews(
   token: string,
-  userId: number
+  userId: number,
 ): Promise<Review[]> {
   const res = await fetch(`${API_BASE}/reviews/user/${userId}`, {
     headers: {
@@ -121,7 +116,7 @@ export async function addFavorite(
     artistNames: string[];
     albumName: string;
     imageUrl?: string;
-  }
+  },
 ): Promise<Favorite> {
   const res = await fetch(`${API_BASE}/favorites`, {
     method: "POST",
@@ -149,7 +144,7 @@ export async function addFavorite(
 
 export async function removeFavorite(
   token: string,
-  favoriteId: number
+  favoriteId: number,
 ): Promise<void> {
   console.log(`API: Attempting to remove favorite with ID: ${favoriteId}`);
 
@@ -179,7 +174,7 @@ export async function removeFavorite(
 
 export async function fetchUserFavorites(
   token: string,
-  userId: number
+  userId: number,
 ): Promise<Favorite[]> {
   console.log(`API: Fetching favorites for user ${userId}`);
 
@@ -198,7 +193,7 @@ export async function fetchUserFavorites(
   const data = await res.json();
   console.log(
     `API: Fetched ${data.length} favorites for user ${userId}:`,
-    data
+    data,
   );
   return data;
 }

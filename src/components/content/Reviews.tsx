@@ -2,11 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { TiStarFullOutline } from "react-icons/ti";
-import { FaTrashAlt, FaPencilAlt, FaTimes } from "react-icons/fa";
+import { FaTrashAlt, FaTimes } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
 import { fetchUserReviews, deleteReviewApi, type Review } from "../../lib/api";
-import ReviewModal from "../ReviewModal"; // Import the ReviewModal
 
 export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -18,44 +17,41 @@ export default function Reviews() {
   const [selectedReviewForView, setSelectedReviewForView] =
     useState<Review | null>(null);
 
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [selectedReviewForEdit, setSelectedReviewForEdit] =
-    useState<Review | null>(null);
-
-  useEffect(() => {
-    // Move loadReviews inside useEffect
-    const loadReviews = async () => {
-      if (!user) {
-        setError("You must be logged in to view your reviews.");
+  const loadReviews = async () => {
+    if (!user) {
+      setError("You must be logged in to view your reviews.");
+      setLoading(false);
+      return;
+    }
+    // Extract userId here to satisfy linter and ensure non-null access
+    const userId = user.id;
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Authentication token missing. Please log in again.");
         setLoading(false);
         return;
       }
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setError("Authentication token missing. Please log in again.");
-          setLoading(false);
-          return;
-        }
-        const data = await fetchUserReviews(token, user.id);
-        setReviews(data);
-        setError(null);
-      } catch (err) {
-        setError(
-          (err as Error).message || "Failed to fetch reviews. Please try again."
-        );
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+      const data = await fetchUserReviews(token, userId);
+      setReviews(data);
+      setError(null);
+    } catch (err) {
+      setError(
+        (err as Error).message || "Failed to fetch reviews. Please try again.",
+      );
+      console.error("Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  useEffect(() => {
     loadReviews();
-  }, [user]); // Now 'user' is the only dependency for this effect
+  }, [user]);
 
   async function handleDeleteReview(id: number) {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this review?"
+      "Are you sure you want to delete this review?",
     );
     if (!confirmDelete) return;
 
@@ -64,37 +60,15 @@ export default function Reviews() {
       if (!token) throw new Error("Authentication token missing.");
       await deleteReviewApi(token, id);
       setReviews((prev) => prev.filter((r) => r.id !== id));
+      alert("Review deleted successfully!");
     } catch (err) {
       alert(
         (err as Error).message ||
-          "An unexpected error occurred while deleting the review."
+          "An unexpected error occurred while deleting the review.",
       );
       console.error("Error:", err);
     }
   }
-
-  const handleEditReview = (review: Review) => {
-    setSelectedReviewForEdit(review);
-    setIsEditModalOpen(true);
-  };
-
-  const handleReviewSubmitted = (updatedReview: Review) => {
-    // Update the reviews list with the new/updated review
-    setReviews((prevReviews) => {
-      const existingIndex = prevReviews.findIndex(
-        (r) => r.id === updatedReview.id
-      );
-      if (existingIndex > -1) {
-        return prevReviews.map((r, index) =>
-          index === existingIndex ? updatedReview : r
-        );
-      } else {
-        return [...prevReviews, updatedReview]; // Should not happen for edits, but good for consistency
-      }
-    });
-    setIsEditModalOpen(false); // Close edit modal
-    setSelectedReviewForEdit(null);
-  };
 
   const openFullViewModal = (review: Review) => {
     setSelectedReviewForView(review);
@@ -145,75 +119,76 @@ export default function Reviews() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
-          {reviews.map((review) => (
-            <Card
-              key={review.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative flex gap-4 min-h-[160px] max-h-[160px] overflow-hidden cursor-pointer hover:bg-white/10 transition-colors"
-              onClick={() => openFullViewModal(review)}
-            >
-              {/* Track Image */}
-              <img
-                src={review.coverUrl || "/placeholder.svg?height=96&width=96"}
-                alt={review.title}
-                className="w-24 h-24 rounded-md object-cover flex-shrink-0"
-              />
+          {reviews.map((review) => {
+            const artistName =
+              typeof review.artist === "string"
+                ? review.artist
+                : review.artist?.name || "Unknown artist";
+            const albumName =
+              typeof review.album === "string"
+                ? review.album
+                : review.album?.name || "Unknown album";
 
-              <div className="flex flex-col flex-grow overflow-hidden">
-                {/* Star Rating */}
-                <div className="flex gap-[2px] mb-1">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <TiStarFullOutline
-                      key={i}
-                      size={20}
-                      className={
-                        i < review.rating ? "text-[#8a2be2]" : "text-white/30"
-                      }
-                    />
-                  ))}
+            return (
+              <Card
+                key={review.id}
+                className="bg-white/15 border border-white/10 p-4 rounded-xl text-white relative flex gap-4 h-[220px] hover:bg-white/20 transition-colors cursor-pointer"
+                onClick={() => openFullViewModal(review)}
+              >
+                {/* Track Image */}
+                <img
+                  src={review.coverUrl || "/placeholder.svg?height=96&width=96"}
+                  alt={review.title}
+                  className="w-28 h-28 rounded-md object-cover flex-shrink-0"
+                />
+
+                <div className="flex flex-col flex-grow min-w-0">
+                  {/* Track Title */}
+                  <h3 className="text-xl font-semibold leading-tight mb-1 break-all">
+                    {review.title}
+                  </h3>
+                  {/* Artist(s) & Album */}
+                  <p className="text-base text-white/70 mb-2 break-all">
+                    {artistName} • {albumName}
+                  </p>
+                  {/* Star Rating */}
+                  <div className="flex gap-[2px] mb-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <TiStarFullOutline
+                        key={i}
+                        size={20}
+                        className={
+                          i < review.rating ? "text-[#8a2be2]" : "text-white/30"
+                        }
+                      />
+                    ))}
+                  </div>
+                  {/* Review Comment */}
+                  <p className="text-sm opacity-90 break-all line-clamp-3 overflow-hidden">
+                    {review.comment}
+                  </p>
+                  <p className="text-xs text-white/50 mt-auto pt-2">
+                    Reviewed on{" "}
+                    {new Date(review.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
 
-                {/* Track Title */}
-                <h3 className="text-lg font-semibold leading-tight truncate">
-                  {review.title}
-                </h3>
-
-                {/* Artist(s) & Album */}
-                <p className="text-sm text-white/70 truncate mb-2">
-                  {review.artist?.name || "Unknown artist"} •{" "}
-                  {review.album?.name || "Unknown album"}
-                </p>
-
-                {/* Review Comment */}
-                <p className="text-sm opacity-90 line-clamp-3">
-                  {review.comment}
-                </p>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="absolute top-3 right-3 flex gap-2">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent card click from opening full view
-                    handleEditReview(review);
-                  }}
-                  className="text-white/70 hover:text-[#8a2be2] bg-transparent p-1 rounded-full"
-                  title="Edit Review"
-                >
-                  <FaPencilAlt size={16} />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent card click from opening full view
-                    handleDeleteReview(review.id);
-                  }}
-                  className="text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
-                  title="Delete Review"
-                >
-                  <FaTrashAlt size={16} />
-                </button>
-              </div>
-            </Card>
-          ))}
+                {/* Action Buttons */}
+                <div className="absolute top-3 right-3 flex gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteReview(review.id);
+                    }}
+                    className="text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
+                    title="Delete Review"
+                  >
+                    <FaTrashAlt size={16} />
+                  </button>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       )}
 
@@ -225,7 +200,7 @@ export default function Reviews() {
             if (e.target === e.currentTarget) closeFullViewModal();
           }}
         >
-          <Card className="bg-[#696969]/40 rounded-[20px] p-6 w-full max-w-2xl relative">
+          <Card className="bg-neutral-800 rounded-[20px] p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
             <button
               onClick={closeFullViewModal}
               className="absolute top-4 right-4 text-white/70 hover:text-white"
@@ -242,7 +217,7 @@ export default function Reviews() {
                 alt={selectedReviewForView.title}
                 className="w-32 h-32 rounded-md object-cover flex-shrink-0"
               />
-              <div className="flex flex-col flex-grow">
+              <div className="flex flex-col flex-grow min-w-0">
                 {/* Star Rating */}
                 <div className="flex gap-1 mb-2">
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -257,52 +232,35 @@ export default function Reviews() {
                     />
                   ))}
                 </div>
-
                 {/* Track Title */}
-                <h3 className="text-2xl font-bold text-white leading-tight mb-1">
+                <h3 className="text-2xl font-bold text-white leading-tight mb-1 break-all">
                   {selectedReviewForView.title}
                 </h3>
-
                 {/* Artist(s) & Album */}
-                <p className="text-base text-white/70 mb-4">
-                  {selectedReviewForView.artist?.name || "Unknown artist"} •{" "}
-                  {selectedReviewForView.album?.name || "Unknown album"}
+                <p className="text-base text-white/70 mb-4 break-all">
+                  {typeof selectedReviewForView.artist === "string"
+                    ? selectedReviewForView.artist
+                    : selectedReviewForView.artist?.name ||
+                      "Unknown artist"}{" "}
+                  •{" "}
+                  {typeof selectedReviewForView.album === "string"
+                    ? selectedReviewForView.album
+                    : selectedReviewForView.album?.name || "Unknown album"}
                 </p>
-
                 {/* Review Comment */}
-                <p className="text-base opacity-90 whitespace-pre-wrap">
+                <p className="text-base opacity-90 whitespace-pre-wrap break-all">
                   {selectedReviewForView.comment}
                 </p>
-
                 <p className="text-xs text-white/50 mt-4">
                   Reviewed on{" "}
                   {new Date(
-                    selectedReviewForView.createdAt
+                    selectedReviewForView.createdAt,
                   ).toLocaleDateString()}
                 </p>
               </div>
             </div>
           </Card>
         </div>
-      )}
-
-      {/* Edit Review Modal */}
-      {isEditModalOpen && selectedReviewForEdit && (
-        <ReviewModal
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          track={{
-            id: selectedReviewForEdit.externalId,
-            title: selectedReviewForEdit.title,
-            artistNames: selectedReviewForEdit.artist?.name
-              ? [selectedReviewForEdit.artist.name]
-              : [],
-            albumName: selectedReviewForEdit.album?.name || "",
-            imageUrl: selectedReviewForEdit.coverUrl,
-          }}
-          existingReview={selectedReviewForEdit}
-          onReviewSubmitted={handleReviewSubmitted}
-        />
       )}
     </div>
   );

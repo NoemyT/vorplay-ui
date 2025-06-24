@@ -9,9 +9,9 @@ import {
   fetchUserReviews,
   type Review,
   fetchUserFavorites,
-  addFavorite,
   type Favorite,
 } from "../../../lib/api";
+import { handleFavoriteToggle } from "../../../lib/utils"; // Corrected import for handleFavoriteToggle
 
 type TrackSummaryDto = {
   id: string;
@@ -31,11 +31,11 @@ export default function Tracks({ tracks, query }: TracksProps) {
   const { user } = useAuth();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<TrackSummaryDto | null>(
-    null
+    null,
   );
-  const [existingReview, setExistingReview] = useState<Review | null>(null);
   const [userReviews, setUserReviews] = useState<Review[]>([]);
   const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
+  // REMOVED: existingReviewForModal state is no longer needed
 
   const refreshUserData = useCallback(async () => {
     if (!user) return;
@@ -43,15 +43,16 @@ export default function Tracks({ tracks, query }: TracksProps) {
     try {
       const token = localStorage.getItem("token");
       if (token) {
-        console.log("Refreshing user data...");
+        console.log("--- Refreshing User Data ---");
         const [reviews, favorites] = await Promise.all([
           fetchUserReviews(token, user.id),
           fetchUserFavorites(token, user.id),
         ]);
-        console.log("Fresh user reviews:", reviews);
-        console.log("Fresh user favorites:", favorites);
+        console.log("Fetched user reviews:", reviews); // Log fetched reviews
+        console.log("Fetched user favorites:", favorites); // Log fetched favorites
         setUserReviews(reviews);
         setUserFavorites(favorites);
+        console.log("--- User Data Refreshed ---");
       }
     } catch (err) {
       console.error("Failed to refresh user data:", err);
@@ -72,88 +73,21 @@ export default function Tracks({ tracks, query }: TracksProps) {
 
   const handleReviewClick = (track: TrackSummaryDto) => {
     setSelectedTrack(track);
-    const review = userReviews.find((r) => r.trackId === track.id);
-    setExistingReview(review || null);
+    // REMOVED: No need to find existing review here, as modal only creates new ones
     setIsReviewModalOpen(true);
   };
 
-  const handleReviewSubmitted = (newOrUpdatedReview: Review) => {
-    setUserReviews((prevReviews) => {
-      const existingIndex = prevReviews.findIndex(
-        (r) => r.id === newOrUpdatedReview.id
-      );
-      if (existingIndex > -1) {
-        return prevReviews.map((r, index) =>
-          index === existingIndex ? newOrUpdatedReview : r
-        );
-      } else {
-        return [...prevReviews, newOrUpdatedReview];
-      }
-    });
+  const handleReviewSubmitted = () => {
+    // MODIFIED: Removed newReview parameter
+    console.log("Review submitted, refreshing user data...");
+    refreshUserData(); // This will re-fetch and update the list, causing button to disappear
   };
 
-  const handleFavoriteToggle = async (track: TrackSummaryDto) => {
-    console.log(`=== FAVORITE TOGGLE START ===`);
-    console.log(`Track: ${track.title} (ID: ${track.id})`);
-    console.log("Current userFavorites state:", userFavorites);
-
-    if (!user) {
-      alert("You must be logged in to favorite tracks.");
-      return;
-    }
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Authentication token missing. Please log in again.");
-      return;
-    }
-
-    const existingFavorite = userFavorites.find(
-      (fav) => fav.trackId === track.id
-    );
-    const isCurrentlyFavorited = !!existingFavorite;
-
-    console.log(`Existing favorite found:`, existingFavorite);
-    console.log(`Is currently favorited: ${isCurrentlyFavorited}`);
-
-    if (isCurrentlyFavorited) {
-      alert(
-        "This song is already in your favorites. You can remove it from the Favorites tab."
-      );
-      return;
-    }
-
-    try {
-      console.log("Adding to favorites...");
-      const newFavorite = await addFavorite(token, {
-        trackId: track.id,
-        title: track.title,
-        artistNames: track.artistNames,
-        albumName: track.albumName,
-        imageUrl: track.imageUrl,
-      });
-
-      console.log("New favorite created:", newFavorite);
-
-      setUserFavorites((prev) => {
-        const updated = [...prev, newFavorite];
-        console.log("Updated userFavorites state:", updated);
-        return updated;
-      });
-
-      alert("Song added to favorites!");
-      console.log(`=== FAVORITE TOGGLE END (SUCCESS) ===`);
-    } catch (err) {
-      console.error("Favorite add error:", err);
-      alert((err as Error).message || "Failed to add to favorites.");
-      console.log(`=== FAVORITE TOGGLE END (ERROR) ===`);
-    }
-  };
-
+  console.log("Current userReviews state in Tracks component:", userReviews); // Log current state
   console.log(
-    "Tracks component rendering with userFavorites (current state):",
-    userFavorites
-  );
+    "Current userFavorites state in Tracks component:",
+    userFavorites,
+  ); // Log current state
 
   if (!tracks.length) {
     return (
@@ -175,13 +109,19 @@ export default function Tracks({ tracks, query }: TracksProps) {
       <div className="grid grid-cols-1 gap-4">
         {tracks.map((track) => {
           const isFavorited = userFavorites.some(
-            (fav) => fav.trackId === track.id
+            (fav) => fav.trackId === track.id,
           );
-          const hasReviewed = userReviews.some((r) => r.trackId === track.id);
+          const hasReviewed = userReviews.some((r) => {
+            // MODIFIED: Use r.externalId for comparison, assuming backend provides it
+            console.log(
+              `Checking track ${track.title} (ID: ${track.id}): Review externalId=${r.externalId}, Review ID=${r.id}`,
+            );
+            return r.externalId === track.id;
+          });
 
           console.log(
-            `Track: ${track.title}, ID: ${track.id}, isFavorited: ${isFavorited}`
-          );
+            `Track: ${track.title}, ID: ${track.id}, hasReviewed: ${hasReviewed}`,
+          ); // Final check for each track
 
           return (
             <Card
@@ -192,7 +132,13 @@ export default function Tracks({ tracks, query }: TracksProps) {
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleFavoriteToggle(track);
+                    // MODIFIED: Pass user object to handleFavoriteToggle
+                    handleFavoriteToggle(
+                      track,
+                      user,
+                      userFavorites,
+                      setUserFavorites,
+                    );
                   }}
                   className="flex-shrink-0 p-1 bg-black rounded-full text-white hover:scale-110 transition-transform"
                   title={
@@ -223,15 +169,16 @@ export default function Tracks({ tracks, query }: TracksProps) {
                 {formatDuration(track.durationMs)}
               </span>
 
-              {user && (
-                <button
-                  onClick={() => handleReviewClick(track)}
-                  className="ml-4 p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
-                  title={hasReviewed ? "Edit Review" : "Write a Review"}
-                >
-                  <FaPencilAlt size={16} />
-                </button>
-              )}
+              {user &&
+                !hasReviewed && ( // MODIFIED: Button only shows if user is logged in AND hasn't reviewed
+                  <button
+                    onClick={() => handleReviewClick(track)}
+                    className="ml-4 p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
+                    title="Write a Review" // MODIFIED: Simplified title
+                  >
+                    <FaPencilAlt size={16} />
+                  </button>
+                )}
             </Card>
           );
         })}
@@ -242,8 +189,8 @@ export default function Tracks({ tracks, query }: TracksProps) {
           isOpen={isReviewModalOpen}
           onClose={() => setIsReviewModalOpen(false)}
           track={selectedTrack}
-          existingReview={existingReview}
           onReviewSubmitted={handleReviewSubmitted}
+          // REMOVED: existingReview prop is no longer passed
         />
       )}
     </>
