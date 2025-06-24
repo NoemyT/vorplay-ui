@@ -23,12 +23,12 @@ export type ReviewPayload = {
 };
 
 export type Favorite = {
-  id: number; // ID of the favorite entry in your DB
-  trackId: string; // Spotify track ID (this is the externalId)
-  externalId: string; // Spotify track ID (redundant but kept for consistency with Review)
+  id: number; // ID of the favorite entry in your DB (this is the primary key for deletion)
+  trackId: number; // MODIFIED: This is the backend's internal track ID (number)
+  externalId: string; // MODIFIED: This is the Spotify track ID (string)
   title: string;
-  artist: { name?: string };
-  album: { name?: string };
+  artist: { name?: string } | string; // MODIFIED: Can be object or string
+  album: { name?: string } | string; // MODIFIED: Can be object or string
   coverUrl: string;
   createdAt: string;
 };
@@ -139,16 +139,20 @@ export async function addFavorite(
     const errorData = await res.json();
     throw new Error(errorData.message || "Failed to add favorite.");
   }
-  return res.json();
+  const data = await res.json();
+  console.log("API: addFavorite response data:", data); // Log the full response
+  return data;
 }
 
+// MODIFIED: removeFavorite now accepts trackId (number)
 export async function removeFavorite(
   token: string,
-  favoriteId: number,
+  trackId: number,
 ): Promise<void> {
-  console.log(`API: Attempting to remove favorite with ID: ${favoriteId}`);
+  console.log(`API: Attempting to remove favorite with trackId: ${trackId}`);
 
-  const res = await fetch(`${API_BASE}/favorites/${favoriteId}`, {
+  // MODIFIED: Changed endpoint to use trackId
+  const res = await fetch(`${API_BASE}/favorites/${trackId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
@@ -195,5 +199,14 @@ export async function fetchUserFavorites(
     `API: Fetched ${data.length} favorites for user ${userId}:`,
     data,
   );
+  // MODIFIED: Add a check for the 'id' and 'externalId' consistency
+  data.forEach((fav: Favorite) => {
+    if (typeof fav.id === "undefined" || fav.id === null) {
+      console.warn(`Favorite item missing 'id' field:`, fav);
+    }
+    if (typeof fav.externalId === "undefined" || fav.externalId === null) {
+      console.warn(`Favorite item missing 'externalId' field:`, fav);
+    }
+  });
   return data;
 }

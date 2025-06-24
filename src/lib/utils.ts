@@ -39,8 +39,9 @@ export async function handleFavoriteToggle(
     return;
   }
 
+  // MODIFIED: Use externalId for finding existing favorite
   const existingFavorite = userFavorites.find(
-    (fav) => fav.trackId === track.id,
+    (fav) => fav.externalId === track.id,
   );
   const isCurrentlyFavorited = !!existingFavorite;
 
@@ -49,17 +50,24 @@ export async function handleFavoriteToggle(
 
   if (isCurrentlyFavorited) {
     // If already favorited, remove it
-    if (!existingFavorite?.id) {
-      console.error("Favorite ID missing for removal.");
-      alert("Cannot remove favorite: ID not found.");
+    if (
+      typeof existingFavorite?.trackId === "undefined" ||
+      existingFavorite?.trackId === null
+    ) {
+      // MODIFIED: Check for the 'trackId' of the favorite entry
+      console.error("Favorite trackId missing for removal.");
+      alert("Cannot remove favorite: Track ID not found.");
       return;
     }
     try {
-      console.log("Removing from favorites...");
-      await removeFavorite(token, existingFavorite.id);
+      console.log(
+        "Removing from favorites, passing trackId:",
+        existingFavorite.trackId,
+      ); // Log the trackId
+      await removeFavorite(token, existingFavorite.trackId); // MODIFIED: Pass the 'trackId'
 
       setUserFavorites((prev) => {
-        const updated = prev.filter((fav) => fav.id !== existingFavorite.id);
+        const updated = prev.filter((fav) => fav.id !== existingFavorite.id); // Filter by DB ID for state
         console.log("Updated userFavorites state after removal:", updated);
         return updated;
       });
@@ -75,7 +83,7 @@ export async function handleFavoriteToggle(
     try {
       console.log("Adding to favorites...");
       const newFavorite = await addFavorite(token, {
-        trackId: track.id,
+        trackId: track.id, // This is the externalId for the backend
         title: track.title,
         artistNames: track.artistNames,
         albumName: track.albumName,

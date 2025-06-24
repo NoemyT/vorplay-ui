@@ -108,19 +108,22 @@ export default function Tracks({ tracks, query }: TracksProps) {
     <>
       <div className="grid grid-cols-1 gap-4">
         {tracks.map((track) => {
-          const isFavorited = userFavorites.some(
-            (fav) => fav.trackId === track.id,
-          );
-          const hasReviewed = userReviews.some((r) => {
-            // MODIFIED: Use r.externalId for comparison, assuming backend provides it
+          // MODIFIED: Always use fav.externalId for comparison with track.id (Spotify ID)
+          const isFavorited = userFavorites.some((fav) => {
             console.log(
-              `Checking track ${track.title} (ID: ${track.id}): Review externalId=${r.externalId}, Review ID=${r.id}`,
+              `Checking favorite for track ${track.title} (ID: ${track.id}): Favorite externalId=${fav.externalId}, Favorite DB ID=${fav.id}`,
+            );
+            return fav.externalId === track.id;
+          });
+          const hasReviewed = userReviews.some((r) => {
+            console.log(
+              `Checking review for track ${track.title} (ID: ${track.id}): Review externalId=${r.externalId}, Review ID=${r.id}`,
             );
             return r.externalId === track.id;
           });
 
           console.log(
-            `Track: ${track.title}, ID: ${track.id}, hasReviewed: ${hasReviewed}`,
+            `Track: ${track.title}, ID: ${track.id}, isFavorited: ${isFavorited}, hasReviewed: ${hasReviewed}`,
           ); // Final check for each track
 
           return (

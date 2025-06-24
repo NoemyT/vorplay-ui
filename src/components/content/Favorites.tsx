@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { TiHeartFullOutline } from "react-icons/ti";
-import { FaTrashAlt } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa"; // Removed FaTimesCircle
 import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
 import {
@@ -17,84 +17,71 @@ export default function Favorites() {
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
 
-  const refreshFavorites = async () => {
-    if (!user) return;
-
-    setLoading(true);
+  const loadFavorites = async () => {
+    if (!user) {
+      setError("You must be logged in to view your favorites.");
+      setLoading(false);
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("Authentication token missing.");
-
-      console.log("Refreshing favorites from server...");
+      if (!token) {
+        setError("Authentication token missing. Please log in again.");
+        setLoading(false);
+        return;
+      }
       const data = await fetchUserFavorites(token, user.id);
-      console.log("Fresh favorites data from server:", data);
       setFavorites(data);
       setError(null);
-      alert("Favorites refreshed!");
     } catch (err) {
-      setError((err as Error).message || "Failed to refresh favorites.");
-      console.error("Error refreshing favorites:", err);
+      setError(
+        (err as Error).message ||
+          "Failed to fetch favorites. Please try again.",
+      );
+      console.error("Error:", err);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    async function loadFavorites() {
-      if (!user) {
-        setError("You must be logged in to view your favorites.");
-        setLoading(false);
-        return;
-      }
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          setError("Authentication token missing. Please log in again.");
-          setLoading(false);
-          return;
-        }
-        const data = await fetchUserFavorites(token, user.id);
-        setFavorites(data);
-        setError(null);
-      } catch (err) {
-        setError(
-          (err as Error).message ||
-            "Failed to fetch favorites. Please try again.",
-        );
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     loadFavorites();
   }, [user]);
 
   async function handleDeleteFavorite(favoriteId: number) {
-    console.log(`Attempting to delete favorite with ID: ${favoriteId}`);
+    console.log(`Attempting to delete favorite with primary ID: ${favoriteId}`);
     console.log("Current favorites state:", favorites);
+    const favoriteToDelete = favorites.find((fav) => fav.id === favoriteId); // Find by primary ID
+    console.log("Favorite object to delete:", favoriteToDelete);
 
-    const confirmDelete = window.confirm(
-      "Are you sure you want to remove this from your favorites?",
-    );
-    if (!confirmDelete) return;
+    if (!favoriteToDelete) {
+      alert("Favorite not found in local state.");
+      return;
+    }
+
+    if (
+      !window.confirm(
+        "Are you sure you want to remove this track from your favorites?",
+      )
+    ) {
+      return;
+    }
 
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication token missing.");
 
+      // MODIFIED: Pass favoriteToDelete.trackId to removeFavorite
       console.log(
-        `Making DELETE request to: ${
-          import.meta.env.VITE_API_URL
-        }/favorites/${favoriteId}`,
+        `Making DELETE request to: ${import.meta.env.VITE_API_URL}/favorites/track/${favoriteToDelete.trackId}`,
       );
-      await removeFavorite(token, favoriteId);
+      await removeFavorite(token, favoriteToDelete.trackId);
 
       console.log(
-        `Successfully deleted favorite ${favoriteId}, updating state`,
+        `Successfully deleted favorite with trackId ${favoriteToDelete.trackId}, updating state`,
       );
       setFavorites((prev) => {
-        const updated = prev.filter((fav) => fav.id !== favoriteId);
+        const updated = prev.filter((fav) => fav.id !== favoriteId); // Filter by primary ID for state update
         console.log("Updated favorites after deletion:", updated);
         return updated;
       });
@@ -114,7 +101,7 @@ export default function Favorites() {
           console.log("Updated favorites after local removal:", updated);
           return updated;
         });
-        alert("Item was already removed from favorites.");
+        alert("Item was already removed from favorites (locally).");
       } else {
         alert(errorMessage);
       }
@@ -149,13 +136,6 @@ export default function Favorites() {
       <div className="flex items-center gap-2 mb-4 text-2xl font-bold text-white">
         <TiHeartFullOutline className="text-[#8a2be2]" size={28} />
         <span>Favorites</span>
-        <button
-          onClick={refreshFavorites}
-          className="ml-auto bg-[#8a2be2] text-white px-3 py-1 rounded-full text-sm hover:bg-[#7a1fd1] transition-colors"
-          disabled={loading}
-        >
-          {loading ? "Refreshing..." : "Refresh"}
-        </button>
       </div>
 
       {/* Favorites list or empty state */}
@@ -169,45 +149,58 @@ export default function Favorites() {
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
-          {favorites.map((favorite) => (
-            <Card
-              key={favorite.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative"
-            >
-              {/* Trash icon */}
-              <button
-                onClick={() => handleDeleteFavorite(favorite.id)}
-                className="absolute top-3 right-3 text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
+          {favorites.map((favorite) => {
+            // MODIFIED: Handle artist and album names being string or object
+            const artistName =
+              typeof favorite.artist === "string"
+                ? favorite.artist
+                : favorite.artist?.name || "Unknown artist";
+            const albumName =
+              typeof favorite.album === "string"
+                ? favorite.album
+                : favorite.album?.name || "Unknown album";
+
+            return (
+              <Card
+                key={favorite.id}
+                className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative"
               >
-                <FaTrashAlt size={16} />
-              </button>
+                {/* Trash icon */}
+                <button
+                  onClick={() => handleDeleteFavorite(favorite.id)} // MODIFIED: Pass the primary 'id'
+                  className="absolute top-3 right-3 text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
+                >
+                  <FaTrashAlt size={16} />
+                </button>
 
-              {/* Top section: image + title */}
-              <div className="flex gap-4 items-start">
-                <img
-                  src={
-                    favorite.coverUrl || "/placeholder.svg?height=64&width=64"
-                  }
-                  alt="cover"
-                  className="w-16 h-16 rounded-md object-cover"
-                />
-                <div className="flex flex-col">
-                  <h3 className="text-lg font-semibold">{favorite.title}</h3>
-                  <p className="text-sm text-white/70">
-                    {favorite.artist?.name || "Unknown artist"} •{" "}
-                    {favorite.album?.name || "Unknown album"}
-                  </p>
+                {/* Top section: image + title */}
+                <div className="flex gap-4 items-start">
+                  <img
+                    src={
+                      favorite.coverUrl || "/placeholder.svg?height=64&width=64"
+                    }
+                    alt="cover"
+                    className="w-16 h-16 rounded-md object-cover"
+                  />
+                  <div className="flex flex-col">
+                    <h3 className="text-lg font-semibold">{favorite.title}</h3>
+                    <p className="text-sm text-white/70">
+                      {artistName} • {albumName}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {/* Date (optional) */}
-              <p className="text-xs text-white/50 mt-2">
-                Added on {new Date(favorite.createdAt).toLocaleDateString()}
-              </p>
-            </Card>
-          ))}
+                {/* Date (optional) */}
+                <p className="text-xs text-white/50 mt-2">
+                  Added on {new Date(favorite.createdAt).toLocaleDateString()}
+                </p>
+              </Card>
+            );
+          })}
         </div>
       )}
+
+      {/* Removed Confirmation Modal for Deletion */}
     </div>
   );
 }
