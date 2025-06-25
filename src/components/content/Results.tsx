@@ -35,7 +35,7 @@ export default function Results({ query }: ResultsProps) {
   const [artistError, setArtistError] = useState<string | null>(null); // Specific error for artists
   const [userError, setUserError] = useState<string | null>(null); // Specific error for users
   const [activeTab, setActiveTab] = useState<"tracks" | "artists" | "users">(
-    "tracks"
+    "tracks",
   );
 
   useEffect(() => {
@@ -58,17 +58,17 @@ export default function Results({ query }: ResultsProps) {
       const trackPromise = fetch(
         `${
           import.meta.env.VITE_API_URL
-        }/tracks/search?query=${encodeURIComponent(query)}`
+        }/tracks/search?query=${encodeURIComponent(query)}`,
       );
       const artistPromise = fetch(
         `${
           import.meta.env.VITE_API_URL
-        }/artists/search?query=${encodeURIComponent(query)}`
+        }/artists/search?query=${encodeURIComponent(query)}`,
       );
       const userPromise = fetch(
         `${
           import.meta.env.VITE_API_URL
-        }/users/search?query=${encodeURIComponent(query)}`
+        }/users/search?query=${encodeURIComponent(query)}`,
       );
 
       const results = await Promise.allSettled([
@@ -91,7 +91,7 @@ export default function Results({ query }: ResultsProps) {
         setTrackError(
           `Network error fetching tracks: ${
             results[0].reason?.message || "Unknown error"
-          }`
+          }`,
         );
         setTracks([]);
       }
@@ -110,7 +110,7 @@ export default function Results({ query }: ResultsProps) {
         setArtistError(
           `Network error fetching artists: ${
             results[1].reason?.message || "Unknown error"
-          }`
+          }`,
         );
         setArtists([]);
       }
@@ -129,7 +129,7 @@ export default function Results({ query }: ResultsProps) {
         setUserError(
           `Network error fetching users: ${
             results[2].reason?.message || "Unknown error"
-          }`
+          }`,
         );
         setUsers([]);
       }
@@ -207,7 +207,7 @@ export default function Results({ query }: ResultsProps) {
           </button>
         ))}
       </div>
-      <div className="flex-grow overflow-y-auto pr-2 min-h-0">
+      <div className="flex-grow overflow-y-auto mt-1 pr-2 min-h-0">
         {renderContent()}
       </div>
     </div>

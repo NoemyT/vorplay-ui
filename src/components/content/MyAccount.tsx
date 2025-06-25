@@ -2,18 +2,24 @@
 
 import type React from "react";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react"; // ADDED: useRef
 import {
   FaUserCircle,
   FaStar,
   FaUsers,
   FaPencilAlt,
   FaTrashAlt,
-} from "react-icons/fa";
+  FaCamera,
+} from "react-icons/fa"; // ADDED: FaCamera
 import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
 import { updateUserProfile } from "../../lib/auth";
-import { useNavigate, createSearchParams } from "react-router-dom";
+import { useNavigate, createSearchParams } from "react-router-dom"; // Corrected import path
+import {
+  uploadProfilePicture,
+  fetchMyFollows,
+  type Follow,
+} from "../../lib/api"; // ADDED: uploadProfilePicture, fetchMyFollows
 
 // Define types for fetched data
 type ReviewSummary = {
@@ -24,15 +30,10 @@ type ReviewSummary = {
   createdAt: string;
 };
 
-type FollowerSummary = {
-  id: number;
-  name: string;
-  profilePicture?: string;
-};
-
 export default function MyAccount() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null); // ADDED: Ref for file input
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || "");
@@ -41,20 +42,20 @@ export default function MyAccount() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [reviews, setReviews] = useState<ReviewSummary[]>([]);
-  const [followers, setFollowers] = useState<FollowerSummary[]>([]);
+  const [following, setFollowing] = useState<Follow[]>([]); // Renamed from 'followers' to 'following'
 
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"success" | "error" | null>(
-    null
+    null,
   );
+  const [uploading, setUploading] = useState(false); // ADDED: State for upload loading
 
   useEffect(() => {
     if (user) {
       setName(user.name);
       setEmail(user.email);
 
-      // Move fetchUserData inside useEffect
       const fetchUserData = async () => {
         setLoading(true);
         try {
@@ -65,7 +66,7 @@ export default function MyAccount() {
             `${import.meta.env.VITE_API_URL}/reviews/user/${user.id}`,
             {
               headers: { Authorization: `Bearer ${token}` },
-            }
+            },
           );
           if (reviewsRes.ok) {
             const reviewsData: ReviewSummary[] = await reviewsRes.json();
@@ -79,22 +80,44 @@ export default function MyAccount() {
             setReviews([]);
           }
 
-          // Fetch user's followers (assuming a new endpoint /users/{userId}/followers)
-          const followersRes = await fetch(
-            `${import.meta.env.VITE_API_URL}/users/${user.id}/followers`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
+          // Fetch "People I Follow" (Following)
+          console.log(`Attempting to fetch following for user ID: ${user.id}`);
+          const fetchedFollowing = await fetchMyFollows(token!); // Use the new API function
+          // MODIFIED: Process fetchedFollowing to correctly extract targetName and targetProfilePicture from 'user' or 'artist'
+          const processedFollowing = fetchedFollowing.map((f: Follow) => {
+            let displayName = "";
+            let displayPicture = "/placeholder.svg?height=96&width=96"; // Default placeholder
+
+            if (f.targetType === "usuario" && f.user) {
+              displayName = f.user.name;
+              displayPicture =
+                f.user.profilePicture || "/placeholder.svg?height=96&width=96";
+            } else if (f.targetType === "artista" && f.artist) {
+              displayName = f.artist.name;
+              displayPicture =
+                f.artist.imageUrl || "/placeholder.svg?height=96&width=96";
+            } else {
+              // Fallback if nested user/artist object is not present or type is unknown
+              displayName =
+                f.targetName ||
+                (f.targetType === "usuario"
+                  ? `User ${f.targetId}`
+                  : `Artist ${f.targetId}`);
+              displayPicture =
+                f.targetProfilePicture || "/placeholder.svg?height=96&width=96";
             }
+
+            return {
+              ...f,
+              targetName: displayName,
+              targetProfilePicture: displayPicture,
+            };
+          });
+          console.log(
+            "Successfully fetched following data:",
+            processedFollowing,
           );
-          if (followersRes.ok) {
-            const followersData: FollowerSummary[] = await followersRes.json();
-            setFollowers(followersData);
-          } else {
-            console.warn(
-              "Failed to fetch user followers. Endpoint might not exist or is unauthorized."
-            );
-            setFollowers([]);
-          }
+          setFollowing(processedFollowing);
         } catch (err) {
           console.error("Error fetching user data:", err);
           setMessage("Failed to load profile data.");
@@ -108,7 +131,7 @@ export default function MyAccount() {
     } else {
       setLoading(false);
     }
-  }, [user]); // Now 'user' is the only dependency for this effect
+  }, [user]);
 
   const handleUpdateProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -162,12 +185,15 @@ export default function MyAccount() {
   };
 
   const handleDeleteAccount = async () => {
-    if (!user) return;
+    if (
+      !window.confirm(
+        "Are you sure you want to delete your account? This action cannot be undone.",
+      )
+    ) {
+      return;
+    }
 
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete your account? This action cannot be undone."
-    );
-    if (!confirmDelete) return;
+    if (!user) return;
 
     setLoading(true);
     setMessage(null);
@@ -196,7 +222,7 @@ export default function MyAccount() {
       }
     } catch (err) {
       setMessage(
-        (err as Error).message || "An error occurred during account deletion."
+        (err as Error).message || "An error occurred during account deletion.",
       );
       setMessageType("error");
       console.error("Account deletion error:", err);
@@ -205,12 +231,51 @@ export default function MyAccount() {
     }
   };
 
-  const handleViewUser = (userId: number) => {
+  // ADDED: Function to handle profile picture file selection
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!user) {
+      setMessage("You must be logged in to upload a profile picture.");
+      setMessageType("error");
+      return;
+    }
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setMessage("Authentication token missing. Please log in again.");
+      setMessageType("error");
+      return;
+    }
+
+    setUploading(true);
+    setMessage(null);
+    setMessageType(null);
+
+    try {
+      const result = await uploadProfilePicture(token, file);
+      const updatedUser = { ...user, profilePicture: result.url };
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+      setMessage("Profile picture updated successfully!");
+      setMessageType("success");
+    } catch (err) {
+      setMessage((err as Error).message || "Failed to upload profile picture.");
+      setMessageType("error");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleViewUser = (targetId: number) => {
     navigate({
       pathname: "/",
       search: createSearchParams({
         section: "user",
-        userId: userId.toString(),
+        userId: targetId.toString(),
       }).toString(),
     });
   };
@@ -238,11 +303,35 @@ export default function MyAccount() {
       <Card className="flex flex-col w-full max-w-[800px] bg-white/5 rounded-[20px] p-6">
         {/* Profile Header */}
         <div className="flex flex-col items-center gap-4 mb-6">
-          <img
-            src={user.profilePicture || "/placeholder.svg?height=128&width=128"}
-            alt={user.name}
-            className="w-32 h-32 rounded-full object-cover border-2 border-[#8a2be2]"
-          />
+          <div className="relative">
+            <img
+              src={
+                user.profilePicture || "/placeholder.svg?height=128&width=128"
+              }
+              alt={user.name}
+              className="w-32 h-32 rounded-full object-cover border-2 border-[#8a2be2]"
+            />
+            {/* ADDED: Camera icon for upload */}
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute bottom-0 right-0 bg-[#8a2be2] text-white p-2 rounded-full hover:bg-[#7a1fd1] transition-colors"
+              title="Upload Profile Picture"
+              disabled={uploading}
+            >
+              {uploading ? (
+                <span className="animate-spin">⚙️</span> // Simple loading indicator
+              ) : (
+                <FaCamera size={16} />
+              )}
+            </button>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              ref={fileInputRef}
+              className="hidden"
+            />
+          </div>
           <div className="flex items-center gap-2">
             <h2 className="font-extrabold text-4xl text-white">{user.name}</h2>
             <button
@@ -255,7 +344,12 @@ export default function MyAccount() {
               />
             </button>
           </div>
-          <p className="text-white/70 text-lg">{user.email}</p>
+          {/* MODIFIED: Display creation date instead of email */}
+          {user.createdAt && (
+            <p className="text-white/70 text-sm">
+              Joined: {new Date(user.createdAt).toLocaleDateString()}
+            </p>
+          )}
         </div>
 
         {/* Edit Form */}
@@ -334,9 +428,7 @@ export default function MyAccount() {
 
             {message && (
               <p
-                className={`text-center ${
-                  messageType === "error" ? "text-red-400" : "text-green-400"
-                }`}
+                className={`text-center ${messageType === "error" ? "text-red-400" : "text-green-400"}`}
               >
                 {message}
               </p>
@@ -412,37 +504,43 @@ export default function MyAccount() {
           )}
         </div>
 
-        {/* Followers Section */}
+        {/* Following Section */}
         <div className="mb-8">
           <h3 className="flex items-center gap-2 text-xl font-bold text-white mb-4">
-            <FaUsers className="text-[#8a2be2]" /> Followers ({followers.length}
+            <FaUsers className="text-[#8a2be2]" /> Following ({following.length}
             )
           </h3>
-          {followers.length > 0 ? (
+          {following.length > 0 ? (
             <div className="flex overflow-x-auto gap-4 pb-2">
-              {followers.map((follower) => (
+              {following.map((follow) => (
                 <Card
-                  key={follower.id}
+                  key={follow.id}
                   className="bg-white/5 border border-white/10 p-3 rounded-xl text-white flex flex-col items-center text-center flex-shrink-0 w-28 cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => handleViewUser(follower.id)}
+                  onClick={() => handleViewUser(follow.targetId)}
                 >
                   <img
                     src={
-                      follower.profilePicture ||
+                      follow.targetProfilePicture ||
                       "/placeholder.svg?height=64&width=64"
                     }
-                    alt={follower.name}
+                    alt={follow.targetName}
                     className="w-16 h-16 rounded-full object-cover mb-2"
                   />
                   <h4 className="font-semibold text-sm truncate w-full px-1">
-                    {follower.name}
+                    {follow.targetName}
                   </h4>
+                  {/* MODIFIED: Display targetType only if it's an artist */}
+                  {follow.targetType === "artista" && (
+                    <p className="text-xs opacity-70 capitalize">
+                      {follow.targetType}
+                    </p>
+                  )}
                 </Card>
               ))}
             </div>
           ) : (
             <p className="text-white/70 text-center">
-              No one is following you yet.
+              You are not following anyone yet.
             </p>
           )}
         </div>

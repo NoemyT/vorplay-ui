@@ -9,7 +9,7 @@ export type User = {
   email: string;
   name: string;
   profilePicture?: string;
-  createdAt?: string;
+  createdAt?: string; // ADDED: createdAt field
 };
 
 type AuthContextType = {
@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } catch (error) {
         console.error(
           "Failed to load user from storage or refresh token:",
-          error
+          error,
         );
         // Clear invalid/expired session
         localStorage.removeItem("token");

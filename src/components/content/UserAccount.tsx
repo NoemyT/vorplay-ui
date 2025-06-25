@@ -1,13 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaStar, FaHeart, FaNotesMedical } from "react-icons/fa";
+import { FaStar, FaHeart, FaUsers, FaArrowLeft } from "react-icons/fa"; // ADDED: FaArrowLeft
 import { Card } from "../ui/Card";
 import { useAuth, type User } from "../../context/authContext";
-
-type UserAccountProps = {
-  userId: string;
-};
+import { useNavigate } from "react-router-dom"; // RE-ADDED: useNavigate, createSearchParams
+import { fetchUserFollows, type Follow } from "../../lib/api";
 
 type ReviewSummary = {
   id: number;
@@ -22,20 +20,16 @@ type FavoriteSummary = {
   coverUrl?: string;
 };
 
-type PlaylistSummary = {
-  id: number;
-  name: string;
-  playlistTracks: { track: { coverUrl?: string } }[];
-};
-
-export default function UserAccount({ userId }: UserAccountProps) {
+export default function UserAccount({ userId }: { userId: string }) {
   const { user: currentUser } = useAuth();
+  const navigate = useNavigate(); // RE-ADDED: useNavigate
+
   const [profile, setProfile] = useState<User | null>(null);
   const [reviews, setReviews] = useState<ReviewSummary[]>([]);
   const [favorites, setFavorites] = useState<FavoriteSummary[]>([]);
-  const [playlists, setPlaylists] = useState<PlaylistSummary[]>([]);
+  const [following, setFollowing] = useState<Follow[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
-  const [followId, setFollowId] = useState<number | null>(null); // ID of the follow relationship
+  const [followId, setFollowId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +40,7 @@ export default function UserAccount({ userId }: UserAccountProps) {
       try {
         // Fetch user profile
         const userRes = await fetch(
-          `${import.meta.env.VITE_API_URL}/users/${userId}`
+          `${import.meta.env.VITE_API_URL}/users/${userId}`,
         );
         if (!userRes.ok)
           throw new Error(`Failed to fetch user profile: ${userRes.status}`);
@@ -55,7 +49,7 @@ export default function UserAccount({ userId }: UserAccountProps) {
 
         // Fetch user's reviews
         const reviewsRes = await fetch(
-          `${import.meta.env.VITE_API_URL}/reviews/user/${userId}`
+          `${import.meta.env.VITE_API_URL}/reviews/user/${userId}`,
         );
         if (!reviewsRes.ok)
           throw new Error(`Failed to fetch user reviews: ${reviewsRes.status}`);
@@ -64,52 +58,36 @@ export default function UserAccount({ userId }: UserAccountProps) {
 
         // Fetch user's favorites
         const favoritesRes = await fetch(
-          `${import.meta.env.VITE_API_URL}/favorites/user/${userId}`
+          `${import.meta.env.VITE_API_URL}/favorites/user/${userId}`,
         );
         if (!favoritesRes.ok)
           throw new Error(
-            `Failed to fetch user favorites: ${favoritesRes.status}`
+            `Failed to fetch user favorites: ${favoritesRes.status}`,
           );
         const favoritesData: FavoriteSummary[] = await favoritesRes.json();
         setFavorites(favoritesData);
 
-        // Fetch user's playlists
-        const playlistsRes = await fetch(
-          `${import.meta.env.VITE_API_URL}/playlists/user/${userId}`
-        ); // Assuming this endpoint exists or is public
-        if (!playlistsRes.ok) {
-          // If no public endpoint, handle gracefully
-          console.warn(
-            "Public playlist endpoint not found for user. Skipping."
-          );
-          setPlaylists([]);
-        } else {
-          const playlistsData: PlaylistSummary[] = await playlistsRes.json();
-          setPlaylists(playlistsData);
-        }
+        // Fetch who THIS user is following using the new API function
+        const fetchedFollowing = await fetchUserFollows(
+          localStorage.getItem("token") || "",
+          Number(userId),
+        );
+        setFollowing(fetchedFollowing);
 
         // Check if current user is following this user
         if (currentUser) {
           const token = localStorage.getItem("token");
-          const followsRes = await fetch(
-            `${import.meta.env.VITE_API_URL}/follows`,
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            }
+          const myFollows = await fetchUserFollows(token!, currentUser.id); // Fetch current user's follows
+          const existingFollow = myFollows.find(
+            (f: { targetId: number; targetType: string }) =>
+              f.targetId === Number(userId) && f.targetType === "usuario",
           );
-          if (followsRes.ok) {
-            const myFollows = await followsRes.json();
-            const existingFollow = myFollows.find(
-              (f: { targetId: number; targetType: string }) =>
-                f.targetId === Number(userId) && f.targetType === "usuario"
-            );
-            if (existingFollow) {
-              setIsFollowing(true);
-              setFollowId(existingFollow.id);
-            } else {
-              setIsFollowing(false);
-              setFollowId(null);
-            }
+          if (existingFollow) {
+            setIsFollowing(true);
+            setFollowId(existingFollow.id);
+          } else {
+            setIsFollowing(false);
+            setFollowId(null);
           }
         }
       } catch (err) {
@@ -142,7 +120,7 @@ export default function UserAccount({ userId }: UserAccountProps) {
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
-          }
+          },
         );
         if (!res.ok) throw new Error("Failed to unfollow.");
         setIsFollowing(false);
@@ -173,13 +151,28 @@ export default function UserAccount({ userId }: UserAccountProps) {
     }
   };
 
+  // ADDED: handleGoBack function
+  const handleGoBack = () => {
+    navigate(-1); // Go back to the previous page in history
+  };
+
   if (loading) return <p className="text-white">Loading user profile...</p>;
   if (error) return <p className="text-red-400">Error: {error}</p>;
   if (!profile) return <p className="text-white">User not found.</p>;
 
   return (
     <div className="flex flex-col w-full h-full items-center">
-      <Card className="flex flex-col w-full max-w-[800px] bg-white/5 rounded-[20px] p-6">
+      <Card className="flex flex-col w-full max-w-[800px] mt-5 bg-white/5 rounded-[20px] p-6 relative">
+        {" "}
+        {/* ADDED: relative */}
+        {/* ADDED: Return button */}
+        <button
+          onClick={handleGoBack}
+          className="absolute top-4 left-6 text-white/70 hover:text-white bg-transparent p-2 rounded-full" // MODIFIED: left-6
+          title="Go Back"
+        >
+          <FaArrowLeft size={20} />
+        </button>
         <div className="flex flex-col items-center gap-4 mb-6">
           <img
             src={
@@ -189,8 +182,12 @@ export default function UserAccount({ userId }: UserAccountProps) {
             className="w-32 h-32 rounded-full object-cover border-2 border-[#8a2be2]"
           />
           <h2 className="font-extrabold text-4xl text-white">{profile.name}</h2>
-          <p className="text-white/70 text-lg">{profile.email}</p>
-
+          {/* ADDED: Display joined date */}
+          {profile.createdAt && (
+            <p className="text-white/70 text-sm">
+              Joined: {new Date(profile.createdAt).toLocaleDateString()}
+            </p>
+          )}
           {currentUser && currentUser.id !== profile.id && (
             <button
               onClick={handleFollowToggle}
@@ -205,7 +202,6 @@ export default function UserAccount({ userId }: UserAccountProps) {
             </button>
           )}
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           {/* Reviews Summary */}
           <div className="flex flex-col items-center text-center bg-white/5 p-4 rounded-lg">
@@ -213,20 +209,7 @@ export default function UserAccount({ userId }: UserAccountProps) {
             <h3 className="text-xl font-semibold text-white mb-2">
               Reviews ({reviews.length})
             </h3>
-            {reviews.length > 0 ? (
-              <div className="grid grid-cols-2 gap-2 w-full">
-                {reviews.slice(0, 4).map((review) => (
-                  <img
-                    key={review.id}
-                    src={
-                      review.coverUrl || "/placeholder.svg?height=64&width=64"
-                    }
-                    alt={review.title}
-                    className="w-full h-auto aspect-square object-cover rounded-md"
-                  />
-                ))}
-              </div>
-            ) : (
+            {reviews.length === 0 && (
               <p className="text-sm text-white/70">No reviews yet.</p>
             )}
           </div>
@@ -237,44 +220,19 @@ export default function UserAccount({ userId }: UserAccountProps) {
             <h3 className="text-xl font-semibold text-white mb-2">
               Favorites ({favorites.length})
             </h3>
-            {favorites.length > 0 ? (
-              <div className="grid grid-cols-2 gap-2 w-full">
-                {favorites.slice(0, 4).map((fav) => (
-                  <img
-                    key={fav.id}
-                    src={fav.coverUrl || "/placeholder.svg?height=64&width=64"}
-                    alt={fav.title}
-                    className="w-full h-auto aspect-square object-cover rounded-md"
-                  />
-                ))}
-              </div>
-            ) : (
+            {favorites.length === 0 && (
               <p className="text-sm text-white/70">No favorites yet.</p>
             )}
           </div>
 
-          {/* Playlists Summary */}
+          {/* Following Summary */}
           <div className="flex flex-col items-center text-center bg-white/5 p-4 rounded-lg">
-            <FaNotesMedical className="text-[#8a2be2] mb-2" size={32} />
+            <FaUsers className="text-[#8a2be2] mb-2" size={32} />
             <h3 className="text-xl font-semibold text-white mb-2">
-              Playlists ({playlists.length})
+              Following ({following.length})
             </h3>
-            {playlists.length > 0 ? (
-              <div className="grid grid-cols-2 gap-2 w-full">
-                {playlists.slice(0, 4).map((playlist) => (
-                  <img
-                    key={playlist.id}
-                    src={
-                      playlist.playlistTracks[0]?.track?.coverUrl ||
-                      "/placeholder.svg?height=64&width=64"
-                    }
-                    alt={playlist.name}
-                    className="w-full h-auto aspect-square object-cover rounded-md"
-                  />
-                ))}
-              </div>
-            ) : (
-              <p className="text-sm text-white/70">No public playlists.</p>
+            {following.length === 0 && (
+              <p className="text-sm text-white/70">Not following anyone yet.</p>
             )}
           </div>
         </div>

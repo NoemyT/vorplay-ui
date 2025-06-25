@@ -68,7 +68,9 @@ export default function MainContent({
           min-h-[364px]
         "
       >
-        <div className="overflow-y-auto flex-grow">{renderContent()}</div>{" "}
+        <div className="flex flex-col items-center justify-center overflow-y-auto flex-grow">
+          {renderContent()}
+        </div>{" "}
         {/* Added pt-4 for spacing */}
       </Card>
     </div>

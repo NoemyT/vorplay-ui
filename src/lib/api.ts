@@ -33,6 +33,32 @@ export type Favorite = {
   createdAt: string;
 };
 
+// MODIFIED: Follow type definition to correctly include nested 'user' or 'artist' objects
+export type Follow = {
+  id: number;
+  followerId: number; // Added followerId based on Swagger
+  targetType: "usuario" | "artista";
+  targetId: number;
+  createdAt: string;
+  // These fields are now optional as they might be nested
+  targetName?: string;
+  targetProfilePicture?: string;
+  // MODIFIED: Use 'user' and 'artist' directly as per Swagger
+  user?: {
+    id: number;
+    name: string;
+    email: string;
+    profilePicture?: string | null;
+    createdAt: string;
+  };
+  artist?: {
+    id: string;
+    name: string;
+    externalUrl: string;
+    imageUrl?: string;
+  };
+};
+
 export async function createReview(
   token: string,
   payload: ReviewPayload,
@@ -208,5 +234,120 @@ export async function fetchUserFavorites(
       console.warn(`Favorite item missing 'externalId' field:`, fav);
     }
   });
+  return data;
+}
+
+// ADDED: Function to upload profile picture
+export async function uploadProfilePicture(
+  token: string,
+  file: File,
+): Promise<{ url: string }> {
+  console.log("API: Uploading profile picture...");
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch(`${API_BASE}/users/me/profile-picture`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  console.log("API: Upload profile picture response status:", res.status);
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error("API: Upload profile picture error:", errorData);
+    throw new Error(errorData.message || "Failed to upload profile picture.");
+  }
+
+  const result = await res.json();
+  console.log("API: Upload profile picture success:", result);
+  return result;
+}
+
+// ADDED: Function to fetch profile picture by user ID
+export async function fetchProfilePictureByUserId(
+  userId: number,
+): Promise<string> {
+  console.log(`API: Fetching profile picture for user ID: ${userId}`);
+  const res = await fetch(`${API_BASE}/users/profile-picture/user/${userId}`);
+
+  console.log(`API: Fetch profile picture response status: ${res.status}`);
+
+  if (!res.ok) {
+    // Assuming 404 means no custom picture, return placeholder
+    if (res.status === 404) {
+      console.log(
+        `Profile picture not found for user ${userId}, returning placeholder.`,
+      );
+      return "/placeholder.svg?height=96&width=96";
+    }
+    const errorData = await res.json();
+    console.error("API: Fetch profile picture error:", errorData);
+    throw new Error(errorData.message || "Failed to fetch profile picture.");
+  }
+
+  // Assuming the API returns a JSON object with a 'url' field, or the image directly
+  // If it returns the image directly, this needs adjustment.
+  // Based on the PATCH example, it's likely a URL.
+  const data = await res.json();
+  if (data && data.url) {
+    return data.url;
+  } else {
+    // If the response is just the image data, or an unexpected format,
+    // we might need to handle it differently (e.g., res.blob() and createObjectURL)
+    // For now, assuming a URL is returned.
+    console.warn(
+      `API: Unexpected response for profile picture for user ${userId}:`,
+      data,
+    );
+    return "/placeholder.svg?height=96&width=96"; // Fallback
+  }
+}
+
+// MODIFIED: fetchUserFollows to use the new API endpoint and return full Follow objects
+export async function fetchUserFollows(
+  token: string,
+  userId: number,
+): Promise<Follow[]> {
+  console.log(`API: Fetching follows for user ID: ${userId}`);
+  const res = await fetch(`${API_BASE}/follows/user/${userId}`, {
+    // Assuming this endpoint exists for other users' follows
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error("API: Fetch user follows error:", errorData);
+    throw new Error(errorData.message || "Failed to fetch user follows.");
+  }
+
+  const data = await res.json();
+  console.log(`API: Fetched ${data.length} follows for user ${userId}:`, data);
+  return data;
+}
+
+// MODIFIED: fetchMyFollows to use the new API endpoint and return full Follow objects
+export async function fetchMyFollows(token: string): Promise<Follow[]> {
+  console.log(`API: Fetching my follows...`);
+  const res = await fetch(`${API_BASE}/follows`, {
+    // This is the "listMine" endpoint
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    console.error("API: Fetch my follows error:", errorData);
+    throw new Error(errorData.message || "Failed to fetch my follows.");
+  }
+
+  const data = await res.json();
+  console.log(`API: Fetched ${data.length} my follows:`, data);
   return data;
 }

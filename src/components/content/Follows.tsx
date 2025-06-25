@@ -2,21 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { TiGroup } from "react-icons/ti";
-import { FaTrashAlt } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
 import { useNavigate, createSearchParams } from "react-router-dom";
-
-type Follow = {
-  id: number;
-  targetId: number;
-  targetType: "usuario" | "artista";
-  createdAt: string;
-  // Assuming the API returns some info about the followed user/artist
-  // For now, we'll just use a placeholder name
-  targetName?: string; // This would ideally come from the API
-  targetProfilePicture?: string; // This would ideally come from the API
-};
+import { fetchMyFollows, type Follow } from "../../lib/api"; // MODIFIED: Changed to fetchMyFollows
 
 export default function Follows() {
   const [follows, setFollows] = useState<Follow[]>([]);
@@ -26,7 +15,7 @@ export default function Follows() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchFollows() {
+    async function fetchFollowsData() {
       if (!user) {
         setError("You must be logged in to view follows.");
         setLoading(false);
@@ -34,72 +23,73 @@ export default function Follows() {
       }
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/follows`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          // For demonstration, adding placeholder names and profile pictures
-          const followsWithNames = data.map((f: Follow) => ({
-            ...f,
-            targetName:
-              f.targetType === "usuario"
-                ? `User ${f.targetId}`
-                : `Artist ${f.targetId}`,
-            targetProfilePicture: "/placeholder.svg?height=96&width=96",
-          }));
-          setFollows(followsWithNames);
-        } else {
-          setError("Failed to fetch follows. Please try again.");
+        if (!token) {
+          setError("Authentication token missing. Please log in again.");
+          setLoading(false);
+          return;
         }
+        // MODIFIED: Use fetchMyFollows to get the current user's follows
+        const data = await fetchMyFollows(token);
+
+        // Process fetched data to extract correct name and picture
+        const processedFollows = data.map((f) => {
+          let displayName = "";
+          let displayPicture = "/placeholder.svg?height=96&width=96"; // Default placeholder
+
+          if (f.targetType === "usuario" && f.user) {
+            displayName = f.user.name;
+            displayPicture =
+              f.user.profilePicture || "/placeholder.svg?height=96&width=96";
+          } else if (f.targetType === "artista" && f.artist) {
+            displayName = f.artist.name;
+            displayPicture =
+              f.artist.imageUrl || "/placeholder.svg?height=96&width=96";
+          } else {
+            // Fallback if nested user/artist object is not present or type is unknown
+            displayName =
+              f.targetName ||
+              (f.targetType === "usuario"
+                ? `User ${f.targetId}`
+                : `Artist ${f.targetId}`);
+            displayPicture =
+              f.targetProfilePicture || "/placeholder.svg?height=96&width=96";
+          }
+
+          return {
+            ...f,
+            targetName: displayName,
+            targetProfilePicture: displayPicture,
+          };
+        });
+        setFollows(processedFollows);
+        setError(null);
       } catch (err) {
-        setError("An unexpected error occurred while fetching follows.");
+        setError(
+          (err as Error).message ||
+            "Failed to fetch follows. Please try again.",
+        );
         console.error("Error:", err);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchFollows();
+    fetchFollowsData();
   }, [user]);
 
-  async function unfollow(id: number) {
-    const confirmUnfollow = window.confirm(
-      "Are you sure you want to unfollow this item?"
-    );
-    if (!confirmUnfollow) return;
+  // REMOVED: unfollow function as it will be handled on the user's profile page
 
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/follows/${id}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  const handleCardClick = (follow: Follow) => {
+    if (follow.targetType === "usuario") {
+      navigate({
+        pathname: "/",
+        search: createSearchParams({
+          section: "user",
+          userId: follow.targetId.toString(),
+        }).toString(),
       });
-
-      if (res.ok) {
-        setFollows((prev) => prev.filter((f) => f.id !== id));
-      } else {
-        alert("Failed to unfollow. Please try again.");
-      }
-    } catch (err) {
-      console.error("Error:", err);
-      alert("An unexpected error occurred while unfollowing.");
     }
-  }
-
-  const handleViewProfile = (targetId: number) => {
-    navigate({
-      pathname: "/",
-      search: createSearchParams({
-        section: "user",
-        userId: targetId.toString(),
-      }).toString(),
-    });
+    // For 'artista' type, we don't have a dedicated artist profile page yet, so no navigation.
   };
 
   if (loading) {
@@ -144,21 +134,19 @@ export default function Follows() {
           {follows.map((follow) => (
             <Card
               key={follow.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative flex flex-col items-center text-center hover:bg-white/10 transition-colors"
+              className={`bg-white/5 border border-white/10 p-4 rounded-xl text-white relative flex flex-col items-center text-center hover:bg-white/10 transition-colors ${
+                follow.targetType === "usuario" ? "cursor-pointer" : ""
+              }`}
+              onClick={() => handleCardClick(follow)}
             >
-              <button
-                onClick={() => unfollow(follow.id)}
-                className="absolute top-3 right-3 text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
-              >
-                <FaTrashAlt size={16} />
-              </button>
+              {/* REMOVED: Trash icon button */}
               <img
                 src={
                   follow.targetProfilePicture ||
                   "/placeholder.svg?height=96&width=96"
                 }
                 alt={follow.targetName}
-                className="w-24 h-24 rounded-full object-cover"
+                className="w-24 h-24 rounded-full object-cover mb-3"
               />
               <h3 className="font-semibold text-base truncate w-full px-1">
                 {follow.targetName}
@@ -166,14 +154,7 @@ export default function Follows() {
               <p className="text-sm opacity-70 capitalize">
                 {follow.targetType}
               </p>
-              {follow.targetType === "usuario" && (
-                <button
-                  onClick={() => handleViewProfile(follow.targetId)}
-                  className="mt-2 bg-[#8a2be2] text-white px-3 py-1 rounded-full text-xs hover:bg-[#7a1fd1]"
-                >
-                  View Profile
-                </button>
-              )}
+              {/* REMOVED: View Profile button */}
             </Card>
           ))}
         </div>
