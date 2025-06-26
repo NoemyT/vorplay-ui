@@ -19,48 +19,97 @@ export default function History() {
   const { user } = useAuth();
 
   useEffect(() => {
-    async function fetchHistory() {
-      if (!user) {
-        setError("You must be logged in to view search history.");
-        setLoading(false);
-        return;
-      }
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/search-history`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        if (res.ok) {
-          const data = await res.json();
-          setHistory(data);
-        } else {
-          setError("Failed to fetch search history. Please try again.");
-        }
-      } catch (err) {
-        setError("An unexpected error occurred while fetching search history.");
-        console.error("Error:", err);
-      } finally {
-        setLoading(false);
-      }
+    console.log("History component: useEffect triggered.");
+    if (!user) {
+      console.log("History component: User not logged in.");
+      setError("You must be logged in to view search history.");
+      setLoading(false);
+      return;
     }
-
+    console.log(
+      "History component: User is logged in, attempting to fetch history.",
+    );
     fetchHistory();
   }, [user]);
 
-  async function deleteHistoryItem(id: number) {
-    const confirmDelete = window.confirm(
-      "Are you sure you want to delete this search item?"
-    );
-    if (!confirmDelete) return;
+  async function fetchHistory() {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        console.error("History component: Authentication token missing.");
+        setError("Authentication token missing. Please log in again.");
+        setLoading(false);
+        return;
+      }
+
+      console.log(
+        `History component: Fetching from ${import.meta.env.VITE_API_URL}/search-history`,
+      );
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/search-history`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      console.log("History component: API response status:", res.status);
+
+      if (!res.ok) {
+        let errorData = {
+          message: `HTTP Error: ${res.status} ${res.statusText}`,
+        };
+        try {
+          errorData = await res.json();
+          console.error(
+            "History component: Failed to fetch history, error data:",
+            errorData,
+          );
+        } catch (jsonError) {
+          console.error(
+            "History component: Failed to parse error JSON:",
+            jsonError,
+          );
+        }
+        setError(
+          errorData.message ||
+            "Failed to fetch search history. Please try again.",
+        );
+        setHistory([]); // Clear history on error
+      } else {
+        const data = await res.json();
+        console.log("History component: Fetched history data:", data);
+        setHistory(data);
+      }
+    } catch (err) {
+      console.error(
+        "History component: An unexpected network error occurred during fetch:",
+        err,
+      );
+      setError(
+        "An unexpected network error occurred while fetching search history. Please check your connection.",
+      );
+      setHistory([]); // Clear history on network error
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleDeleteItem(id: number) {
+    if (!window.confirm("Are you sure you want to delete this search item?")) {
+      return;
+    }
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) throw new Error("Authentication token missing.");
+
+      console.log(
+        `History component: Deleting item ${id} from ${import.meta.env.VITE_API_URL}/search-history/${id}`,
+      );
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/search-history/${id}`,
         {
@@ -68,28 +117,53 @@ export default function History() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
+      );
+
+      console.log(
+        "History component: Delete item response status:",
+        res.status,
       );
 
       if (res.ok) {
         setHistory((prev) => prev.filter((item) => item.id !== id));
+        alert("Search item deleted successfully!");
       } else {
-        alert("Failed to delete search item. Please try again.");
+        const errorData = await res.json();
+        console.error(
+          "History component: Failed to delete item, error data:",
+          errorData,
+        );
+        alert(
+          errorData.message ||
+            "Failed to delete search item. Please try again.",
+        );
       }
     } catch (err) {
-      console.error("Error:", err);
-      alert("An unexpected error occurred while deleting the search item.");
+      console.error(
+        "History component: An unexpected error occurred during delete item:",
+        err,
+      );
+      alert("An unexpected error occurred during the operation.");
     }
   }
 
-  async function clearAllHistory() {
-    const confirmClear = window.confirm(
-      "Are you sure you want to clear all search history?"
-    );
-    if (!confirmClear) return;
+  async function handleClearAllHistory() {
+    if (
+      !window.confirm(
+        "Are you sure you want to clear all your search history? This action cannot be undone.",
+      )
+    ) {
+      return;
+    }
 
     try {
       const token = localStorage.getItem("token");
+      if (!token) throw new Error("Authentication token missing.");
+
+      console.log(
+        `History component: Clearing all history from ${import.meta.env.VITE_API_URL}/search-history`,
+      );
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/search-history`,
         {
@@ -97,17 +171,34 @@ export default function History() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
+      );
+
+      console.log(
+        "History component: Clear all history response status:",
+        res.status,
       );
 
       if (res.ok) {
         setHistory([]);
+        alert("All search history cleared successfully!");
       } else {
-        alert("Failed to clear all search history. Please try again.");
+        const errorData = await res.json();
+        console.error(
+          "History component: Failed to clear all history, error data:",
+          errorData,
+        );
+        alert(
+          errorData.message ||
+            "Failed to clear all search history. Please try again.",
+        );
       }
     } catch (err) {
-      console.error("Error:", err);
-      alert("An unexpected error occurred while clearing all search history.");
+      console.error(
+        "History component: An unexpected error occurred during clear all history:",
+        err,
+      );
+      alert("An unexpected error occurred during the operation.");
     }
   }
 
@@ -141,7 +232,7 @@ export default function History() {
         <span>Search History</span>
         {history.length > 0 && (
           <button
-            onClick={clearAllHistory}
+            onClick={handleClearAllHistory}
             className="ml-auto bg-red-600 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1 hover:bg-red-500"
           >
             <FaTimesCircle size={12} /> Clear All
@@ -172,7 +263,7 @@ export default function History() {
                 </p>
               </div>
               <button
-                onClick={() => deleteHistoryItem(item.id)}
+                onClick={() => handleDeleteItem(item.id)}
                 className="text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
               >
                 <FaTrashAlt size={16} />

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Card } from "../../ui/Card";
 import { FaMusic, FaPencilAlt, FaHeart } from "react-icons/fa";
 import ReviewModal from "../../ReviewModal";
+import TrackDetailsModal from "../../TrackDetailsModal"; // ADDED: Import TrackDetailsModal
 import { useAuth } from "../../../context/authContext";
 import {
   fetchUserReviews,
@@ -20,6 +21,8 @@ type TrackSummaryDto = {
   albumName: string;
   imageUrl?: string;
   durationMs: number;
+  popularity?: number; // ADDED: Popularity
+  previewUrl?: string; // ADDED: Preview URL for audio
 };
 
 type TracksProps = {
@@ -35,7 +38,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
   );
   const [userReviews, setUserReviews] = useState<Review[]>([]);
   const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
-  // REMOVED: existingReviewForModal state is no longer needed
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false); // ADDED: State for track details modal
 
   const refreshUserData = useCallback(async () => {
     if (!user) return;
@@ -73,21 +76,32 @@ export default function Tracks({ tracks, query }: TracksProps) {
 
   const handleReviewClick = (track: TrackSummaryDto) => {
     setSelectedTrack(track);
-    // REMOVED: No need to find existing review here, as modal only creates new ones
     setIsReviewModalOpen(true);
   };
 
   const handleReviewSubmitted = () => {
-    // MODIFIED: Removed newReview parameter
     console.log("Review submitted, refreshing user data...");
-    refreshUserData(); // This will re-fetch and update the list, causing button to disappear
+    refreshUserData();
   };
 
-  console.log("Current userReviews state in Tracks component:", userReviews); // Log current state
+  // ADDED: Function to open track details modal
+  const handleTrackClick = (track: TrackSummaryDto) => {
+    console.log("Track clicked for details:", track); // LOG: Log the track object
+    setSelectedTrack(track);
+    setIsDetailsModalOpen(true);
+  };
+
+  // ADDED: Function to close track details modal
+  const closeDetailsModal = () => {
+    setIsDetailsModalOpen(false);
+    setSelectedTrack(null);
+  };
+
+  console.log("Current userReviews state in Tracks component:", userReviews);
   console.log(
     "Current userFavorites state in Tracks component:",
     userFavorites,
-  ); // Log current state
+  );
 
   if (!tracks.length) {
     return (
@@ -108,7 +122,6 @@ export default function Tracks({ tracks, query }: TracksProps) {
     <>
       <div className="grid grid-cols-1 gap-4">
         {tracks.map((track) => {
-          // MODIFIED: Always use fav.externalId for comparison with track.id (Spotify ID)
           const isFavorited = userFavorites.some((fav) => {
             console.log(
               `Checking favorite for track ${track.title} (ID: ${track.id}): Favorite externalId=${fav.externalId}, Favorite DB ID=${fav.id}`,
@@ -124,18 +137,18 @@ export default function Tracks({ tracks, query }: TracksProps) {
 
           console.log(
             `Track: ${track.title}, ID: ${track.id}, isFavorited: ${isFavorited}, hasReviewed: ${hasReviewed}`,
-          ); // Final check for each track
+          );
 
           return (
             <Card
               key={track.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white flex items-center gap-4 hover:bg-white/10 transition-colors relative"
+              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white flex items-center gap-4 hover:bg-white/10 transition-colors relative cursor-pointer" // ADDED: cursor-pointer
+              onClick={() => handleTrackClick(track)} // ADDED: onClick to open details modal
             >
               {user && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    // MODIFIED: Pass user object to handleFavoriteToggle
                     handleFavoriteToggle(
                       track,
                       user,
@@ -172,16 +185,18 @@ export default function Tracks({ tracks, query }: TracksProps) {
                 {formatDuration(track.durationMs)}
               </span>
 
-              {user &&
-                !hasReviewed && ( // MODIFIED: Button only shows if user is logged in AND hasn't reviewed
-                  <button
-                    onClick={() => handleReviewClick(track)}
-                    className="ml-4 p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
-                    title="Write a Review" // MODIFIED: Simplified title
-                  >
-                    <FaPencilAlt size={16} />
-                  </button>
-                )}
+              {user && !hasReviewed && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation(); // Prevent card click from opening details modal
+                    handleReviewClick(track);
+                  }}
+                  className="ml-4 p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
+                  title="Write a Review"
+                >
+                  <FaPencilAlt size={16} />
+                </button>
+              )}
             </Card>
           );
         })}
@@ -193,7 +208,15 @@ export default function Tracks({ tracks, query }: TracksProps) {
           onClose={() => setIsReviewModalOpen(false)}
           track={selectedTrack}
           onReviewSubmitted={handleReviewSubmitted}
-          // REMOVED: existingReview prop is no longer passed
+        />
+      )}
+
+      {/* ADDED: Track Details Modal */}
+      {selectedTrack && (
+        <TrackDetailsModal
+          isOpen={isDetailsModalOpen}
+          onClose={closeDetailsModal}
+          track={selectedTrack}
         />
       )}
     </>

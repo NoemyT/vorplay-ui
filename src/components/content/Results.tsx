@@ -4,7 +4,8 @@ import { useState, useEffect } from "react";
 import Tracks from "./searchContent/Tracks";
 import Artists from "./searchContent/Artists";
 import Users from "./searchContent/Users";
-import type { User } from "../../context/authContext";
+// import Albums from "./searchContent/Albums" // Removed as per request
+import type { User } from "../../../context/authContext";
 
 type TrackSummaryDto = {
   id: string;
@@ -13,6 +14,8 @@ type TrackSummaryDto = {
   albumName: string;
   imageUrl?: string;
   durationMs: number;
+  popularity?: number; // ADDED: Popularity
+  previewUrl?: string; // ADDED: Preview URL for audio
 };
 
 type ArtistSummaryDto = {
@@ -36,7 +39,7 @@ export default function Results({ query }: ResultsProps) {
   const [userError, setUserError] = useState<string | null>(null); // Specific error for users
   const [activeTab, setActiveTab] = useState<"tracks" | "artists" | "users">(
     "tracks",
-  );
+  ); // Removed "albums"
 
   useEffect(() => {
     if (!query) {
@@ -56,19 +59,13 @@ export default function Results({ query }: ResultsProps) {
 
     const fetchAllResults = async () => {
       const trackPromise = fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/tracks/search?query=${encodeURIComponent(query)}`,
+        `${import.meta.env.VITE_API_URL}/tracks/search?query=${encodeURIComponent(query)}`,
       );
       const artistPromise = fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/artists/search?query=${encodeURIComponent(query)}`,
+        `${import.meta.env.VITE_API_URL}/artists/search?query=${encodeURIComponent(query)}`,
       );
       const userPromise = fetch(
-        `${
-          import.meta.env.VITE_API_URL
-        }/users/search?query=${encodeURIComponent(query)}`,
+        `${import.meta.env.VITE_API_URL}/users/search?query=${encodeURIComponent(query)}`,
       );
 
       const results = await Promise.allSettled([
@@ -89,9 +86,7 @@ export default function Results({ query }: ResultsProps) {
         }
       } else {
         setTrackError(
-          `Network error fetching tracks: ${
-            results[0].reason?.message || "Unknown error"
-          }`,
+          `Network error fetching tracks: ${results[0].reason?.message || "Unknown error"}`,
         );
         setTracks([]);
       }
@@ -108,9 +103,7 @@ export default function Results({ query }: ResultsProps) {
         }
       } else {
         setArtistError(
-          `Network error fetching artists: ${
-            results[1].reason?.message || "Unknown error"
-          }`,
+          `Network error fetching artists: ${results[1].reason?.message || "Unknown error"}`,
         );
         setArtists([]);
       }
@@ -127,9 +120,7 @@ export default function Results({ query }: ResultsProps) {
         }
       } else {
         setUserError(
-          `Network error fetching users: ${
-            results[2].reason?.message || "Unknown error"
-          }`,
+          `Network error fetching users: ${results[2].reason?.message || "Unknown error"}`,
         );
         setUsers([]);
       }
@@ -180,6 +171,7 @@ export default function Results({ query }: ResultsProps) {
     type: "tracks" | "artists" | "users";
     count: number;
   }[] = [
+    // Removed "albums" type
     { name: "Tracks", type: "tracks", count: tracks.length },
     { name: "Artists", type: "artists", count: artists.length },
     { name: "Users", type: "users", count: users.length },
@@ -187,8 +179,9 @@ export default function Results({ query }: ResultsProps) {
 
   return (
     <div className="flex flex-col w-full h-full">
-      <div className="flex gap-4 mb-2 overflow-x-auto pb-1 flex-shrink-0">
+      <div className="flex gap-4 mb-2 overflow-x-auto pb-2 flex-shrink-0">
         {" "}
+        {/* Changed mb-4 to mb-2 to move tabs up */}
         {tabs.map((tab) => (
           <button
             key={tab.type}
@@ -207,7 +200,7 @@ export default function Results({ query }: ResultsProps) {
           </button>
         ))}
       </div>
-      <div className="flex-grow overflow-y-auto mt-1 pr-2 min-h-0">
+      <div className="flex-grow overflow-y-auto pr-2 min-h-0">
         {renderContent()}
       </div>
     </div>
