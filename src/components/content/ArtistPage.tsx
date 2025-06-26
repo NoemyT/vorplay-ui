@@ -48,7 +48,7 @@ export default function ArtistPage({ artistId }: ArtistPageProps) {
         setTopTracks(tracksData);
 
         // Fetch artist's albums
-        const albumsData = await fetchArtistAlbums(artistId);
+        const albumsData = await fetchArtistAlbums(artistId, 40);
         setAlbums(albumsData);
       } catch (err) {
         setError((err as Error).message || "Failed to load artist data.");

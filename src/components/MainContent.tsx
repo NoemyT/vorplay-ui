@@ -91,7 +91,7 @@ export default function MainContent({
         min-h-[364px]
       "
       >
-        <div className="flex flex-col items-center justify-center overflow-y-auto flex-grow pt-4">
+        <div className="flex flex-col items-center justify-center overflow-y-auto flex-grow">
           {renderContent()}
         </div>
       </Card>

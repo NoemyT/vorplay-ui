@@ -113,7 +113,7 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
       imageUrl: album.imageUrl, // Use the album's image
       durationMs: trackItem.durationMs,
       popularity: undefined, // Not available from this endpoint
-      previewUrl: undefined, // Not available from this endpoint
+      previewUrl: trackItem.previewUrl, // Not available from this endpoint
       href: undefined, // Not available from this endpoint
     };
     console.log("Constructed TrackSummaryDto for modal:", fullTrackDetails);

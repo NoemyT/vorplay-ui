@@ -37,8 +37,8 @@ export type Favorite = {
 export type Follow = {
   id: number;
   followerId: number; // Added followerId based on Swagger
-  targetType: "usuario" | "artista";
-  targetId: number | string; // MODIFIED: Can be number (for user) or string (for artist)
+  targetType: "usuario";
+  targetId: number; // MODIFIED: Can be number (for user) or string (for artist)
   createdAt: string;
   // These fields are now optional as they might be nested
   targetName?: string;
@@ -50,12 +50,6 @@ export type Follow = {
     email: string;
     profilePicture?: string | null;
     createdAt: string;
-  };
-  artist?: {
-    id: string;
-    name: string;
-    externalUrl: string;
-    imageUrl?: string;
   };
 };
 
@@ -87,12 +81,24 @@ export type TrackSummaryDto = {
   href?: string;
 };
 
-// ADDED: New type for tracks returned by the album tracks endpoint
+// MODIFIED: New type for tracks returned by the album tracks endpoint
 export type AlbumTrackItemDto = {
   id: string;
   title: string;
   durationMs: number;
   trackNumber: number;
+  artists: {
+    id: string;
+    name: string;
+    externalUrl: string;
+  }[];
+  album: {
+    id: string;
+    name: string;
+    coverUrl?: string;
+    releaseDate: string;
+  };
+  previewUrl?: string;
 };
 
 // MODIFIED: AlbumDetails type to remove tracks, as they will be fetched separately
@@ -442,9 +448,14 @@ export async function fetchArtistTopTracks(
 
 export async function fetchArtistAlbums(
   artistId: string,
+  limit = 20,
 ): Promise<AlbumSummaryDto[]> {
-  console.log(`API: Fetching albums for artist ID: ${artistId}`);
-  const res = await fetch(`${API_BASE}/artists/${artistId}/albums`);
+  console.log(
+    `API: Fetching albums for artist ID: ${artistId} with limit=${limit}`,
+  );
+  const res = await fetch(
+    `${API_BASE}/artists/${artistId}/albums?limit=${limit}`,
+  );
   if (!res.ok) {
     const errorData = await res.json();
     throw new Error(errorData.message || "Failed to fetch artist albums.");
