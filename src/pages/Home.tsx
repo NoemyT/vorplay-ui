@@ -12,7 +12,9 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const section = searchParams.get("section") || "default";
-  const userId = searchParams.get("userId"); // Get userId from search params
+  const userId = searchParams.get("userId");
+  const artistId = searchParams.get("artistId"); // Get artistId from search params
+  const albumId = searchParams.get("albumId"); // Get albumId from search params
 
   const handleSectionChange = (newSection: string) => {
     setSearchParams({ section: newSection.toLowerCase() });
@@ -24,7 +26,7 @@ export default function Home() {
         onSelectSection={handleSectionChange}
         onSearch={(query) => {
           setSearchQuery(query);
-          setSearchParams({ section: "results", query: query }); // Update search params for results
+          setSearchParams({ section: "results", query: query });
         }}
       />
       <div>
@@ -33,6 +35,8 @@ export default function Home() {
           selectedSection={section}
           searchQuery={searchQuery}
           userId={userId ?? undefined}
+          artistId={artistId ?? undefined}
+          albumId={albumId ?? undefined}
         />
       </div>
     </>

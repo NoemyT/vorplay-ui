@@ -38,7 +38,7 @@ export type Follow = {
   id: number;
   followerId: number; // Added followerId based on Swagger
   targetType: "usuario" | "artista";
-  targetId: number;
+  targetId: number; // MODIFIED: Can be number (for user) or string (for artist)
   createdAt: string;
   // These fields are now optional as they might be nested
   targetName?: string;
@@ -52,11 +52,47 @@ export type Follow = {
     createdAt: string;
   };
   artist?: {
-    id: string;
+    id: number;
     name: string;
     externalUrl: string;
     imageUrl?: string;
   };
+};
+
+// ADDED: New types for Artist, Album, and TrackSummaryDto (for artist top tracks)
+export type Artist = {
+  id: string;
+  name: string;
+  externalUrl: string;
+  imageUrl?: string;
+};
+
+export type AlbumSummaryDto = {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  releaseDate: string;
+  externalUrl: string;
+};
+
+export type TrackSummaryDto = {
+  id: string;
+  title: string;
+  artistNames: string[];
+  albumName: string;
+  imageUrl?: string;
+  durationMs: number;
+  popularity?: number;
+  previewUrl?: string;
+  href?: string;
+};
+
+// MODIFIED: AlbumDetails type to remove tracks, as they will be fetched separately
+export type AlbumDetails = {
+  id: string;
+  title: string;
+  imageUrl?: string;
+  releaseDate: string;
 };
 
 export async function createReview(
@@ -351,3 +387,85 @@ export async function fetchMyFollows(token: string): Promise<Follow[]> {
   console.log(`API: Fetched ${data.length} my follows:`, data);
   return data;
 }
+
+// MODIFIED: fetchArtistAllTracks to accept limit and offset
+export async function fetchArtistAllTracks(
+  artistId: string,
+  limit: number,
+  offset: number,
+): Promise<{ items: TrackSummaryDto[]; total: number }> {
+  console.log(
+    `API: Fetching all tracks for artist ID: ${artistId} with limit=${limit}, offset=${offset}`,
+  );
+  const res = await fetch(
+    `${API_BASE}/artists/${artistId}/tracks?limit=${limit}&offset=${offset}`,
+  );
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch all artist tracks.");
+  }
+  const data = await res.json();
+  console.log("API: fetchArtistAllTracks raw response:", data);
+  // Assuming the backend returns an object with an 'items' array and a 'total' count
+  return { items: data.items || [], total: data.total || 0 };
+}
+
+export async function fetchArtistDetails(artistId: string): Promise<Artist> {
+  console.log(`API: Fetching artist details for ID: ${artistId}`);
+  const res = await fetch(`${API_BASE}/artists/${artistId}`);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch artist details.");
+  }
+  return res.json();
+}
+
+export async function fetchArtistTopTracks(
+  artistId: string,
+): Promise<TrackSummaryDto[]> {
+  console.log(`API: Fetching top tracks for artist ID: ${artistId}`);
+  const res = await fetch(`${API_BASE}/artists/${artistId}/top-tracks`);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch artist top tracks.");
+  }
+  return res.json();
+}
+
+export async function fetchArtistAlbums(
+  artistId: string,
+): Promise<AlbumSummaryDto[]> {
+  console.log(`API: Fetching albums for artist ID: ${artistId}`);
+  const res = await fetch(`${API_BASE}/artists/${artistId}/albums`);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch artist albums.");
+  }
+  return res.json();
+}
+
+// MODIFIED: fetchTracksForAlbum endpoint back to tracks/{albumId}/tracks
+export async function fetchTracksForAlbum(
+  albumId: string,
+  token?: string,
+): Promise<TrackSummaryDto[]> {
+  console.log(
+    `API: Fetching tracks for album ID: ${albumId} from /tracks/${albumId}/tracks`,
+  );
+  const headers: HeadersInit = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+  const res = await fetch(`${API_BASE}/tracks/${albumId}/tracks`, { headers }); // Reverted endpoint
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch album tracks.");
+  }
+  const data = await res.json();
+  console.log("API: fetchTracksForAlbum raw response:", data);
+  // Assuming the backend returns an object with an 'items' array
+  return data.items || [];
+}
+
+// REMOVED: fetchAlbumDetails as per user's feedback that /api/v1/albums/{id} doesn't exist.
+// We will derive album details from fetchArtistAlbums response.
