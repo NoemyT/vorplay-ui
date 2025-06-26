@@ -7,10 +7,10 @@ import Follows from "./content/Follows";
 import MyAccount from "./content/MyAccount";
 import UserAccount from "./content/UserAccount";
 import Results from "./content/Results";
-import AlbumDetails from "./content/AlbumDetails"; // MODIFIED: Renamed from Albums
-import ArtistPage from "./content/ArtistPage"; // ADDED: Import ArtistPage
-import ArtistAllTracks from "./content/ArtistAllTracks"; // ADDED: Import ArtistAllTracks
-import Welcome from "./content/Welcome"; // Import Welcome component
+import AlbumDetails from "./content/AlbumDetails";
+import ArtistPage from "./content/ArtistPage";
+// import ArtistAllTracks from "./content/ArtistAllTracks" // REMOVED: Import ArtistAllTracks
+import Welcome from "./content/Welcome";
 
 type MainContentProps = {
   selectedSection: string;
@@ -54,17 +54,18 @@ export default function MainContent({
           <p className="text-white">Artist ID not provided.</p>
         );
       case "album":
-        return albumId && artistId ? ( // Ensure both albumId and artistId are present
+        return albumId && artistId ? (
           <AlbumDetails albumId={albumId} artistId={artistId} />
         ) : (
           <p className="text-white">Album or Artist ID not provided.</p>
         );
-      case "artist-tracks": // ADDED: New case for ArtistAllTracks
-        return artistId ? (
-          <ArtistAllTracks artistId={artistId} />
-        ) : (
-          <p className="text-white">Artist ID not provided for tracks.</p>
-        );
+      // REMOVED: Case for "artist-tracks"
+      // case "artist-tracks":
+      //   return artistId ? (
+      //     <ArtistAllTracks artistId={artistId} />
+      //   ) : (
+      //     <p className="text-white">Artist ID not provided for tracks.</p>
+      //   )
       case "results":
         return <Results query={searchQuery ?? ""} />;
       default:
@@ -92,8 +93,7 @@ export default function MainContent({
       >
         <div className="flex flex-col items-center justify-center overflow-y-auto flex-grow pt-4">
           {renderContent()}
-        </div>{" "}
-        {/* Added pt-4 for spacing */}
+        </div>
       </Card>
     </div>
   );

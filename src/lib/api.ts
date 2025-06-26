@@ -38,7 +38,7 @@ export type Follow = {
   id: number;
   followerId: number; // Added followerId based on Swagger
   targetType: "usuario" | "artista";
-  targetId: number; // MODIFIED: Can be number (for user) or string (for artist)
+  targetId: number | string; // MODIFIED: Can be number (for user) or string (for artist)
   createdAt: string;
   // These fields are now optional as they might be nested
   targetName?: string;
@@ -52,7 +52,7 @@ export type Follow = {
     createdAt: string;
   };
   artist?: {
-    id: number;
+    id: string;
     name: string;
     externalUrl: string;
     imageUrl?: string;
@@ -87,10 +87,18 @@ export type TrackSummaryDto = {
   href?: string;
 };
 
+// ADDED: New type for tracks returned by the album tracks endpoint
+export type AlbumTrackItemDto = {
+  id: string;
+  title: string;
+  durationMs: number;
+  trackNumber: number;
+};
+
 // MODIFIED: AlbumDetails type to remove tracks, as they will be fetched separately
 export type AlbumDetails = {
   id: string;
-  title: string;
+  name: string;
   imageUrl?: string;
   releaseDate: string;
 };
@@ -444,11 +452,14 @@ export async function fetchArtistAlbums(
   return res.json();
 }
 
-// MODIFIED: fetchTracksForAlbum endpoint back to tracks/{albumId}/tracks
+// REMOVED: followArtist function as per user request
+// REMOVED: unfollowArtist function as per user request
+
+// MODIFIED: fetchTracksForAlbum endpoint back to tracks/{albumId}/tracks and return data directly
 export async function fetchTracksForAlbum(
   albumId: string,
   token?: string,
-): Promise<TrackSummaryDto[]> {
+): Promise<AlbumTrackItemDto[]> {
   console.log(
     `API: Fetching tracks for album ID: ${albumId} from /tracks/${albumId}/tracks`,
   );
@@ -463,8 +474,8 @@ export async function fetchTracksForAlbum(
   }
   const data = await res.json();
   console.log("API: fetchTracksForAlbum raw response:", data);
-  // Assuming the backend returns an object with an 'items' array
-  return data.items || [];
+  // MODIFIED: Return data directly as it's already an array
+  return data;
 }
 
 // REMOVED: fetchAlbumDetails as per user's feedback that /api/v1/albums/{id} doesn't exist.

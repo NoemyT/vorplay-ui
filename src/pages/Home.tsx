@@ -13,8 +13,8 @@ export default function Home() {
 
   const section = searchParams.get("section") || "default";
   const userId = searchParams.get("userId");
-  const artistId = searchParams.get("artistId"); // Get artistId from search params
-  const albumId = searchParams.get("albumId"); // Get albumId from search params
+  const artistId = searchParams.get("artistId");
+  const albumId = searchParams.get("albumId");
 
   const handleSectionChange = (newSection: string) => {
     setSearchParams({ section: newSection.toLowerCase() });

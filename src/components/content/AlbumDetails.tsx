@@ -4,9 +4,14 @@ import { useEffect, useState } from "react";
 import { FaCompactDisc, FaArrowLeft } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useNavigate } from "react-router-dom";
-import { fetchArtistAlbums } from "../../lib/api";
-import { fetchTracksForAlbum, type TrackSummaryDto } from "../../lib/api";
-import TrackDetailsModal from "../TrackDetailsModal"; // ADDED: Import TrackDetailsModal
+import { fetchArtistAlbums, fetchArtistDetails } from "../../lib/api"; // ADDED: fetchArtistDetails
+import {
+  fetchTracksForAlbum,
+  type AlbumTrackItemDto,
+  type TrackSummaryDto,
+  type Artist,
+} from "../../lib/api"; // MODIFIED: Import AlbumTrackItemDto and Artist
+import TrackDetailsModal from "../TrackDetailsModal";
 
 type AlbumDetailsData = {
   id: string;
@@ -24,24 +29,33 @@ type AlbumDetailsProps = {
 export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
   const navigate = useNavigate();
   const [album, setAlbum] = useState<AlbumDetailsData | null>(null);
-  const [albumTracks, setAlbumTracks] = useState<TrackSummaryDto[]>([]);
+  const [artist, setArtist] = useState<Artist | null>(null); // ADDED: State for artist details
+  const [albumTracks, setAlbumTracks] = useState<AlbumTrackItemDto[]>([]); // MODIFIED: Use AlbumTrackItemDto
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false); // ADDED: State for track details modal
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<TrackSummaryDto | null>(
     null,
-  ); // ADDED: State for selected track
+  ); // Keep TrackSummaryDto for modal
 
   useEffect(() => {
     async function loadAlbumDetails() {
       setLoading(true);
       setError(null);
       console.log(
-        `AlbumDetails: Loading details for albumId: ${albumId}, artistId: ${artistId}`,
+        `AlbumDetails: Starting load for albumId: ${albumId}, artistId: ${artistId}`,
       );
       try {
         const token = localStorage.getItem("token");
+
+        // Fetch artist details to get artist name
+        console.log(
+          `AlbumDetails: Fetching artist details for artistId: ${artistId}`,
+        );
+        const artistData = await fetchArtistDetails(artistId);
+        setArtist(artistData);
+        console.log("AlbumDetails: Fetched artist details:", artistData);
 
         console.log(
           `AlbumDetails: Fetching artist albums for artistId: ${artistId}`,
@@ -81,14 +95,32 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
     navigate(-1);
   };
 
-  // ADDED: Function to open track details modal
-  const handleTrackClick = (track: TrackSummaryDto) => {
-    console.log("Track clicked for details:", track);
-    setSelectedTrack(track);
+  const handleTrackClick = (trackItem: AlbumTrackItemDto) => {
+    console.log("Album track clicked for details:", trackItem);
+    if (!album || !artist) {
+      console.error(
+        "Album or Artist data not available for track details modal.",
+      );
+      return;
+    }
+
+    // Construct TrackSummaryDto for the modal
+    const fullTrackDetails: TrackSummaryDto = {
+      id: trackItem.id,
+      title: trackItem.title,
+      artistNames: [artist.name], // Use the album's artist name
+      albumName: album.title,
+      imageUrl: album.imageUrl, // Use the album's image
+      durationMs: trackItem.durationMs,
+      popularity: undefined, // Not available from this endpoint
+      previewUrl: undefined, // Not available from this endpoint
+      href: undefined, // Not available from this endpoint
+    };
+    console.log("Constructed TrackSummaryDto for modal:", fullTrackDetails);
+    setSelectedTrack(fullTrackDetails);
     setIsDetailsModalOpen(true);
   };
 
-  // ADDED: Function to close track details modal
   const closeDetailsModal = () => {
     setIsDetailsModalOpen(false);
     setSelectedTrack(null);
@@ -119,11 +151,11 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
     );
   }
 
-  if (!album) {
+  if (!album || !artist) {
     return (
       <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70 py-10">
         <FaCompactDisc size={48} className="mb-4 text-[#8a2be2]" />
-        <p className="text-lg">Album not found.</p>
+        <p className="text-lg">Album or Artist not found.</p>
       </div>
     );
   }
@@ -150,7 +182,8 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
               {album.title}
             </h2>
             <p className="text-white/70 text-sm">
-              Released: {new Date(album.releaseDate).toLocaleDateString()}
+              {artist.name} • Released:{" "}
+              {new Date(album.releaseDate).toLocaleDateString()}
             </p>
           </div>
 
@@ -162,14 +195,15 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
                   <Card
                     key={track.id}
                     className="bg-white/5 border border-white/10 p-3 rounded-xl text-white flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer"
-                    onClick={() => handleTrackClick(track)} // ADDED: onClick to open details modal
+                    onClick={() => handleTrackClick(track)}
                   >
                     <div>
                       <h4 className="font-semibold text-base truncate">
                         {track.title}
                       </h4>
+                      {/* MODIFIED: Display artist name from fetched artist and album name */}
                       <p className="text-sm opacity-70 truncate">
-                        {track.artistNames.join(", ")}
+                        {artist.name} • {album.title}
                       </p>
                     </div>
                     <span className="text-sm opacity-70 flex-shrink-0">
@@ -187,7 +221,6 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
         </Card>
       </div>
 
-      {/* ADDED: Track Details Modal */}
       {selectedTrack && (
         <TrackDetailsModal
           isOpen={isDetailsModalOpen}
