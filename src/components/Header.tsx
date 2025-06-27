@@ -49,7 +49,6 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
     <header className="w-full bg-black text-[#8a2be2] relative z-50">
       <div className="w-full px-6 py-4 flex items-center relative h-[60px]">
         {" "}
-        {/* Removed justify-between */}
         {/* Left Section */}
         <div className="flex items-center gap-2 flex-shrink-0">
           <Link to="/">
@@ -61,10 +60,9 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
           </Link>
           <span className="font-semibold">Vorplay</span>
         </div>
-        {/* Search Bar (Centered) */}
+        {/* Search Bar */}
         <div className="flex-grow flex justify-center mx-4">
           {" "}
-          {/* Added flex-grow and justify-center */}
           <SearchBar
             onSearch={(query) => {
               onSelectSection("results");
@@ -75,7 +73,6 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
         {/* Right Section */}
         <div className="flex items-center gap-4 flex-shrink-0">
           {" "}
-          {/* Removed w-[200px] and justify-end */}
           {!user ? (
             <>
               <Link

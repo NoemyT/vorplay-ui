@@ -5,22 +5,18 @@ import { useState, useEffect } from "react";
 import { FaStar, FaTimes } from "react-icons/fa";
 import { Card } from "./ui/Card";
 import { useAuth } from "../context/authContext";
-import { createReview, type Review, type ReviewPayload } from "../lib/api"; // Removed deleteReviewApi as it's no longer used here
-
-type TrackDetails = {
-  id: string; // Spotify track ID (string)
-  title: string;
-  artistNames: string[];
-  albumName: string;
-  imageUrl?: string;
-};
+import {
+  createReview,
+  type Review,
+  type ReviewPayload,
+  type TrackSummaryDto,
+} from "../lib/api";
 
 type ReviewModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  track: TrackDetails;
-  onReviewSubmitted: (newReview: Review) => void; // MODIFIED: Removed oldReviewId parameter
-  // REMOVED: existingReview prop is no longer needed here
+  track: TrackSummaryDto;
+  onReviewSubmitted: (newReview: Review) => void;
 };
 
 const MAX_COMMENT_LENGTH = 150;
@@ -42,11 +38,10 @@ export default function ReviewModal({
     if (isOpen) {
       setError(null);
       setSuccess(null);
-      // Always reset form for a new review, as existingReview prop is removed
       setRating(0);
       setComment("");
     }
-  }, [isOpen]); // MODIFIED: Removed existingReview from dependencies
+  }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +69,6 @@ export default function ReviewModal({
     }
 
     try {
-      // REMOVED: No more delete logic here. This modal only creates new reviews.
       const payload: ReviewPayload = {
         id: track.id,
         rating,
@@ -82,7 +76,7 @@ export default function ReviewModal({
       };
       const submittedReview = await createReview(token, payload);
       setSuccess("Review submitted successfully!");
-      onReviewSubmitted(submittedReview); // MODIFIED: Only pass newReview
+      onReviewSubmitted(submittedReview);
       setTimeout(onClose, 1500);
     } catch (err) {
       setError((err as Error).message || "Failed to submit review.");
@@ -108,7 +102,6 @@ export default function ReviewModal({
         >
           <FaTimes size={20} />
         </button>
-        {/* Consolidated Song Information and Modal Title */}
         <div className="flex flex-col items-center text-center mb-6 flex-shrink-0">
           <h2 className="text-2xl font-bold text-white mb-1">{track.title}</h2>
           <p className="text-base text-white/70">

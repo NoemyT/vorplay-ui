@@ -59,12 +59,11 @@ export async function fetchUserProfile(token: string) {
   return res.json() as Promise<User>;
 }
 
-// Define a type for the update payload that includes optional password
 type UpdateUserPayload = Partial<User> & { password?: string };
 
 export async function updateUserProfile(
   token: string,
-  userData: UpdateUserPayload
+  userData: UpdateUserPayload,
 ) {
   const res = await fetch(`${API_BASE}/users/me`, {
     method: "PUT",

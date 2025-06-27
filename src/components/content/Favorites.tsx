@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { TiHeartFullOutline } from "react-icons/ti";
-import { FaTrashAlt } from "react-icons/fa"; // Removed FaTimesCircle
+import { FaTrashAlt } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
 import {
@@ -51,7 +51,7 @@ export default function Favorites() {
   async function handleDeleteFavorite(favoriteId: number) {
     console.log(`Attempting to delete favorite with primary ID: ${favoriteId}`);
     console.log("Current favorites state:", favorites);
-    const favoriteToDelete = favorites.find((fav) => fav.id === favoriteId); // Find by primary ID
+    const favoriteToDelete = favorites.find((fav) => fav.id === favoriteId);
     console.log("Favorite object to delete:", favoriteToDelete);
 
     if (!favoriteToDelete) {
@@ -71,18 +71,17 @@ export default function Favorites() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication token missing.");
 
-      // MODIFIED: Pass favoriteToDelete.trackId to removeFavorite
-      console.log(
+      /* console.log(
         `Making DELETE request to: ${import.meta.env.VITE_API_URL}/favorites/track/${favoriteToDelete.trackId}`,
-      );
+      ); */
       await removeFavorite(token, favoriteToDelete.trackId);
 
-      console.log(
+      /* console.log(
         `Successfully deleted favorite with trackId ${favoriteToDelete.trackId}, updating state`,
-      );
+      ); */
       setFavorites((prev) => {
-        const updated = prev.filter((fav) => fav.id !== favoriteId); // Filter by primary ID for state update
-        console.log("Updated favorites after deletion:", updated);
+        const updated = prev.filter((fav) => fav.id !== favoriteId);
+        // console.log("Updated favorites after deletion:", updated);
         return updated;
       });
 
@@ -93,12 +92,11 @@ export default function Favorites() {
         (err as Error).message ||
         "An unexpected error occurred while removing the favorite.";
 
-      // If the favorite doesn't exist on the server, remove it from local state anyway
       if (errorMessage.includes("not found") || errorMessage.includes("404")) {
-        console.log("Favorite not found on server, removing from local state");
+        // console.log("Favorite not found on server, removing from local state");
         setFavorites((prev) => {
           const updated = prev.filter((fav) => fav.id !== favoriteId);
-          console.log("Updated favorites after local removal:", updated);
+          // console.log("Updated favorites after local removal:", updated);
           return updated;
         });
         alert("Item was already removed from favorites (locally).");
@@ -150,7 +148,6 @@ export default function Favorites() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
           {favorites.map((favorite) => {
-            // MODIFIED: Handle artist and album names being string or object
             const artistName =
               typeof favorite.artist === "string"
                 ? favorite.artist
@@ -167,7 +164,7 @@ export default function Favorites() {
               >
                 {/* Trash icon */}
                 <button
-                  onClick={() => handleDeleteFavorite(favorite.id)} // MODIFIED: Pass the primary 'id'
+                  onClick={() => handleDeleteFavorite(favorite.id)}
                   className="absolute top-3 right-3 text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
                 >
                   <FaTrashAlt size={16} />
@@ -199,8 +196,6 @@ export default function Favorites() {
           })}
         </div>
       )}
-
-      {/* Removed Confirmation Modal for Deletion */}
     </div>
   );
 }

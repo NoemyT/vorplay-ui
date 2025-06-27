@@ -23,7 +23,6 @@ export default function Reviews() {
       setLoading(false);
       return;
     }
-    // Extract userId here to satisfy linter and ensure non-null access
     const userId = user.id;
     try {
       const token = localStorage.getItem("token");

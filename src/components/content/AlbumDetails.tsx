@@ -4,22 +4,15 @@ import { useEffect, useState } from "react";
 import { FaCompactDisc, FaArrowLeft } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useNavigate } from "react-router-dom";
-import { fetchArtistAlbums, fetchArtistDetails } from "../../lib/api"; // ADDED: fetchArtistDetails
+import { fetchArtistAlbums, fetchArtistDetails } from "../../lib/api";
 import {
   fetchTracksForAlbum,
   type AlbumTrackItemDto,
+  type AlbumSummaryDto,
   type TrackSummaryDto,
   type Artist,
-} from "../../lib/api"; // MODIFIED: Import AlbumTrackItemDto and Artist
+} from "../../lib/api";
 import TrackDetailsModal from "../TrackDetailsModal";
-
-type AlbumDetailsData = {
-  id: string;
-  title: string;
-  imageUrl?: string;
-  releaseDate: string;
-  externalUrl: string;
-};
 
 type AlbumDetailsProps = {
   albumId: string;
@@ -28,52 +21,51 @@ type AlbumDetailsProps = {
 
 export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
   const navigate = useNavigate();
-  const [album, setAlbum] = useState<AlbumDetailsData | null>(null);
-  const [artist, setArtist] = useState<Artist | null>(null); // ADDED: State for artist details
-  const [albumTracks, setAlbumTracks] = useState<AlbumTrackItemDto[]>([]); // MODIFIED: Use AlbumTrackItemDto
+  const [album, setAlbum] = useState<AlbumSummaryDto | null>(null);
+  const [artist, setArtist] = useState<Artist | null>(null);
+  const [albumTracks, setAlbumTracks] = useState<AlbumTrackItemDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<TrackSummaryDto | null>(
     null,
-  ); // Keep TrackSummaryDto for modal
+  );
 
   useEffect(() => {
     async function loadAlbumDetails() {
       setLoading(true);
       setError(null);
-      console.log(
+      /* console.log(
         `AlbumDetails: Starting load for albumId: ${albumId}, artistId: ${artistId}`,
-      );
+      ); */
       try {
         const token = localStorage.getItem("token");
 
-        // Fetch artist details to get artist name
-        console.log(
+        /* console.log(
           `AlbumDetails: Fetching artist details for artistId: ${artistId}`,
-        );
+        ); */
         const artistData = await fetchArtistDetails(artistId);
         setArtist(artistData);
-        console.log("AlbumDetails: Fetched artist details:", artistData);
+        // console.log("AlbumDetails: Fetched artist details:", artistData);
 
-        console.log(
+        /* console.log(
           `AlbumDetails: Fetching artist albums for artistId: ${artistId}`,
-        );
+        ); */
         const artistAlbums = await fetchArtistAlbums(artistId);
-        console.log("AlbumDetails: Fetched artist albums:", artistAlbums);
+        // console.log("AlbumDetails: Fetched artist albums:", artistAlbums);
 
         const foundAlbum = artistAlbums.find((a) => a.id === albumId);
-        console.log("AlbumDetails: Found album:", foundAlbum);
+        // console.log("AlbumDetails: Found album:", foundAlbum);
 
         if (!foundAlbum) {
           throw new Error("Album not found for this artist.");
         }
         setAlbum(foundAlbum);
 
-        console.log(`AlbumDetails: Fetching tracks for albumId: ${albumId}`);
+        // console.log(`AlbumDetails: Fetching tracks for albumId: ${albumId}`);
         const tracksData = await fetchTracksForAlbum(albumId, token || "");
-        console.log("AlbumDetails: Fetched album tracks:", tracksData);
+        // console.log("AlbumDetails: Fetched album tracks:", tracksData);
         setAlbumTracks(tracksData);
       } catch (err) {
         setError((err as Error).message || "Failed to load album details.");
@@ -96,7 +88,7 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
   };
 
   const handleTrackClick = (trackItem: AlbumTrackItemDto) => {
-    console.log("Album track clicked for details:", trackItem);
+    // console.log("Album track clicked for details:", trackItem);
     if (!album || !artist) {
       console.error(
         "Album or Artist data not available for track details modal.",
@@ -104,19 +96,18 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
       return;
     }
 
-    // Construct TrackSummaryDto for the modal
     const fullTrackDetails: TrackSummaryDto = {
       id: trackItem.id,
       title: trackItem.title,
-      artistNames: [artist.name], // Use the album's artist name
+      artistNames: [artist.name],
       albumName: album.title,
-      imageUrl: album.imageUrl, // Use the album's image
+      imageUrl: album.imageUrl,
       durationMs: trackItem.durationMs,
-      popularity: undefined, // Not available from this endpoint
-      previewUrl: trackItem.previewUrl, // Not available from this endpoint
-      href: undefined, // Not available from this endpoint
+      popularity: undefined,
+      previewUrl: trackItem.previewUrl,
+      href: undefined,
     };
-    console.log("Constructed TrackSummaryDto for modal:", fullTrackDetails);
+    // console.log("Constructed TrackSummaryDto for modal:", fullTrackDetails);
     setSelectedTrack(fullTrackDetails);
     setIsDetailsModalOpen(true);
   };
@@ -201,7 +192,6 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
                       <h4 className="font-semibold text-base truncate">
                         {track.title}
                       </h4>
-                      {/* MODIFIED: Display artist name from fetched artist and album name */}
                       <p className="text-sm opacity-70 truncate">
                         {artist.name} • {album.title}
                       </p>

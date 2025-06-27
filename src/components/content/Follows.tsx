@@ -5,7 +5,7 @@ import { TiGroup } from "react-icons/ti";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
 import { useNavigate, createSearchParams } from "react-router-dom";
-import { fetchMyFollows, type Follow } from "../../lib/api"; // MODIFIED: Changed to fetchMyFollows
+import { fetchMyFollows, type Follow } from "../../lib/api";
 
 export default function Follows() {
   const [follows, setFollows] = useState<Follow[]>([]);
@@ -28,24 +28,18 @@ export default function Follows() {
           setLoading(false);
           return;
         }
-        // MODIFIED: Use fetchMyFollows to get the current user's follows
+
         const data = await fetchMyFollows(token);
 
-        // Process fetched data to extract correct name and picture
         const processedFollows = data.map((f) => {
           let displayName = "";
-          let displayPicture = "/placeholder.svg?height=96&width=96"; // Default placeholder
+          let displayPicture = "/placeholder.svg?height=96&width=96";
 
           if (f.targetType === "usuario" && f.user) {
             displayName = f.user.name;
             displayPicture =
               f.user.profilePicture || "/placeholder.svg?height=96&width=96";
-          } else if (f.targetType === "artista" && f.artist) {
-            displayName = f.artist.name;
-            displayPicture =
-              f.artist.imageUrl || "/placeholder.svg?height=96&width=96";
           } else {
-            // Fallback if nested user/artist object is not present or type is unknown
             displayName =
               f.targetName ||
               (f.targetType === "usuario"
@@ -77,8 +71,6 @@ export default function Follows() {
     fetchFollowsData();
   }, [user]);
 
-  // REMOVED: unfollow function as it will be handled on the user's profile page
-
   const handleCardClick = (follow: Follow) => {
     if (follow.targetType === "usuario") {
       navigate({
@@ -89,7 +81,6 @@ export default function Follows() {
         }).toString(),
       });
     }
-    // For 'artista' type, we don't have a dedicated artist profile page yet, so no navigation.
   };
 
   if (loading) {
@@ -139,7 +130,6 @@ export default function Follows() {
               }`}
               onClick={() => handleCardClick(follow)}
             >
-              {/* REMOVED: Trash icon button */}
               <img
                 src={
                   follow.targetProfilePicture ||
@@ -154,7 +144,6 @@ export default function Follows() {
               <p className="text-sm opacity-70 capitalize">
                 {follow.targetType}
               </p>
-              {/* REMOVED: View Profile button */}
             </Card>
           ))}
         </div>

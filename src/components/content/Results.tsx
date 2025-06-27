@@ -4,26 +4,8 @@ import { useState, useEffect } from "react";
 import Tracks from "./searchContent/Tracks";
 import Artists from "./searchContent/Artists";
 import Users from "./searchContent/Users";
-// import Albums from "./searchContent/Albums" // Removed as per request
-import type { User } from "../../../context/authContext";
-
-type TrackSummaryDto = {
-  id: string;
-  title: string;
-  artistNames: string[];
-  albumName: string;
-  imageUrl?: string;
-  durationMs: number;
-  popularity?: number; // ADDED: Popularity
-  previewUrl?: string; // ADDED: Preview URL for audio
-};
-
-type ArtistSummaryDto = {
-  id: string;
-  name: string;
-  externalUrl: string;
-  imageUrl?: string;
-};
+import type { User } from "../../context/authContext";
+import type { TrackSummaryDto, Artist } from "../../lib/api";
 
 type ResultsProps = {
   query: string;
@@ -31,15 +13,15 @@ type ResultsProps = {
 
 export default function Results({ query }: ResultsProps) {
   const [tracks, setTracks] = useState<TrackSummaryDto[]>([]);
-  const [artists, setArtists] = useState<ArtistSummaryDto[]>([]);
+  const [artists, setArtists] = useState<Artist[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(false);
-  const [trackError, setTrackError] = useState<string | null>(null); // Specific error for tracks
-  const [artistError, setArtistError] = useState<string | null>(null); // Specific error for artists
-  const [userError, setUserError] = useState<string | null>(null); // Specific error for users
+  const [trackError, setTrackError] = useState<string | null>(null);
+  const [artistError, setArtistError] = useState<string | null>(null);
+  const [userError, setUserError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"tracks" | "artists" | "users">(
     "tracks",
-  ); // Removed "albums"
+  );
 
   useEffect(() => {
     if (!query) {
@@ -74,7 +56,6 @@ export default function Results({ query }: ResultsProps) {
         userPromise,
       ]);
 
-      // Process Tracks
       if (results[0].status === "fulfilled") {
         const tracksRes = results[0].value;
         if (tracksRes.ok) {
@@ -91,7 +72,6 @@ export default function Results({ query }: ResultsProps) {
         setTracks([]);
       }
 
-      // Process Artists
       if (results[1].status === "fulfilled") {
         const artistsRes = results[1].value;
         if (artistsRes.ok) {
@@ -108,7 +88,6 @@ export default function Results({ query }: ResultsProps) {
         setArtists([]);
       }
 
-      // Process Users
       if (results[2].status === "fulfilled") {
         const usersRes = results[2].value;
         if (usersRes.ok) {
@@ -141,7 +120,6 @@ export default function Results({ query }: ResultsProps) {
         </p>
       );
 
-    // Display specific errors if they exist, otherwise render content
     switch (activeTab) {
       case "tracks":
         return trackError ? (
@@ -171,7 +149,6 @@ export default function Results({ query }: ResultsProps) {
     type: "tracks" | "artists" | "users";
     count: number;
   }[] = [
-    // Removed "albums" type
     { name: "Tracks", type: "tracks", count: tracks.length },
     { name: "Artists", type: "artists", count: artists.length },
     { name: "Users", type: "users", count: users.length },
@@ -181,7 +158,6 @@ export default function Results({ query }: ResultsProps) {
     <div className="flex flex-col w-full h-full">
       <div className="flex gap-4 mb-2 overflow-x-auto pb-2 flex-shrink-0">
         {" "}
-        {/* Changed mb-4 to mb-2 to move tabs up */}
         {tabs.map((tab) => (
           <button
             key={tab.type}

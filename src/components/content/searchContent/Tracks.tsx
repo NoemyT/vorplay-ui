@@ -4,26 +4,16 @@ import { useState, useEffect, useCallback } from "react";
 import { Card } from "../../ui/Card";
 import { FaMusic, FaPencilAlt, FaHeart } from "react-icons/fa";
 import ReviewModal from "../../ReviewModal";
-import TrackDetailsModal from "../../TrackDetailsModal"; // ADDED: Import TrackDetailsModal
+import TrackDetailsModal from "../../TrackDetailsModal";
 import { useAuth } from "../../../context/authContext";
 import {
   fetchUserReviews,
   type Review,
   fetchUserFavorites,
   type Favorite,
+  type TrackSummaryDto,
 } from "../../../lib/api";
-import { handleFavoriteToggle } from "../../../lib/utils"; // Corrected import for handleFavoriteToggle
-
-type TrackSummaryDto = {
-  id: string;
-  title: string;
-  artistNames: string[];
-  albumName: string;
-  imageUrl?: string;
-  durationMs: number;
-  popularity?: number; // ADDED: Popularity
-  previewUrl?: string; // ADDED: Preview URL for audio
-};
+import { handleFavoriteToggle } from "../../../lib/utils";
 
 type TracksProps = {
   tracks: TrackSummaryDto[];
@@ -38,7 +28,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
   );
   const [userReviews, setUserReviews] = useState<Review[]>([]);
   const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false); // ADDED: State for track details modal
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const refreshUserData = useCallback(async () => {
     if (!user) return;
@@ -46,16 +36,16 @@ export default function Tracks({ tracks, query }: TracksProps) {
     try {
       const token = localStorage.getItem("token");
       if (token) {
-        console.log("--- Refreshing User Data ---");
+        // console.log("--- Refreshing User Data ---");
         const [reviews, favorites] = await Promise.all([
           fetchUserReviews(token, user.id),
           fetchUserFavorites(token, user.id),
         ]);
-        console.log("Fetched user reviews:", reviews); // Log fetched reviews
-        console.log("Fetched user favorites:", favorites); // Log fetched favorites
+        // console.log("Fetched user reviews:", reviews);
+        // console.log("Fetched user favorites:", favorites);
         setUserReviews(reviews);
         setUserFavorites(favorites);
-        console.log("--- User Data Refreshed ---");
+        // console.log("--- User Data Refreshed ---");
       }
     } catch (err) {
       console.error("Failed to refresh user data:", err);
@@ -80,28 +70,26 @@ export default function Tracks({ tracks, query }: TracksProps) {
   };
 
   const handleReviewSubmitted = () => {
-    console.log("Review submitted, refreshing user data...");
+    // console.log("Review submitted, refreshing user data...");
     refreshUserData();
   };
 
-  // ADDED: Function to open track details modal
   const handleTrackClick = (track: TrackSummaryDto) => {
-    console.log("Track clicked for details:", track); // LOG: Log the track object
+    // console.log("Track clicked for details:", track);
     setSelectedTrack(track);
     setIsDetailsModalOpen(true);
   };
 
-  // ADDED: Function to close track details modal
   const closeDetailsModal = () => {
     setIsDetailsModalOpen(false);
     setSelectedTrack(null);
   };
 
-  console.log("Current userReviews state in Tracks component:", userReviews);
-  console.log(
+  // console.log("Current userReviews state in Tracks component:", userReviews);
+  /* console.log(
     "Current userFavorites state in Tracks component:",
     userFavorites,
-  );
+  ); */
 
   if (!tracks.length) {
     return (
@@ -123,27 +111,27 @@ export default function Tracks({ tracks, query }: TracksProps) {
       <div className="grid grid-cols-1 gap-4">
         {tracks.map((track) => {
           const isFavorited = userFavorites.some((fav) => {
-            console.log(
+            /* console.log(
               `Checking favorite for track ${track.title} (ID: ${track.id}): Favorite externalId=${fav.externalId}, Favorite DB ID=${fav.id}`,
-            );
+            ); */
             return fav.externalId === track.id;
           });
           const hasReviewed = userReviews.some((r) => {
-            console.log(
+            /* console.log(
               `Checking review for track ${track.title} (ID: ${track.id}): Review externalId=${r.externalId}, Review ID=${r.id}`,
-            );
+            ); */
             return r.externalId === track.id;
           });
 
-          console.log(
+          /* console.log(
             `Track: ${track.title}, ID: ${track.id}, isFavorited: ${isFavorited}, hasReviewed: ${hasReviewed}`,
-          );
+          ); */
 
           return (
             <Card
               key={track.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white flex items-center gap-4 hover:bg-white/10 transition-colors relative cursor-pointer" // ADDED: cursor-pointer
-              onClick={() => handleTrackClick(track)} // ADDED: onClick to open details modal
+              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white flex items-center gap-4 hover:bg-white/10 transition-colors relative cursor-pointer"
+              onClick={() => handleTrackClick(track)}
             >
               {user && (
                 <button
@@ -188,7 +176,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
               {user && !hasReviewed && (
                 <button
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent card click from opening details modal
+                    e.stopPropagation();
                     handleReviewClick(track);
                   }}
                   className="ml-4 p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
@@ -211,7 +199,6 @@ export default function Tracks({ tracks, query }: TracksProps) {
         />
       )}
 
-      {/* ADDED: Track Details Modal */}
       {selectedTrack && (
         <TrackDetailsModal
           isOpen={isDetailsModalOpen}

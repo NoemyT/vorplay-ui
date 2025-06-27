@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useEffect, useRef } from "react"; // ADDED: useRef
+import { useState, useEffect, useRef } from "react";
 import {
   FaUserCircle,
   FaStar,
@@ -10,30 +10,22 @@ import {
   FaPencilAlt,
   FaTrashAlt,
   FaCamera,
-} from "react-icons/fa"; // ADDED: FaCamera
+} from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
 import { updateUserProfile } from "../../lib/auth";
-import { useNavigate, createSearchParams } from "react-router-dom"; // Corrected import path
+import { useNavigate, createSearchParams } from "react-router-dom";
 import {
   uploadProfilePicture,
   fetchMyFollows,
   type Follow,
-} from "../../lib/api"; // ADDED: uploadProfilePicture, fetchMyFollows
-
-// Define types for fetched data
-type ReviewSummary = {
-  id: number;
-  title: string;
-  rating: number;
-  coverUrl?: string;
-  createdAt: string;
-};
+  type Review,
+} from "../../lib/api";
 
 export default function MyAccount() {
   const { user, setUser } = useAuth();
   const navigate = useNavigate();
-  const fileInputRef = useRef<HTMLInputElement>(null); // ADDED: Ref for file input
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(user?.name || "");
@@ -41,15 +33,15 @@ export default function MyAccount() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [reviews, setReviews] = useState<ReviewSummary[]>([]);
-  const [following, setFollowing] = useState<Follow[]>([]); // Renamed from 'followers' to 'following'
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [following, setFollowing] = useState<Follow[]>([]);
 
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"success" | "error" | null>(
     null,
   );
-  const [uploading, setUploading] = useState(false); // ADDED: State for upload loading
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -61,7 +53,6 @@ export default function MyAccount() {
         try {
           const token = localStorage.getItem("token");
 
-          // Fetch user's reviews
           const reviewsRes = await fetch(
             `${import.meta.env.VITE_API_URL}/reviews/user/${user.id}`,
             {
@@ -69,8 +60,7 @@ export default function MyAccount() {
             },
           );
           if (reviewsRes.ok) {
-            const reviewsData: ReviewSummary[] = await reviewsRes.json();
-            // Sort by rating descending and take top 3
+            const reviewsData: Review[] = await reviewsRes.json();
             const topReviews = reviewsData
               .sort((a, b) => b.rating - a.rating)
               .slice(0, 3);
@@ -80,24 +70,17 @@ export default function MyAccount() {
             setReviews([]);
           }
 
-          // Fetch "People I Follow" (Following)
-          console.log(`Attempting to fetch following for user ID: ${user.id}`);
-          const fetchedFollowing = await fetchMyFollows(token!); // Use the new API function
-          // MODIFIED: Process fetchedFollowing to correctly extract targetName and targetProfilePicture from 'user' or 'artist'
+          // console.log(`Attempting to fetch following for user ID: ${user.id}`);
+          const fetchedFollowing = await fetchMyFollows(token!);
           const processedFollowing = fetchedFollowing.map((f: Follow) => {
             let displayName = "";
-            let displayPicture = "/placeholder.svg?height=96&width=96"; // Default placeholder
+            let displayPicture = "/placeholder.svg?height=96&width=96";
 
             if (f.targetType === "usuario" && f.user) {
               displayName = f.user.name;
               displayPicture =
                 f.user.profilePicture || "/placeholder.svg?height=96&width=96";
-            } else if (f.targetType === "artista" && f.artist) {
-              displayName = f.artist.name;
-              displayPicture =
-                f.artist.imageUrl || "/placeholder.svg?height=96&width=96";
             } else {
-              // Fallback if nested user/artist object is not present or type is unknown
               displayName =
                 f.targetName ||
                 (f.targetType === "usuario"
@@ -113,10 +96,10 @@ export default function MyAccount() {
               targetProfilePicture: displayPicture,
             };
           });
-          console.log(
+          /* console.log(
             "Successfully fetched following data:",
             processedFollowing,
-          );
+          ); */
           setFollowing(processedFollowing);
         } catch (err) {
           console.error("Error fetching user data:", err);
@@ -175,7 +158,7 @@ export default function MyAccount() {
       setMessageType("success");
       setPassword("");
       setConfirmPassword("");
-      setIsEditing(false); // Exit edit mode on success
+      setIsEditing(false);
     } catch (err) {
       setMessage((err as Error).message || "Failed to update profile.");
       setMessageType("error");
@@ -215,7 +198,7 @@ export default function MyAccount() {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         alert("Your account has been successfully deleted.");
-        navigate("/"); // Redirect to home or login page
+        navigate("/");
       } else {
         const errorData = await res.json();
         throw new Error(errorData.message || "Failed to delete account.");
@@ -231,7 +214,6 @@ export default function MyAccount() {
     }
   };
 
-  // ADDED: Function to handle profile picture file selection
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
@@ -311,7 +293,6 @@ export default function MyAccount() {
               alt={user.name}
               className="w-32 h-32 rounded-full object-cover border-2 border-[#8a2be2]"
             />
-            {/* ADDED: Camera icon for upload */}
             <button
               onClick={() => fileInputRef.current?.click()}
               className="absolute bottom-0 right-0 bg-[#8a2be2] text-white p-2 rounded-full hover:bg-[#7a1fd1] transition-colors"
@@ -319,7 +300,7 @@ export default function MyAccount() {
               disabled={uploading}
             >
               {uploading ? (
-                <span className="animate-spin">⚙️</span> // Simple loading indicator
+                <span className="animate-spin">⚙️</span>
               ) : (
                 <FaCamera size={16} />
               )}
@@ -344,7 +325,6 @@ export default function MyAccount() {
               />
             </button>
           </div>
-          {/* MODIFIED: Display creation date instead of email */}
           {user.createdAt && (
             <p className="text-white/70 text-sm">
               Joined: {new Date(user.createdAt).toLocaleDateString()}
@@ -450,7 +430,7 @@ export default function MyAccount() {
                   setMessageType(null);
                   setPassword("");
                   setConfirmPassword("");
-                  setName(user.name); // Reset name/email if user cancels
+                  setName(user.name);
                   setEmail(user.email);
                 }}
                 className="bg-neutral-700 text-white py-2.5 px-10 rounded-full font-semibold hover:bg-neutral-600 transition"
@@ -529,12 +509,6 @@ export default function MyAccount() {
                   <h4 className="font-semibold text-sm truncate w-full px-1">
                     {follow.targetName}
                   </h4>
-                  {/* MODIFIED: Display targetType only if it's an artist */}
-                  {follow.targetType === "artista" && (
-                    <p className="text-xs opacity-70 capitalize">
-                      {follow.targetType}
-                    </p>
-                  )}
                 </Card>
               ))}
             </div>

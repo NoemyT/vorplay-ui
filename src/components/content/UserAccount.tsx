@@ -1,32 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { FaStar, FaHeart, FaUsers, FaArrowLeft } from "react-icons/fa"; // ADDED: FaArrowLeft
+import { FaStar, FaHeart, FaUsers, FaArrowLeft } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useAuth, type User } from "../../context/authContext";
-import { useNavigate } from "react-router-dom"; // RE-ADDED: useNavigate, createSearchParams
-import { fetchUserFollows, type Follow } from "../../lib/api";
-
-type ReviewSummary = {
-  id: number;
-  title: string;
-  rating: number;
-  coverUrl?: string;
-};
-
-type FavoriteSummary = {
-  id: number;
-  title: string;
-  coverUrl?: string;
-};
+import { useNavigate } from "react-router-dom";
+import {
+  fetchUserFollows,
+  type Follow,
+  type Review,
+  type Favorite,
+} from "../../lib/api";
 
 export default function UserAccount({ userId }: { userId: string }) {
   const { user: currentUser } = useAuth();
-  const navigate = useNavigate(); // RE-ADDED: useNavigate
+  const navigate = useNavigate();
 
   const [profile, setProfile] = useState<User | null>(null);
-  const [reviews, setReviews] = useState<ReviewSummary[]>([]);
-  const [favorites, setFavorites] = useState<FavoriteSummary[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [following, setFollowing] = useState<Follow[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [followId, setFollowId] = useState<number | null>(null);
@@ -38,7 +30,6 @@ export default function UserAccount({ userId }: { userId: string }) {
       setLoading(true);
       setError(null);
       try {
-        // Fetch user profile
         const userRes = await fetch(
           `${import.meta.env.VITE_API_URL}/users/${userId}`,
         );
@@ -47,16 +38,14 @@ export default function UserAccount({ userId }: { userId: string }) {
         const userData: User = await userRes.json();
         setProfile(userData);
 
-        // Fetch user's reviews
         const reviewsRes = await fetch(
           `${import.meta.env.VITE_API_URL}/reviews/user/${userId}`,
         );
         if (!reviewsRes.ok)
           throw new Error(`Failed to fetch user reviews: ${reviewsRes.status}`);
-        const reviewsData: ReviewSummary[] = await reviewsRes.json();
+        const reviewsData: Review[] = await reviewsRes.json();
         setReviews(reviewsData);
 
-        // Fetch user's favorites
         const favoritesRes = await fetch(
           `${import.meta.env.VITE_API_URL}/favorites/user/${userId}`,
         );
@@ -64,20 +53,18 @@ export default function UserAccount({ userId }: { userId: string }) {
           throw new Error(
             `Failed to fetch user favorites: ${favoritesRes.status}`,
           );
-        const favoritesData: FavoriteSummary[] = await favoritesRes.json();
+        const favoritesData: Favorite[] = await favoritesRes.json();
         setFavorites(favoritesData);
 
-        // Fetch who THIS user is following using the new API function
         const fetchedFollowing = await fetchUserFollows(
           localStorage.getItem("token") || "",
           Number(userId),
         );
         setFollowing(fetchedFollowing);
 
-        // Check if current user is following this user
         if (currentUser) {
           const token = localStorage.getItem("token");
-          const myFollows = await fetchUserFollows(token!, currentUser.id); // Fetch current user's follows
+          const myFollows = await fetchUserFollows(token!, currentUser.id);
           const existingFollow = myFollows.find(
             (f: { targetId: number; targetType: string }) =>
               f.targetId === Number(userId) && f.targetType === "usuario",
@@ -114,7 +101,6 @@ export default function UserAccount({ userId }: { userId: string }) {
       if (!token) throw new Error("Authentication token missing.");
 
       if (isFollowing && followId) {
-        // Unfollow
         const res = await fetch(
           `${import.meta.env.VITE_API_URL}/follows/${followId}`,
           {
@@ -126,7 +112,6 @@ export default function UserAccount({ userId }: { userId: string }) {
         setIsFollowing(false);
         setFollowId(null);
       } else {
-        // Follow
         const res = await fetch(`${import.meta.env.VITE_API_URL}/follows`, {
           method: "POST",
           headers: {
@@ -151,9 +136,8 @@ export default function UserAccount({ userId }: { userId: string }) {
     }
   };
 
-  // ADDED: handleGoBack function
   const handleGoBack = () => {
-    navigate(-1); // Go back to the previous page in history
+    navigate(-1);
   };
 
   if (loading) return <p className="text-white">Loading user profile...</p>;
@@ -164,11 +148,9 @@ export default function UserAccount({ userId }: { userId: string }) {
     <div className="flex flex-col w-full h-full items-center">
       <Card className="flex flex-col w-full max-w-[800px] mt-5 bg-white/5 rounded-[20px] p-6 relative">
         {" "}
-        {/* ADDED: relative */}
-        {/* ADDED: Return button */}
         <button
           onClick={handleGoBack}
-          className="absolute top-4 left-6 text-white/70 hover:text-white bg-transparent p-2 rounded-full" // MODIFIED: left-6
+          className="absolute top-4 left-6 text-white/70 hover:text-white bg-transparent p-2 rounded-full"
           title="Go Back"
         >
           <FaArrowLeft size={20} />
@@ -182,7 +164,6 @@ export default function UserAccount({ userId }: { userId: string }) {
             className="w-32 h-32 rounded-full object-cover border-2 border-[#8a2be2]"
           />
           <h2 className="font-extrabold text-4xl text-white">{profile.name}</h2>
-          {/* ADDED: Display joined date */}
           {profile.createdAt && (
             <p className="text-white/70 text-sm">
               Joined: {new Date(profile.createdAt).toLocaleDateString()}

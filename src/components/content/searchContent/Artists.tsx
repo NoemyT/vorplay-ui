@@ -2,29 +2,23 @@
 
 import { Card } from "../../ui/Card";
 import { FaUserCircle } from "react-icons/fa";
-import { useNavigate, createSearchParams } from "react-router-dom"; // ADDED: useNavigate, createSearchParams
-
-type ArtistSummaryDto = {
-  id: string;
-  name: string;
-  externalUrl: string;
-  imageUrl?: string;
-};
+import { useNavigate, createSearchParams } from "react-router-dom";
+import { type Artist } from "../../../lib/api";
 
 type ArtistsProps = {
-  artists: ArtistSummaryDto[];
+  artists: Artist[];
   query: string;
 };
 
 export default function Artists({ artists, query }: ArtistsProps) {
-  const navigate = useNavigate(); // ADDED: useNavigate hook
+  const navigate = useNavigate();
 
   const handleArtistClick = (artistId: string) => {
     navigate({
       pathname: "/",
       search: createSearchParams({
-        section: "artist", // Navigate to the new artist page section
-        artistId: artistId, // Pass the artist ID
+        section: "artist",
+        artistId: artistId,
       }).toString(),
     });
   };
@@ -44,7 +38,7 @@ export default function Artists({ artists, query }: ArtistsProps) {
         <Card
           key={artist.id}
           className="bg-white/5 border border-white/10 p-4 rounded-xl text-white text-center flex flex-col items-center justify-center hover:bg-white/10 transition-colors cursor-pointer" // ADDED: cursor-pointer
-          onClick={() => handleArtistClick(artist.id)} // ADDED: onClick handler
+          onClick={() => handleArtistClick(artist.id)}
         >
           <img
             src={artist.imageUrl || "/placeholder.svg?height=96&width=96"}

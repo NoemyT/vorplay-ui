@@ -9,7 +9,6 @@ import UserAccount from "./content/UserAccount";
 import Results from "./content/Results";
 import AlbumDetails from "./content/AlbumDetails";
 import ArtistPage from "./content/ArtistPage";
-// import ArtistAllTracks from "./content/ArtistAllTracks" // REMOVED: Import ArtistAllTracks
 import Welcome from "./content/Welcome";
 
 type MainContentProps = {
@@ -59,13 +58,6 @@ export default function MainContent({
         ) : (
           <p className="text-white">Album or Artist ID not provided.</p>
         );
-      // REMOVED: Case for "artist-tracks"
-      // case "artist-tracks":
-      //   return artistId ? (
-      //     <ArtistAllTracks artistId={artistId} />
-      //   ) : (
-      //     <p className="text-white">Artist ID not provided for tracks.</p>
-      //   )
       case "results":
         return <Results query={searchQuery ?? ""} />;
       default:

@@ -1,23 +1,12 @@
 "use client";
 import { FaTimes } from "react-icons/fa";
 import { Card } from "./ui/Card";
-
-type TrackDetails = {
-  id: string;
-  title: string;
-  artistNames: string[];
-  albumName: string;
-  imageUrl?: string;
-  durationMs: number;
-  popularity?: number;
-  previewUrl?: string;
-  href?: string;
-};
+import { type TrackSummaryDto } from "../lib/api";
 
 type TrackDetailsModalProps = {
   isOpen: boolean;
   onClose: () => void;
-  track: TrackDetails;
+  track: TrackSummaryDto;
 };
 
 export default function TrackDetailsModal({
@@ -69,7 +58,6 @@ export default function TrackDetailsModal({
           {spotifyEmbedUrl && (
             <div className="w-full mt-4 rounded-md overflow-hidden">
               {" "}
-              {/* ADDED: overflow-hidden */}
               <h3 className="text-white text-lg font-semibold mb-2">
                 Listen Preview:
               </h3>
