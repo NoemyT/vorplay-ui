@@ -11,6 +11,7 @@ import {
   type Review,
   type Favorite,
 } from "../../lib/api";
+import placeholder from "../../assets/placeholder.svg";
 
 export default function UserAccount({ userId }: { userId: string }) {
   const { user: currentUser } = useAuth();
@@ -157,9 +158,7 @@ export default function UserAccount({ userId }: { userId: string }) {
         </button>
         <div className="flex flex-col items-center gap-4 mb-6">
           <img
-            src={
-              profile.profilePicture || "/placeholder.svg?height=128&width=128"
-            }
+            src={profile.profilePicture || placeholder}
             alt={profile.name}
             className="w-32 h-32 rounded-full object-cover border-2 border-[#8a2be2]"
           />

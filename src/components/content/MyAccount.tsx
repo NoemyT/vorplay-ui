@@ -21,6 +21,7 @@ import {
   type Follow,
   type Review,
 } from "../../lib/api";
+import placeholder from "../../assets/placeholder.svg";
 
 export default function MyAccount() {
   const { user, setUser } = useAuth();
@@ -74,20 +75,18 @@ export default function MyAccount() {
           const fetchedFollowing = await fetchMyFollows(token!);
           const processedFollowing = fetchedFollowing.map((f: Follow) => {
             let displayName = "";
-            let displayPicture = "/placeholder.svg?height=96&width=96";
+            let displayPicture = placeholder;
 
             if (f.targetType === "usuario" && f.user) {
               displayName = f.user.name;
-              displayPicture =
-                f.user.profilePicture || "/placeholder.svg?height=96&width=96";
+              displayPicture = f.user.profilePicture || placeholder;
             } else {
               displayName =
                 f.targetName ||
                 (f.targetType === "usuario"
                   ? `User ${f.targetId}`
                   : `Artist ${f.targetId}`);
-              displayPicture =
-                f.targetProfilePicture || "/placeholder.svg?height=96&width=96";
+              displayPicture = f.targetProfilePicture || placeholder;
             }
 
             return {
@@ -287,9 +286,7 @@ export default function MyAccount() {
         <div className="flex flex-col items-center gap-4 mb-6">
           <div className="relative">
             <img
-              src={
-                user.profilePicture || "/placeholder.svg?height=128&width=128"
-              }
+              src={user.profilePicture || placeholder}
               alt={user.name}
               className="w-32 h-32 rounded-full object-cover border-2 border-[#8a2be2]"
             />
@@ -454,9 +451,7 @@ export default function MyAccount() {
                   className="bg-white/5 border border-white/10 p-3 rounded-xl text-white flex flex-col items-center text-center"
                 >
                   <img
-                    src={
-                      review.coverUrl || "/placeholder.svg?height=96&width=96"
-                    }
+                    src={review.coverUrl || placeholder}
                     alt={review.title}
                     className="w-24 h-24 rounded-md object-cover mb-2"
                   />
@@ -499,10 +494,7 @@ export default function MyAccount() {
                   onClick={() => handleViewUser(follow.targetId)}
                 >
                   <img
-                    src={
-                      follow.targetProfilePicture ||
-                      "/placeholder.svg?height=64&width=64"
-                    }
+                    src={follow.targetProfilePicture || placeholder}
                     alt={follow.targetName}
                     className="w-16 h-16 rounded-full object-cover mb-2"
                   />

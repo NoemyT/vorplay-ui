@@ -6,6 +6,7 @@ import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import { fetchMyFollows, type Follow } from "../../lib/api";
+import placeholder from "../../assets/placeholder.svg";
 
 export default function Follows() {
   const [follows, setFollows] = useState<Follow[]>([]);
@@ -33,20 +34,18 @@ export default function Follows() {
 
         const processedFollows = data.map((f) => {
           let displayName = "";
-          let displayPicture = "/placeholder.svg?height=96&width=96";
+          let displayPicture = placeholder;
 
           if (f.targetType === "usuario" && f.user) {
             displayName = f.user.name;
-            displayPicture =
-              f.user.profilePicture || "/placeholder.svg?height=96&width=96";
+            displayPicture = f.user.profilePicture || placeholder;
           } else {
             displayName =
               f.targetName ||
               (f.targetType === "usuario"
                 ? `User ${f.targetId}`
                 : `Artist ${f.targetId}`);
-            displayPicture =
-              f.targetProfilePicture || "/placeholder.svg?height=96&width=96";
+            displayPicture = f.targetProfilePicture || placeholder;
           }
 
           return {
@@ -131,10 +130,7 @@ export default function Follows() {
               onClick={() => handleCardClick(follow)}
             >
               <img
-                src={
-                  follow.targetProfilePicture ||
-                  "/placeholder.svg?height=96&width=96"
-                }
+                src={follow.targetProfilePicture || placeholder}
                 alt={follow.targetName}
                 className="w-24 h-24 rounded-full object-cover mb-3"
               />

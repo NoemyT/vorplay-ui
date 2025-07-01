@@ -15,6 +15,7 @@ export default function Home() {
   const userId = searchParams.get("userId");
   const artistId = searchParams.get("artistId");
   const albumId = searchParams.get("albumId");
+  const playlistId = searchParams.get("playlistId");
 
   const handleSectionChange = (newSection: string) => {
     setSearchParams({ section: newSection.toLowerCase() });
@@ -37,6 +38,7 @@ export default function Home() {
           userId={userId ?? undefined}
           artistId={artistId ?? undefined}
           albumId={albumId ?? undefined}
+          playlistId={playlistId ?? undefined}
         />
       </div>
     </>

@@ -9,6 +9,7 @@ import UserAccount from "./content/UserAccount";
 import Results from "./content/Results";
 import AlbumDetails from "./content/AlbumDetails";
 import ArtistPage from "./content/ArtistPage";
+import PlaylistDetails from "./content/PlaylistDetails";
 import Welcome from "./content/Welcome";
 
 type MainContentProps = {
@@ -17,6 +18,7 @@ type MainContentProps = {
   userId?: string;
   artistId?: string;
   albumId?: string;
+  playlistId?: string;
 };
 
 export default function MainContent({
@@ -25,6 +27,7 @@ export default function MainContent({
   userId,
   artistId,
   albumId,
+  playlistId,
 }: MainContentProps) {
   const renderContent = () => {
     switch (selectedSection.toLowerCase()) {
@@ -57,6 +60,12 @@ export default function MainContent({
           <AlbumDetails albumId={albumId} artistId={artistId} />
         ) : (
           <p className="text-white">Album or Artist ID not provided.</p>
+        );
+      case "playlist":
+        return playlistId ? (
+          <PlaylistDetails playlistId={playlistId} />
+        ) : (
+          <p className="text-white">Playlist ID not provided.</p>
         );
       case "results":
         return <Results query={searchQuery ?? ""} />;

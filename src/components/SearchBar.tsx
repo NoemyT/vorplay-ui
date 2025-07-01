@@ -1,8 +1,12 @@
+"use client";
+
+import type React from "react";
+
 import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 
 type SearchBarProps = {
-  onSearch: (query: string) => void;
+  onSearch: (query: string, setOpen: (open: boolean) => void) => void;
 };
 
 export default function SearchBar({ onSearch }: SearchBarProps) {
@@ -12,7 +16,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      onSearch(searchTerm.trim());
+      onSearch(searchTerm.trim(), () => {});
       setOpen(false);
     }
   };

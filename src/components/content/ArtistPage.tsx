@@ -14,6 +14,7 @@ import {
   type AlbumSummaryDto,
 } from "../../lib/api";
 import TrackDetailsModal from "../TrackDetailsModal";
+import placeholder from "../../assets/placeholder.svg";
 
 type ArtistPageProps = {
   artistId: string;
@@ -113,7 +114,7 @@ export default function ArtistPage({ artistId }: ArtistPageProps) {
 
           <div className="flex flex-col items-center gap-4 mb-6">
             <img
-              src={artist.imageUrl || "/placeholder.svg?height=128&width=128"}
+              src={artist.imageUrl || placeholder}
               alt={artist.name}
               className="w-32 h-32 rounded-full object-cover border-2 border-[#8a2be2]"
             />
@@ -172,9 +173,7 @@ export default function ArtistPage({ artistId }: ArtistPageProps) {
                     onClick={() => handleAlbumClick(album.id)}
                   >
                     <img
-                      src={
-                        album.imageUrl || "/placeholder.svg?height=96&width=96"
-                      }
+                      src={album.imageUrl || placeholder}
                       alt={album.title}
                       className="w-24 h-24 rounded-md object-cover mb-2"
                     />

@@ -5,6 +5,7 @@ import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/authContext";
 import logo from "../assets/vorp.png";
 import SearchBar from "../components/SearchBar";
+import placeholder from "../assets/placeholder.svg";
 
 type HeaderProps = {
   onSelectSection: (section: string) => void;
@@ -45,6 +46,32 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
     };
   }, []);
 
+  const handleSearch = (
+    searchTerm: string,
+    setOpen?: (open: boolean) => void,
+  ) => {
+    if (searchTerm.trim()) {
+      onSearch(searchTerm.trim());
+
+      // Save search query to history if user is logged in
+      if (user) {
+        const token = localStorage.getItem("token");
+        if (token) {
+          import("../lib/api").then(({ saveSearchQuery }) => {
+            saveSearchQuery(token, searchTerm.trim()).catch((err) => {
+              console.error("Failed to save search query:", err);
+              // Don't show error to user as this is not critical functionality
+            });
+          });
+        }
+      }
+
+      if (setOpen) {
+        setOpen(false);
+      }
+    }
+  };
+
   return (
     <header className="w-full bg-black text-[#8a2be2] relative z-50">
       <div className="w-full px-6 py-4 flex items-center relative h-[60px]">
@@ -53,7 +80,7 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
         <div className="flex items-center gap-2 flex-shrink-0">
           <Link to="/">
             <img
-              src={logo || "/placeholder.svg"}
+              src={logo || placeholder}
               alt="Logo"
               className="h-10 w-auto rounded-[20px]"
             />
@@ -64,9 +91,9 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
         <div className="flex-grow flex justify-center mx-4">
           {" "}
           <SearchBar
-            onSearch={(query) => {
+            onSearch={(query, setOpen) => {
               onSelectSection("results");
-              onSearch(query);
+              handleSearch(query, setOpen);
             }}
           />
         </div>

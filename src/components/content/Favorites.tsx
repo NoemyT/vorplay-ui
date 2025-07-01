@@ -10,6 +10,7 @@ import {
   removeFavorite,
   type Favorite,
 } from "../../lib/api";
+import placeholder from "../../assets/placeholder.svg";
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
@@ -173,9 +174,7 @@ export default function Favorites() {
                 {/* Top section: image + title */}
                 <div className="flex gap-4 items-start">
                   <img
-                    src={
-                      favorite.coverUrl || "/placeholder.svg?height=64&width=64"
-                    }
+                    src={favorite.coverUrl || placeholder}
                     alt="cover"
                     className="w-16 h-16 rounded-md object-cover"
                   />

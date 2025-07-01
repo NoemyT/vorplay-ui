@@ -2,9 +2,10 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card } from "../../ui/Card";
-import { FaMusic, FaPencilAlt, FaHeart } from "react-icons/fa";
+import { FaMusic, FaPencilAlt, FaHeart, FaPlus } from "react-icons/fa";
 import ReviewModal from "../../ReviewModal";
 import TrackDetailsModal from "../../TrackDetailsModal";
+import AddToPlaylistModal from "../../AddToPlaylistModal";
 import { useAuth } from "../../../context/authContext";
 import {
   fetchUserReviews,
@@ -23,6 +24,7 @@ type TracksProps = {
 export default function Tracks({ tracks, query }: TracksProps) {
   const { user } = useAuth();
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<TrackSummaryDto | null>(
     null,
   );
@@ -36,16 +38,12 @@ export default function Tracks({ tracks, query }: TracksProps) {
     try {
       const token = localStorage.getItem("token");
       if (token) {
-        // console.log("--- Refreshing User Data ---");
         const [reviews, favorites] = await Promise.all([
           fetchUserReviews(token, user.id),
           fetchUserFavorites(token, user.id),
         ]);
-        // console.log("Fetched user reviews:", reviews);
-        // console.log("Fetched user favorites:", favorites);
         setUserReviews(reviews);
         setUserFavorites(favorites);
-        // console.log("--- User Data Refreshed ---");
       }
     } catch (err) {
       console.error("Failed to refresh user data:", err);
@@ -69,13 +67,20 @@ export default function Tracks({ tracks, query }: TracksProps) {
     setIsReviewModalOpen(true);
   };
 
+  const handlePlaylistClick = (track: TrackSummaryDto) => {
+    setSelectedTrack(track);
+    setIsPlaylistModalOpen(true);
+  };
+
   const handleReviewSubmitted = () => {
-    // console.log("Review submitted, refreshing user data...");
     refreshUserData();
   };
 
+  const handleTrackAdded = () => {
+    // Could refresh playlists here if needed
+  };
+
   const handleTrackClick = (track: TrackSummaryDto) => {
-    // console.log("Track clicked for details:", track);
     setSelectedTrack(track);
     setIsDetailsModalOpen(true);
   };
@@ -84,12 +89,6 @@ export default function Tracks({ tracks, query }: TracksProps) {
     setIsDetailsModalOpen(false);
     setSelectedTrack(null);
   };
-
-  // console.log("Current userReviews state in Tracks component:", userReviews);
-  /* console.log(
-    "Current userFavorites state in Tracks component:",
-    userFavorites,
-  ); */
 
   if (!tracks.length) {
     return (
@@ -111,21 +110,11 @@ export default function Tracks({ tracks, query }: TracksProps) {
       <div className="grid grid-cols-1 gap-4">
         {tracks.map((track) => {
           const isFavorited = userFavorites.some((fav) => {
-            /* console.log(
-              `Checking favorite for track ${track.title} (ID: ${track.id}): Favorite externalId=${fav.externalId}, Favorite DB ID=${fav.id}`,
-            ); */
             return fav.externalId === track.id;
           });
           const hasReviewed = userReviews.some((r) => {
-            /* console.log(
-              `Checking review for track ${track.title} (ID: ${track.id}): Review externalId=${r.externalId}, Review ID=${r.id}`,
-            ); */
             return r.externalId === track.id;
           });
-
-          /* console.log(
-            `Track: ${track.title}, ID: ${track.id}, isFavorited: ${isFavorited}, hasReviewed: ${hasReviewed}`,
-          ); */
 
           return (
             <Card
@@ -173,17 +162,31 @@ export default function Tracks({ tracks, query }: TracksProps) {
                 {formatDuration(track.durationMs)}
               </span>
 
-              {user && !hasReviewed && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleReviewClick(track);
-                  }}
-                  className="ml-4 p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
-                  title="Write a Review"
-                >
-                  <FaPencilAlt size={16} />
-                </button>
+              {user && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handlePlaylistClick(track);
+                    }}
+                    className="p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
+                    title="Add to Playlist"
+                  >
+                    <FaPlus size={16} />
+                  </button>
+                  {!hasReviewed && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleReviewClick(track);
+                      }}
+                      className="p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
+                      title="Write a Review"
+                    >
+                      <FaPencilAlt size={16} />
+                    </button>
+                  )}
+                </div>
               )}
             </Card>
           );
@@ -191,20 +194,27 @@ export default function Tracks({ tracks, query }: TracksProps) {
       </div>
 
       {selectedTrack && (
-        <ReviewModal
-          isOpen={isReviewModalOpen}
-          onClose={() => setIsReviewModalOpen(false)}
-          track={selectedTrack}
-          onReviewSubmitted={handleReviewSubmitted}
-        />
-      )}
+        <>
+          <ReviewModal
+            isOpen={isReviewModalOpen}
+            onClose={() => setIsReviewModalOpen(false)}
+            track={selectedTrack}
+            onReviewSubmitted={handleReviewSubmitted}
+          />
 
-      {selectedTrack && (
-        <TrackDetailsModal
-          isOpen={isDetailsModalOpen}
-          onClose={closeDetailsModal}
-          track={selectedTrack}
-        />
+          <AddToPlaylistModal
+            isOpen={isPlaylistModalOpen}
+            onClose={() => setIsPlaylistModalOpen(false)}
+            track={selectedTrack}
+            onTrackAdded={handleTrackAdded}
+          />
+
+          <TrackDetailsModal
+            isOpen={isDetailsModalOpen}
+            onClose={closeDetailsModal}
+            track={selectedTrack}
+          />
+        </>
       )}
     </>
   );

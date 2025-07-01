@@ -4,6 +4,7 @@ import { Card } from "../../ui/Card";
 import { FaUserCircle } from "react-icons/fa";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import { type Artist } from "../../../lib/api";
+import placeholder from "../../../assets/placeholder.svg";
 
 type ArtistsProps = {
   artists: Artist[];
@@ -41,7 +42,7 @@ export default function Artists({ artists, query }: ArtistsProps) {
           onClick={() => handleArtistClick(artist.id)}
         >
           <img
-            src={artist.imageUrl || "/placeholder.svg?height=96&width=96"}
+            src={artist.imageUrl || placeholder}
             alt={artist.name}
             className="w-24 h-24 rounded-full object-cover mb-3"
           />

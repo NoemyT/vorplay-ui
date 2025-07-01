@@ -13,6 +13,7 @@ import {
   type Artist,
 } from "../../lib/api";
 import TrackDetailsModal from "../TrackDetailsModal";
+import placeholder from "../../assets/placeholder.svg";
 
 type AlbumDetailsProps = {
   albumId: string;
@@ -165,7 +166,7 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
 
           <div className="flex flex-col items-center gap-4 mb-6">
             <img
-              src={album.imageUrl || "/placeholder.svg?height=128&width=128"}
+              src={album.imageUrl || placeholder}
               alt={album.title}
               className="w-32 h-32 rounded-md object-cover border-2 border-[#8a2be2]"
             />

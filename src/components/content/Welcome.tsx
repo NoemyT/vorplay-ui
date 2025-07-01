@@ -5,6 +5,7 @@ import type React from "react";
 import { Card, CardHeader, CardContent } from "../ui/Card";
 import logo from "../../assets/vorp.png";
 import { FaStar, FaPlus, FaUsers, FaMusic } from "react-icons/fa";
+import placeholder from "../../assets/placeholder.svg";
 
 export default function Welcome() {
   return (
@@ -21,7 +22,7 @@ export default function Welcome() {
         "
         >
           <img
-            src={logo || "/placeholder.svg"}
+            src={logo || placeholder}
             alt="Vorplay Logo"
             className="w-24 h-24 rounded-full mb-2"
           />

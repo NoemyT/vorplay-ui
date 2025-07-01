@@ -4,6 +4,7 @@ import { Card } from "../../ui/Card";
 import { FaUsers } from "react-icons/fa";
 import type { User } from "../../../context/authContext";
 import { useNavigate, createSearchParams } from "react-router-dom";
+import placeholder from "../../../assets/placeholder.svg";
 
 type UsersProps = {
   users: User[];
@@ -41,7 +42,7 @@ export default function Users({ users, query }: UsersProps) {
           onClick={() => handleUserClick(user.id)}
         >
           <img
-            src={user.profilePicture || "/placeholder.svg?height=96&width=96"}
+            src={user.profilePicture || placeholder}
             alt={user.name}
             className="w-24 h-24 rounded-full object-cover mb-3"
           />

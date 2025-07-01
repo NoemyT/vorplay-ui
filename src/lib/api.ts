@@ -102,6 +102,46 @@ export type AlbumDetails = {
   releaseDate: string;
 };
 
+export type PlaylistTrack = {
+  playlistId: number;
+  trackId: number;
+  position: number;
+  track: {
+    id: number;
+    externalId: string;
+    title: string;
+    artist: string;
+    album: string;
+    coverUrl?: string;
+  };
+};
+
+export type Playlist = {
+  id: number;
+  userId: number;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+  playlistTracks: PlaylistTrack[];
+};
+
+export type CreatePlaylistPayload = {
+  name: string;
+  description?: string;
+};
+
+export type UpdatePlaylistPayload = {
+  name?: string;
+  description?: string;
+};
+
+export type AddTrackToPlaylistPayload = {
+  externalId: string;
+  externalProvider: "Spotify";
+  position?: number;
+};
+
 export async function createReview(
   token: string,
   payload: ReviewPayload,
@@ -265,7 +305,7 @@ export async function fetchUserFavorites(
   /* console.log(
     `API: Fetched ${data.length} favorites for user ${userId}:`,
     data,
-  );
+  ); */
   data.forEach((fav: Favorite) => {
     if (typeof fav.id === "undefined" || fav.id === null) {
       console.warn(`Favorite item missing 'id' field:`, fav);
@@ -273,7 +313,7 @@ export async function fetchUserFavorites(
     if (typeof fav.externalId === "undefined" || fav.externalId === null) {
       console.warn(`Favorite item missing 'externalId' field:`, fav);
     }
-  }); */
+  });
   return data;
 }
 
@@ -297,7 +337,7 @@ export async function uploadProfilePicture(
 
   if (!res.ok) {
     const errorData = await res.json();
-    // console.error("API: Upload profile picture error:", errorData);
+    console.error("API: Upload profile picture error:", errorData);
     throw new Error(errorData.message || "Failed to upload profile picture.");
   }
 
@@ -322,7 +362,7 @@ export async function fetchProfilePictureByUserId(
       return "/placeholder.svg?height=96&width=96";
     }
     const errorData = await res.json();
-    // console.error("API: Fetch profile picture error:", errorData);
+    console.error("API: Fetch profile picture error:", errorData);
     throw new Error(errorData.message || "Failed to fetch profile picture.");
   }
 
@@ -330,11 +370,11 @@ export async function fetchProfilePictureByUserId(
   if (data && data.url) {
     return data.url;
   } else {
-    /* console.warn(
+    console.warn(
       `API: Unexpected response for profile picture for user ${userId}:`,
       data,
-    ); */
-    return "/placeholder.svg?height=96&width=96"; // Fallback
+    );
+    return "/placeholder.svg?height=96&width=96";
   }
 }
 
@@ -351,7 +391,7 @@ export async function fetchUserFollows(
 
   if (!res.ok) {
     const errorData = await res.json();
-    // console.error("API: Fetch user follows error:", errorData);
+    console.error("API: Fetch user follows error:", errorData);
     throw new Error(errorData.message || "Failed to fetch user follows.");
   }
 
@@ -371,7 +411,7 @@ export async function fetchMyFollows(token: string): Promise<Follow[]> {
 
   if (!res.ok) {
     const errorData = await res.json();
-    // console.error("API: Fetch my follows error:", errorData);
+    console.error("API: Fetch my follows error:", errorData);
     throw new Error(errorData.message || "Failed to fetch my follows.");
   }
 
@@ -458,4 +498,160 @@ export async function fetchTracksForAlbum(
   const data = await res.json();
   // console.log("API: fetchTracksForAlbum raw response:", data);
   return data;
+}
+
+export async function saveSearchQuery(
+  token: string,
+  query: string,
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/search-history`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ query }),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to save search query.");
+  }
+}
+
+export async function fetchUserPlaylists(token: string): Promise<Playlist[]> {
+  const res = await fetch(`${API_BASE}/playlists`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch playlists.");
+  }
+
+  return res.json();
+}
+
+export async function fetchPlaylistDetails(
+  token: string,
+  playlistId: number,
+): Promise<Playlist> {
+  const res = await fetch(`${API_BASE}/playlists/${playlistId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    cache: "no-store",
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch playlist details.");
+  }
+
+  return res.json();
+}
+
+export async function createPlaylist(
+  token: string,
+  payload: CreatePlaylistPayload,
+): Promise<Playlist> {
+  const res = await fetch(`${API_BASE}/playlists`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to create playlist.");
+  }
+
+  return res.json();
+}
+
+export async function updatePlaylist(
+  token: string,
+  playlistId: number,
+  payload: UpdatePlaylistPayload,
+): Promise<Playlist> {
+  const res = await fetch(`${API_BASE}/playlists/${playlistId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to update playlist.");
+  }
+
+  return res.json();
+}
+
+export async function deletePlaylist(
+  token: string,
+  playlistId: number,
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/playlists/${playlistId}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to delete playlist.");
+  }
+}
+
+export async function addTrackToPlaylist(
+  token: string,
+  playlistId: number,
+  payload: AddTrackToPlaylistPayload,
+): Promise<void> {
+  const res = await fetch(`${API_BASE}/playlists/${playlistId}/tracks`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to add track to playlist.");
+  }
+}
+
+export async function removeTrackFromPlaylist(
+  token: string,
+  playlistId: number,
+  trackId: number,
+): Promise<void> {
+  const res = await fetch(
+    `${API_BASE}/playlists/${playlistId}/tracks/${trackId}`,
+    {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(
+      errorData.message || "Failed to remove track from playlist.",
+    );
+  }
 }

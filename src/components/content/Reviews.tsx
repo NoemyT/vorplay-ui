@@ -6,6 +6,7 @@ import { FaTrashAlt, FaTimes } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../context/authContext";
 import { fetchUserReviews, deleteReviewApi, type Review } from "../../lib/api";
+import placeholder from "../../assets/placeholder.svg";
 
 export default function Reviews() {
   const [reviews, setReviews] = useState<Review[]>([]);
@@ -136,7 +137,7 @@ export default function Reviews() {
               >
                 {/* Track Image */}
                 <img
-                  src={review.coverUrl || "/placeholder.svg?height=96&width=96"}
+                  src={review.coverUrl || placeholder}
                   alt={review.title}
                   className="w-28 h-28 rounded-md object-cover flex-shrink-0"
                 />
@@ -209,10 +210,7 @@ export default function Reviews() {
 
             <div className="flex items-start gap-6 mb-6">
               <img
-                src={
-                  selectedReviewForView.coverUrl ||
-                  "/placeholder.svg?height=128&width=128"
-                }
+                src={selectedReviewForView.coverUrl || placeholder}
                 alt={selectedReviewForView.title}
                 className="w-32 h-32 rounded-md object-cover flex-shrink-0"
               />
