@@ -13,7 +13,6 @@ import {
   type Artist,
 } from "../../lib/api";
 import TrackDetailsModal from "../TrackDetailsModal";
-import placeholder from "../../assets/placeholder.svg";
 
 type AlbumDetailsProps = {
   albumId: string;
@@ -105,8 +104,8 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
       imageUrl: album.imageUrl,
       durationMs: trackItem.durationMs,
       popularity: undefined,
-      previewUrl: trackItem.previewUrl,
-      href: undefined,
+      previewUrl: undefined,
+      href: trackItem.previewUrl,
     };
     // console.log("Constructed TrackSummaryDto for modal:", fullTrackDetails);
     setSelectedTrack(fullTrackDetails);
@@ -166,7 +165,7 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
 
           <div className="flex flex-col items-center gap-4 mb-6">
             <img
-              src={album.imageUrl || placeholder}
+              src={album.imageUrl || "/placeholder.svg?height=128&width=128"}
               alt={album.title}
               className="w-32 h-32 rounded-md object-cover border-2 border-[#8a2be2]"
             />
