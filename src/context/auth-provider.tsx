@@ -1,24 +1,9 @@
 "use client";
 
 import type React from "react";
-import { createContext, useContext, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
+import { AuthContext, type User } from "./auth-context";
 import { fetchUserProfile } from "../lib/auth";
-
-export type User = {
-  id: number;
-  email: string;
-  name: string;
-  profilePicture?: string;
-  createdAt?: string;
-};
-
-type AuthContextType = {
-  user: User | null;
-  setUser: (user: User | null) => void;
-  loadingInitialAuth: boolean;
-};
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -55,10 +40,4 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth must be used within AuthProvider");
-  return context;
 }

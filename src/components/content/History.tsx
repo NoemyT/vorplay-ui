@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { TiArchive } from "react-icons/ti";
 import { FaTrashAlt, FaTimesCircle } from "react-icons/fa";
 import { Card } from "../ui/Card";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../hooks/use-auth";
 
 type SearchHistoryItem = {
   id: number;

@@ -10,9 +10,10 @@ import {
   FaPencilAlt,
   FaTrashAlt,
   FaCamera,
+  FaInfoCircle,
 } from "react-icons/fa";
 import { Card } from "../ui/Card";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../hooks/use-auth";
 import { updateUserProfile } from "../../lib/auth";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import {
@@ -43,6 +44,10 @@ export default function MyAccount() {
     null,
   );
   const [uploading, setUploading] = useState(false);
+
+  const [activeTooltip, setActiveTooltip] = useState<
+    "name" | "email" | "password" | null
+  >(null);
 
   useEffect(() => {
     if (user) {
@@ -137,8 +142,19 @@ export default function MyAccount() {
     }
 
     const updateData: { name?: string; email?: string; password?: string } = {};
-    if (name !== user?.name) updateData.name = name;
-    if (email !== user?.email) updateData.email = email;
+
+    if (name.trim() !== "" && name.trim() !== user?.name) {
+      updateData.name = name.trim();
+    } else if (name.trim() === "" && user?.name !== "") {
+      // Don't change
+    }
+
+    if (email.trim() !== "" && email.trim() !== user?.email) {
+      updateData.email = email.trim();
+    } else if (email.trim() === "" && user?.email !== "") {
+      // Don't change
+    }
+
     if (password) updateData.password = password;
 
     if (Object.keys(updateData).length === 0) {
@@ -344,6 +360,21 @@ export default function MyAccount() {
                 className="block text-white text-sm font-medium mb-1"
               >
                 Username
+                <span
+                  className="relative inline-block ml-2 cursor-pointer"
+                  onMouseEnter={() => setActiveTooltip("name")}
+                  onMouseLeave={() => setActiveTooltip(null)}
+                  onClick={() =>
+                    setActiveTooltip(activeTooltip === "name" ? null : "name")
+                  }
+                >
+                  <FaInfoCircle size={14} className="text-white/70" />
+                  {activeTooltip === "name" && (
+                    <div className="absolute z-10 bg-neutral-700 text-white text-sm rounded py-1 px-2 w-64 -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap shadow-lg before:content-[''] before:absolute before:bottom-[-5px] before:left-1/2 before:-translate-x-1/2 before:border-t-neutral-700 before:border-x-transparent before:border-b-transparent before:border-[6px]">
+                      To keep current username, leave as is.
+                    </div>
+                  )}
+                </span>
               </label>
               <input
                 id="name"
@@ -360,6 +391,21 @@ export default function MyAccount() {
                 className="block text-white text-sm font-medium mb-1"
               >
                 Email
+                <span
+                  className="relative inline-block ml-2 cursor-pointer"
+                  onMouseEnter={() => setActiveTooltip("email")}
+                  onMouseLeave={() => setActiveTooltip(null)}
+                  onClick={() =>
+                    setActiveTooltip(activeTooltip === "email" ? null : "email")
+                  }
+                >
+                  <FaInfoCircle size={14} className="text-white/70" />
+                  {activeTooltip === "email" && (
+                    <div className="absolute z-10 bg-neutral-700 text-white text-sm rounded py-1 px-2 w-54 -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap shadow-lg before:content-[''] before:absolute before:bottom-[-5px] before:left-1/2 before:-translate-x-1/2 before:border-t-neutral-700 before:border-x-transparent before:border-b-transparent before:border-[6px]">
+                      To keep current email, leave as is.
+                    </div>
+                  )}
+                </span>
               </label>
               <input
                 id="email"
@@ -375,7 +421,24 @@ export default function MyAccount() {
                 htmlFor="password"
                 className="block text-white text-sm font-medium mb-1"
               >
-                New Password (leave blank to keep current)
+                New Password
+                <span
+                  className="relative inline-block ml-2 cursor-pointer"
+                  onMouseEnter={() => setActiveTooltip("password")}
+                  onMouseLeave={() => setActiveTooltip(null)}
+                  onClick={() =>
+                    setActiveTooltip(
+                      activeTooltip === "password" ? null : "password",
+                    )
+                  }
+                >
+                  <FaInfoCircle size={14} className="text-white/70" />
+                  {activeTooltip === "password" && (
+                    <div className="absolute z-10 bg-neutral-700 text-white text-sm rounded py-1 px-2 w-66 -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap shadow-lg before:content-[''] before:absolute before:bottom-[-5px] before:left-1/2 before:-translate-x-1/2 before:border-t-neutral-700 before:border-x-transparent before:border-b-transparent before:border-[6px]">
+                      Leave blank to keep current password.
+                    </div>
+                  )}
+                </span>
               </label>
               <input
                 id="password"

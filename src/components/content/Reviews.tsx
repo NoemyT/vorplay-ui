@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { TiStarFullOutline } from "react-icons/ti";
 import { FaTrashAlt, FaTimes } from "react-icons/fa";
 import { Card } from "../ui/Card";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../hooks/use-auth";
 import { fetchUserReviews, deleteReviewApi, type Review } from "../../lib/api";
 import placeholder from "../../assets/placeholder.svg";
 

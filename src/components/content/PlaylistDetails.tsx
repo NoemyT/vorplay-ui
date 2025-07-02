@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { FaArrowLeft, FaTrashAlt, FaPencilAlt, FaPlay } from "react-icons/fa";
 import { Card } from "../ui/Card";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../hooks/use-auth";
 import { useNavigate } from "react-router-dom";
 import {
   fetchPlaylistDetails,

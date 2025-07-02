@@ -2,7 +2,7 @@
 
 import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../hooks/use-auth";
 import logo from "../assets/vorp.png";
 import SearchBar from "../components/SearchBar";
 import placeholder from "../assets/placeholder.svg";

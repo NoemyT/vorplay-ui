@@ -4,7 +4,7 @@ import type React from "react";
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { Card } from "./ui/Card";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../hooks/use-auth";
 import { createPlaylist, type CreatePlaylistPayload } from "../lib/api";
 
 type CreatePlaylistModalProps = {

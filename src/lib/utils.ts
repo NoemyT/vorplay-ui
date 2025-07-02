@@ -7,7 +7,7 @@ import {
   type Favorite,
   type TrackSummaryDto,
 } from "./api";
-import type { User } from "../context/authContext";
+import type { User } from "../context/auth-context";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

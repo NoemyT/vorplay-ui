@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card } from "../components/ui/Card";
-import { useAuth } from "../context/authContext";
+import { useAuth } from "../hooks/use-auth";
 import { login, fetchUserProfile } from "../lib/auth";
 
 import logo from "../assets/vorp.png";

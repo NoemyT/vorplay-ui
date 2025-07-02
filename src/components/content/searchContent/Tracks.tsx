@@ -6,7 +6,7 @@ import { FaMusic, FaPencilAlt, FaHeart, FaPlus } from "react-icons/fa";
 import ReviewModal from "../../ReviewModal";
 import TrackDetailsModal from "../../TrackDetailsModal";
 import AddToPlaylistModal from "../../AddToPlaylistModal";
-import { useAuth } from "../../../context/authContext";
+import { useAuth } from "../../../hooks/use-auth";
 import {
   fetchUserReviews,
   type Review,

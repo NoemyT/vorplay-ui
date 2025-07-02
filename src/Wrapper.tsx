@@ -1,7 +1,7 @@
 "use client";
 
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { useAuth } from "./context/authContext";
+import { useAuth } from "./hooks/use-auth";
 
 import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";

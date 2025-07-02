@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { FaArrowLeft, FaMusic, FaCompactDisc } from "react-icons/fa";
 import { Card } from "../ui/Card";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../hooks/use-auth";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import {
   fetchArtistDetails,

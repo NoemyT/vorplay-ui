@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Tracks from "./searchContent/Tracks";
 import Artists from "./searchContent/Artists";
 import Users from "./searchContent/Users";
-import type { User } from "../../context/authContext";
+import type { User } from "../../context/auth-context";
 import type { TrackSummaryDto, Artist } from "../../lib/api";
 
 type ResultsProps = {

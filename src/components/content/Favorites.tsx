@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { TiHeartFullOutline } from "react-icons/ti";
 import { FaTrashAlt } from "react-icons/fa";
 import { Card } from "../ui/Card";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../hooks/use-auth";
 import {
   fetchUserFavorites,
   removeFavorite,

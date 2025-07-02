@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { FaStar, FaHeart, FaUsers, FaArrowLeft } from "react-icons/fa";
 import { Card } from "../ui/Card";
-import { useAuth, type User } from "../../context/authContext";
+import { useAuth } from "../../hooks/use-auth";
+import { type User } from "../../context/auth-context";
 import { useNavigate } from "react-router-dom";
 import {
   fetchUserFollows,

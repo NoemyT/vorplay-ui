@@ -1,8 +1,12 @@
+"use client";
+
+import type React from "react";
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card } from "../components/ui/Card";
-import { register } from "../lib/auth";
-import { useAuth } from "../context/authContext";
+import { register, fetchUserProfile } from "../lib/auth";
+import { useAuth } from "../hooks/use-auth";
 
 import logo from "../assets/vorp.png";
 
@@ -35,8 +39,11 @@ export default function SignUp() {
       setLoading(true);
       const data = await register(name.trim(), email.trim(), password);
       localStorage.setItem("token", data.access_token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      setUser(data.user);
+
+      const fullUser = await fetchUserProfile(data.access_token);
+      setUser(fullUser);
+      localStorage.setItem("user", JSON.stringify(fullUser));
+
       navigate("/");
     } catch (err) {
       setError((err as Error).message);
@@ -51,7 +58,7 @@ export default function SignUp() {
         <div className="flex flex-col items-center gap-2 mb-6">
           <Link to="/">
             <img
-              src={logo}
+              src={logo || "/placeholder.svg"}
               alt="Logo"
               className="h-[50px] w-auto rounded-full"
             />

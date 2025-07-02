@@ -1,4 +1,4 @@
-import type { User } from "../context/authContext";
+import type { User } from "../context/auth-context";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -75,6 +75,12 @@ export async function updateUserProfile(
   });
 
   if (!res.ok) {
+    if (res.status === 400) {
+      const errorData = await res.json();
+      if (errorData.message && errorData.message.includes("users_email_key")) {
+        throw new Error("This email is already being used.");
+      }
+    }
     const errorData = await res.json();
     throw new Error(errorData.message || "Failed to update user profile");
   }

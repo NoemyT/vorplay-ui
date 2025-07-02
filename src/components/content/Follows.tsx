@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { TiGroup } from "react-icons/ti";
 import { Card } from "../ui/Card";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../hooks/use-auth";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import { fetchMyFollows, type Follow } from "../../lib/api";
 import placeholder from "../../assets/placeholder.svg";

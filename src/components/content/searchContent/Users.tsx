@@ -2,7 +2,7 @@
 
 import { Card } from "../../ui/Card";
 import { FaUsers } from "react-icons/fa";
-import type { User } from "../../../context/authContext";
+import type { User } from "../../../context/auth-context";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import placeholder from "../../../assets/placeholder.svg";
 

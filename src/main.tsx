@@ -3,7 +3,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import AppWrapper from "./Wrapper";
-import { AuthProvider } from "./context/authContext";
+import { AuthProvider } from "./context/auth-provider";
 
 import "./index.css";
 

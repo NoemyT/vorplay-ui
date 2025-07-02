@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { TiNotes } from "react-icons/ti";
 import { FaPlus, FaTrashAlt } from "react-icons/fa";
 import { Card } from "../ui/Card";
-import { useAuth } from "../../context/authContext";
+import { useAuth } from "../../hooks/use-auth";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import CreatePlaylistModal from "../CreatePlaylistModal";
 import { fetchUserPlaylists, type Playlist } from "../../lib/api";
