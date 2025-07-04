@@ -8,13 +8,21 @@ import LogIn from "./pages/LogIn";
 import SignUp from "./pages/SignUp";
 import ErrorPage from "./pages/ErrorPage";
 
+import loadingGif from "./assets/bidoofious-bidoofiousfor1.gif";
+import placeholder from "./assets/placeholder.svg";
+
 export default function AppWrapper() {
   const { loadingInitialAuth } = useAuth();
 
   if (loadingInitialAuth) {
     return (
-      <div className="flex items-center justify-center min-h-screen text-white">
-        Loading application...
+      <div className="flex flex-col items-center justify-center min-h-screen bg-[#292928]">
+        <img
+          src={loadingGif || placeholder}
+          alt="Loading..."
+          className="w-32 h-32 object-contain"
+        />
+        <p className="text-white mt-4 text-lg">Loading application...</p>
       </div>
     );
   }

@@ -1,16 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TiNotes } from "react-icons/ti";
 import { FaPlus, FaTrashAlt } from "react-icons/fa";
+import { TiNotes } from "react-icons/ti";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../hooks/use-auth";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import CreatePlaylistModal from "../CreatePlaylistModal";
 import { fetchUserPlaylists, type Playlist } from "../../lib/api";
 
+type PlaylistWithColor = Playlist & { displayColorClass: string };
+
+const getRandomColorClass = () => {
+  const colors = [
+    "text-red-400",
+    "text-green-400",
+    "text-yellow-400",
+    "text-purple-400",
+    "text-pink-400",
+    "text-teal-400",
+  ];
+  return colors[Math.floor(Math.random() * colors.length)];
+};
+
 export default function Playlists() {
-  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [playlistsWithColors, setPlaylistsWithColors] = useState<
+    PlaylistWithColor[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -40,24 +56,12 @@ export default function Playlists() {
       }
 
       const data = await fetchUserPlaylists(token);
-      console.log(
-        "Playlists.tsx: Raw API response for fetchUserPlaylists:",
-        data,
-      ); // Debug log: See raw API response
-
-      // Ensure playlistTracks is always an array and log the structure
-      const normalizedData = data.map((playlist) => {
-        const normalized = {
-          ...playlist,
-          playlistTracks: playlist.playlistTracks || [],
-        };
-        console.log(
-          `Playlists.tsx: Normalized Playlist "${playlist.name}" (ID: ${playlist.id}) has ${normalized.playlistTracks.length} tracks. Tracks data:`,
-          normalized.playlistTracks, // Debug log: Inspect actual tracks data
-        );
-        return normalized;
-      });
-      setPlaylists(normalizedData);
+      const normalizedData: PlaylistWithColor[] = data.map((playlist) => ({
+        ...playlist,
+        playlistTracks: playlist.playlistTracks || [],
+        displayColorClass: getRandomColorClass(),
+      }));
+      setPlaylistsWithColors(normalizedData);
     } catch (err) {
       setError(
         (err as Error).message ||
@@ -70,7 +74,7 @@ export default function Playlists() {
   };
 
   const handleDeletePlaylist = async (id: number) => {
-    const playlist = playlists.find((p) => p.id === id);
+    const playlist = playlistsWithColors.find((p) => p.id === id);
     if (!playlist) {
       alert("Playlist not found in local state.");
       return;
@@ -90,15 +94,10 @@ export default function Playlists() {
         return;
       }
 
-      console.log(
+      /* console.log(
         `Playlists.tsx: Attempting to delete playlist with ID: ${id}.`,
-      );
+      ); */
 
-      // Directly attempt to delete the playlist.
-      // The backend should handle the deletion of associated tracks (e.g., via cascade delete or explicit logic).
-      console.log(
-        `Playlists.tsx: Attempting to delete the playlist ${id} itself.`,
-      );
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/playlists/${id}`,
         {
@@ -109,9 +108,9 @@ export default function Playlists() {
         },
       );
 
-      console.log(
+      /* console.log(
         `Playlists.tsx: Delete playlist (final step) response status: ${response.status}`,
-      );
+      ); */
 
       if (!response.ok) {
         const errorText = await response.text();
@@ -131,8 +130,7 @@ export default function Playlists() {
         throw new Error(errorData.message || "Failed to delete playlist.");
       }
 
-      // Remove from local state only after successful deletion
-      setPlaylists((prev) => prev.filter((p) => p.id !== id));
+      setPlaylistsWithColors((prev) => prev.filter((p) => p.id !== id));
       alert("Playlist deleted successfully!");
     } catch (err) {
       console.error(
@@ -159,11 +157,8 @@ export default function Playlists() {
   };
 
   const handlePlaylistCreated = () => {
-    loadPlaylists(); // Reload playlists after creation
+    loadPlaylists();
   };
-
-  // Removed getPlaylistCoverUrl and getTrackCount as they rely on playlistTracks from the /playlists endpoint
-  // which is currently not returning track data.
 
   if (loading) {
     return (
@@ -203,7 +198,7 @@ export default function Playlists() {
         </div>
 
         {/* Playlists list or empty state */}
-        {playlists.length === 0 ? (
+        {playlistsWithColors.length === 0 ? (
           <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70">
             <TiNotes size={48} className="mb-4 text-[#8a2be2]" />
             <p className="text-lg">You haven't created any playlists yet.</p>
@@ -211,7 +206,7 @@ export default function Playlists() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
-            {playlists.map((playlist) => {
+            {playlistsWithColors.map((playlist) => {
               return (
                 <Card
                   key={playlist.id}
@@ -232,6 +227,10 @@ export default function Playlists() {
                       <FaTrashAlt size={16} />
                     )}
                   </button>
+                  <div className="w-32 h-32 rounded-md bg-neutral-700 flex items-center justify-center mb-3">
+                    <TiNotes size={64} className={playlist.displayColorClass} />{" "}
+                    {/* Use FaMusic and random color */}
+                  </div>
                   <h3 className="text-lg font-semibold truncate w-full px-1">
                     {playlist.name}
                   </h3>
