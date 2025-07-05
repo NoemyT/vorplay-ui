@@ -25,46 +25,46 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
     <>
       <form
         onSubmit={handleSearch}
-        className="hidden md:flex items-center bg-neutral-800 rounded-full px-3 py-1 w-full max-w-[300px] text-sm text-white focus-within:ring-2 ring-purple-500"
+        className="hidden md:flex items-center bg-slate-800/80 backdrop-blur-sm rounded-full px-4 py-2 w-full max-w-[400px] text-sm text-white focus-within:ring-2 ring-[#8a2be2] border border-white/10 transition-all duration-200"
       >
-        <FaSearch className="mr-2 text-gray-400" />
+        <FaSearch className="mr-3 text-[#8a2be2]" />
         <input
           type="text"
           placeholder="What do you want to play?"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="bg-transparent outline-none w-full text-sm placeholder-gray-400"
+          className="bg-transparent outline-none w-full text-sm placeholder-white/50 text-white"
         />
       </form>
 
       <div className="md:hidden relative">
         <button
           onClick={() => setOpen(true)}
-          className="p-2 bg-neutral-800 rounded-full text-white hover:bg-neutral-700"
+          className="p-2 bg-slate-800/80 backdrop-blur-sm rounded-full text-[#8a2be2] hover:bg-slate-700/80 transition-colors border border-white/10"
         >
           <FaSearch />
         </button>
 
         {open && (
           <div className="fixed inset-0 z-50 flex items-start justify-center mt-20 px-4">
-            <div className="w-full max-w-sm bg-black border border-white/20 rounded-xl shadow-lg p-4">
+            <div className="w-full max-w-sm bg-slate-800/95 backdrop-blur-sm border border-white/20 rounded-xl shadow-2xl p-4">
               <form
                 onSubmit={handleSearch}
-                className="flex items-center bg-neutral-800 rounded-full px-4 py-2 text-white"
+                className="flex items-center bg-slate-700/80 rounded-full px-4 py-3 text-white border border-white/10"
               >
-                <FaSearch className="mr-2 text-gray-400" />
+                <FaSearch className="mr-3 text-[#8a2be2]" />
                 <input
                   autoFocus
                   type="text"
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="bg-transparent outline-none w-full text-sm placeholder-gray-400"
+                  className="bg-transparent outline-none w-full text-sm placeholder-white/50"
                 />
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="ml-2 text-gray-300 hover:text-white text-xs"
+                  className="ml-2 text-white/70 hover:text-white text-lg transition-colors"
                 >
                   ✕
                 </button>

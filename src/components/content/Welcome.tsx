@@ -18,7 +18,8 @@ export default function Welcome() {
           gap-1
           w-full max-w-[900px]
           min-h-[250px]
-          bg-white/5 px-6 py-6 shadow-none text-center rounded-[20px] mb-4
+          bg-slate-800/60 backdrop-blur-sm px-6 py-6 
+          shadow-xl border border-white/10 text-center rounded-[20px] mb-6
         "
         >
           <img
@@ -70,10 +71,22 @@ type FeatureCardProps = {
 
 function FeatureCard({ icon, title, description }: FeatureCardProps) {
   return (
-    <Card className="bg-white/5 rounded-[16px] p-6 text-white shadow-none flex flex-col items-center text-center gap-4 h-full">
-      <div className="mb-2">{icon}</div>
-      <CardHeader className="text-xl text-white p-0">{title}</CardHeader>
-      <CardContent className="text-white/70 text-sm p-0">
+    <Card className="
+      bg-slate-800/60 backdrop-blur-sm rounded-[16px] p-6 
+      text-white shadow-lg border border-white/10
+      flex flex-col items-center text-center gap-4 h-full
+      hover:bg-slate-800/80 hover:border-[#8a2be2]/50 
+      hover:shadow-xl hover:shadow-[#8a2be2]/20
+      transition-all duration-300 cursor-pointer
+      group
+    ">
+      <div className="mb-2 group-hover:scale-110 transition-transform duration-300">
+        {icon}
+      </div>
+      <CardHeader className="text-xl text-white p-0 group-hover:text-[#8a2be2] transition-colors duration-300">
+        {title}
+      </CardHeader>
+      <CardContent className="text-white/80 text-sm p-0 group-hover:text-white/90 transition-colors duration-300">
         {description}
       </CardContent>
     </Card>

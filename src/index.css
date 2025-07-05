@@ -2,14 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', 'SF Pro Display', system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
+  color-scheme: dark;
   color: rgba(255, 255, 255, 0.87);
-  background-color: #292928;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3a 50%, #292928 100%);
+  background-attachment: fixed;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -27,7 +30,9 @@ body {
   min-width: 100%;
   min-height: 100vh;
   overflow-y: auto;
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'Inter', 'SF Pro Display', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  background: linear-gradient(135deg, #1e1e2e 0%, #2a2a3a 50%, #292928 100%);
+  background-attachment: fixed;
 }
 
 h1 {
@@ -52,6 +57,52 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
+}
+
+/* Custom scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(138, 43, 226, 0.6);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(138, 43, 226, 0.8);
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeInUp {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Glassmorphism effect */
+.glass {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Smooth transitions for all interactive elements */
+* {
+  transition: all 0.2s ease-in-out;
 }
 
 @media (prefers-color-scheme: light) {

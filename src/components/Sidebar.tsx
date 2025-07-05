@@ -6,19 +6,27 @@ import {
   TiArchive,
   TiGroup,
 } from "react-icons/ti";
+import { useState } from "react";
 
 type SidebarProps = {
   onSelectSection: (section: string) => void;
 };
 
 export default function Sidebar({ onSelectSection }: SidebarProps) {
+  const [activeSection, setActiveSection] = useState("reviews");
+  
   const navLinks = [
-    { name: "reviews", icon: TiStarFullOutline },
-    { name: "favorites", icon: TiHeartFullOutline },
-    { name: "playlists", icon: TiNotes },
-    { name: "history", icon: TiArchive },
-    { name: "follows", icon: TiGroup },
+    { name: "reviews", icon: TiStarFullOutline, label: "Reviews" },
+    { name: "favorites", icon: TiHeartFullOutline, label: "Favorites" },
+    { name: "playlists", icon: TiNotes, label: "Playlists" },
+    { name: "history", icon: TiArchive, label: "History" },
+    { name: "follows", icon: TiGroup, label: "Follows" },
   ];
+
+  const handleSectionClick = (section: string) => {
+    setActiveSection(section);
+    onSelectSection(section);
+  };
 
   return (
     <div
@@ -31,46 +39,57 @@ export default function Sidebar({ onSelectSection }: SidebarProps) {
     >
       <Card
         className="
-          bg-[#696969]/40 rounded-[20px]
+          bg-slate-800/95 backdrop-blur-sm rounded-[20px]
           flex flex-col justify-between
           px-6 py-4
           md:min-h-[calc(100vh-92px)]
+          border border-white/10
         "
       >
         <div>
-          <h2 className="text-[#292928] font-semibold text-[24px] mb-6">
+          <h2 className="text-white font-semibold text-[24px] mb-6">
             Your Library
           </h2>
 
           <nav>
-            <ul className="flex flex-col gap-4">
+            <ul className="flex flex-col gap-2">
               {navLinks.map((link, index) => {
                 const Icon = link.icon;
+                const isActive = activeSection === link.name;
                 return (
                   <li
                     key={index}
-                    onClick={() => onSelectSection(link.name.toLowerCase())}
-                    className="cursor-pointer text-[#8a2be2] hover:text-[#6548D5] group"
+                    onClick={() => handleSectionClick(link.name)}
+                    className={`
+                      flex items-center gap-4 p-3 rounded-xl
+                      cursor-pointer transition-all duration-200
+                      ${isActive 
+                        ? 'bg-[#8a2be2]/20 text-[#8a2be2] border border-[#8a2be2]/30' 
+                        : 'text-white/80 hover:bg-white/10 hover:text-white'
+                      }
+                    `}
                   >
-                    <div className="flex items-center space-x-2 py-1">
-                      <span className="text-base group-hover:scale-110">
-                        <Icon />
-                      </span>
-                      <span className="group-hover:translate-x-1">
-                        <span>
-                          {link.name.charAt(0).toUpperCase() +
-                            link.name.slice(1)}
-                        </span>
-                      </span>
-                    </div>
+                    <Icon
+                      size={20}
+                      className={`
+                        ${isActive ? 'text-[#8a2be2]' : 'text-white/70'}
+                        transition-colors duration-200
+                      `}
+                    />
+                    <span className="text-[16px] font-medium capitalize">
+                      {link.label}
+                    </span>
                   </li>
                 );
               })}
             </ul>
           </nav>
         </div>
-        <div className="text-center text-base text-[#292928] mt-6 shrink-0">
-          &copy; {new Date().getFullYear()} Vorplay
+
+        <div className="pt-4 mt-4 border-t border-white/10">
+          <p className="text-white/50 text-sm text-center">
+            © 2025 Vorplay
+          </p>
         </div>
       </Card>
     </div>

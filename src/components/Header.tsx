@@ -73,23 +73,22 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
   };
 
   return (
-    <header className="w-full bg-black text-[#8a2be2] relative z-50">
+    <header className="w-full bg-slate-900/95 backdrop-blur-sm text-white relative z-50 border-b border-white/10">
       <div className="w-full px-6 py-4 flex items-center relative h-[60px]">
-        {" "}
         {/* Left Section */}
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <Link to="/">
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <img
               src={logo || placeholder}
               alt="Logo"
               className="h-10 w-auto rounded-[20px]"
             />
+            <span className="font-bold text-[#8a2be2] text-xl">Vorplay</span>
           </Link>
-          <span className="font-semibold">Vorplay</span>
         </div>
+        
         {/* Search Bar */}
         <div className="flex-grow flex justify-center mx-4">
-          {" "}
           <SearchBar
             onSearch={(query, setOpen) => {
               onSelectSection("results");
@@ -97,51 +96,51 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
             }}
           />
         </div>
+        
         {/* Right Section */}
         <div className="flex items-center gap-4 flex-shrink-0">
-          {" "}
           {!user ? (
             <>
               <Link
                 to="/signup"
-                className="text-[#8a2be2] hover:text-white/80 transition"
+                className="text-white/80 hover:text-[#8a2be2] transition-colors font-medium"
               >
                 Sign Up
               </Link>
               <Link
                 to="/login"
-                className="rounded-full px-4 py-1 bg-[#8a2be2] text-white hover:text-black/80 transition"
+                className="rounded-full px-6 py-2 bg-[#8a2be2] text-white hover:bg-[#7c25cc] transition-all duration-200 font-medium shadow-lg"
               >
                 Log In
               </Link>
             </>
           ) : (
-            <div className="flex items-center gap-2 relative" ref={dropdownRef}>
+            <div className="flex items-center gap-3 relative" ref={dropdownRef}>
               <img
                 src={user?.profilePicture ?? logo}
                 alt="Profile"
-                className="w-8 h-8 rounded-full object-cover"
+                className="w-8 h-8 rounded-full object-cover border-2 border-[#8a2be2]"
               />
               <div className="relative">
                 <span
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="cursor-pointer font-semibold text-white hover:opacity-80"
+                  className="cursor-pointer font-medium text-white hover:text-[#8a2be2] transition-colors"
                 >
                   {user?.name ?? "Account"}
                 </span>
 
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 bg-white text-black rounded-md shadow-lg w-36 text-sm">
+                  <div className="absolute right-0 mt-2 bg-slate-800 text-white rounded-lg shadow-xl w-40 text-sm border border-white/10">
                     <ul className="flex flex-col py-2">
                       <li
                         onClick={() => onSelectSection("account")}
-                        className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                        className="px-4 py-2 hover:bg-white/10 cursor-pointer transition-colors"
                       >
                         Account
                       </li>
                       <li
                         onClick={handleLogout}
-                        className="px-4 py-2 hover:bg-gray-100 text-red-600 cursor-pointer"
+                        className="px-4 py-2 hover:bg-red-500/20 text-red-400 cursor-pointer transition-colors"
                       >
                         Exit
                       </li>
