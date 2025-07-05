@@ -1,0 +1,72 @@
+name: Full clean & deploy React App via sshpass
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1) Checkout do código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # 2) Setup Node.js e cache npm
+      - name: Setup Node.js & Cache npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      # 3) Instala dependências e build local
+      - name: Install dependencies & Build
+        run: |
+          npm ci
+          npm run build
+
+      # 4) Instala sshpass
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      # 5) Limpa tudo no servidor, preservando apenas .env
+      - name: Clean remote directory (keep .env)
+        run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+            "cd /www/wwwroot/VorPlayUI && \
+             find . -mindepth 1 -maxdepth 1 ! -name '.env' -exec rm -rf {} +"
+
+      # 6) Copia os arquivos build para o servidor
+      - name: Copy build files to server
+        run: |
+          # copia dist/ para o servidor (arquivos estáticos)
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" \
+            scp -o StrictHostKeyChecking=no -r \
+            dist \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/www/wwwroot/VorPlayUI/
+          
+          # copia arquivos de configuração
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" \
+            scp -o StrictHostKeyChecking=no \
+            package.json \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }}:/www/wwwroot/VorPlayUI/
+
+      # 7) Configura e inicia com PM2
+      - name: Deploy with PM2
+        run: |
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no \
+            ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+            "cd /www/wwwroot/VorPlayUI && \
+             echo '--- Configurando permissões ---' && \
+             chmod -R 755 . && \
+             echo '--- Parando PM2 anterior ---' && \
+             pm2 delete VorPlayUI || true && \
+             echo '--- Iniciando com PM2 serve ---' && \
+             pm2 serve dist 3001 --name VorPlayUI --spa && \
+             echo '--- Status do PM2 ---' && \
+             pm2 list && \
+             echo '✅ Deploy concluído com sucesso'"
