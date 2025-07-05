@@ -14,7 +14,7 @@ type SidebarProps = {
 
 export default function Sidebar({ onSelectSection }: SidebarProps) {
   const [activeSection, setActiveSection] = useState("reviews");
-  
+
   const navLinks = [
     { name: "reviews", icon: TiStarFullOutline, label: "Reviews" },
     { name: "favorites", icon: TiHeartFullOutline, label: "Favorites" },
@@ -63,16 +63,17 @@ export default function Sidebar({ onSelectSection }: SidebarProps) {
                     className={`
                       flex items-center gap-4 p-3 rounded-xl
                       cursor-pointer transition-all duration-200
-                      ${isActive 
-                        ? 'bg-[#8a2be2]/20 text-[#8a2be2] border border-[#8a2be2]/30' 
-                        : 'text-white/80 hover:bg-white/10 hover:text-white'
+                      ${
+                        isActive
+                          ? "bg-[#8a2be2]/20 text-[#8a2be2] border border-[#8a2be2]/30"
+                          : "text-white/80 hover:bg-white/10 hover:text-white"
                       }
                     `}
                   >
                     <Icon
                       size={20}
                       className={`
-                        ${isActive ? 'text-[#8a2be2]' : 'text-white/70'}
+                        ${isActive ? "text-[#8a2be2]" : "text-white/70"}
                         transition-colors duration-200
                       `}
                     />
@@ -87,9 +88,7 @@ export default function Sidebar({ onSelectSection }: SidebarProps) {
         </div>
 
         <div className="pt-4 mt-4 border-t border-white/10">
-          <p className="text-white/50 text-sm text-center">
-            © 2025 Vorplay
-          </p>
+          <p className="text-white/50 text-sm text-center">© 2025 Vorplay</p>
         </div>
       </Card>
     </div>

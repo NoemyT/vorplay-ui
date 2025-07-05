@@ -111,11 +111,11 @@ export default function CreatePlaylistModal({
               onChange={(e) => setName(e.target.value)}
               type="text"
               placeholder="My Awesome Playlist"
-              maxLength={50}
+              maxLength={15}
               className="w-full p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none"
             />
             <p className="text-right text-xs text-white/70 mt-1">
-              {name.length}/50
+              {name.length}/15
             </p>
           </div>
 

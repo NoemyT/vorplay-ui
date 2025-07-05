@@ -77,7 +77,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
   };
 
   const handleTrackAdded = () => {
-    // Could refresh playlists here if needed
+    // Playlist refresh
   };
 
   const handleTrackClick = (track: TrackSummaryDto) => {
@@ -122,33 +122,11 @@ export default function Tracks({ tracks, query }: TracksProps) {
               className="bg-white/5 border border-white/10 p-4 rounded-xl text-white flex items-center gap-4 hover:bg-white/10 transition-colors relative cursor-pointer"
               onClick={() => handleTrackClick(track)}
             >
-              {user && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleFavoriteToggle(
-                      track,
-                      user,
-                      userFavorites,
-                      setUserFavorites,
-                    );
-                  }}
-                  className="flex-shrink-0 p-1 bg-black rounded-full text-white hover:scale-110 transition-transform"
-                  title={
-                    isFavorited ? "Already in Favorites" : "Add to Favorites"
-                  }
-                >
-                  <FaHeart
-                    size={16}
-                    className={isFavorited ? "text-[#8a2be2]" : "text-white/50"}
-                    style={{
-                      color: isFavorited
-                        ? "#8a2be2"
-                        : "rgba(255, 255, 255, 0.5)",
-                    }}
-                  />
-                </button>
-              )}
+              <img
+                src={track.imageUrl || "/placeholder.svg?height=48&width=48"}
+                alt={track.title}
+                className="w-12 h-12 rounded-md object-cover flex-shrink-0"
+              />
 
               <div className="flex-grow">
                 <h3 className="text-lg font-semibold truncate">
@@ -164,6 +142,31 @@ export default function Tracks({ tracks, query }: TracksProps) {
 
               {user && (
                 <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleFavoriteToggle(
+                        track,
+                        user,
+                        userFavorites,
+                        setUserFavorites,
+                      );
+                    }}
+                    className="flex-shrink-0 p-2 bg-[#8a2be2] rounded-full text-white hover:scale-110 transition-transform"
+                    title={
+                      isFavorited ? "Already in Favorites" : "Add to Favorites"
+                    }
+                  >
+                    <FaHeart
+                      size={18}
+                      className={isFavorited ? "text-white" : "text-white/30"}
+                      style={{
+                        color: isFavorited
+                          ? "white"
+                          : "rgba(255, 255, 255, 0.3)",
+                      }}
+                    />
+                  </button>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();

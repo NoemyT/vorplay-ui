@@ -19,6 +19,8 @@ const getRandomColorClass = () => {
     "text-purple-400",
     "text-pink-400",
     "text-teal-400",
+    "text-blue-400",
+    "text-orange-400",
   ];
   return colors[Math.floor(Math.random() * colors.length)];
 };
@@ -215,7 +217,7 @@ export default function Playlists() {
                 >
                   <button
                     onClick={(e) => {
-                      e.stopPropagation(); // Prevent card click from triggering
+                      e.stopPropagation();
                       handleDeletePlaylist(playlist.id);
                     }}
                     disabled={deletingPlaylistId === playlist.id}
@@ -228,8 +230,10 @@ export default function Playlists() {
                     )}
                   </button>
                   <div className="w-32 h-32 rounded-md bg-neutral-700 flex items-center justify-center mb-3">
-                    <TiNotes size={64} className={playlist.displayColorClass} />{" "}
-                    {/* Use FaMusic and random color */}
+                    <TiNotes
+                      size={64}
+                      className={playlist.displayColorClass}
+                    />{" "}
                   </div>
                   <h3 className="text-lg font-semibold truncate w-full px-1">
                     {playlist.name}

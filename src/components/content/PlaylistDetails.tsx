@@ -51,7 +51,6 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
         token,
         Number(playlistId),
       );
-      // Ensure playlistTracks is always an array
       const normalizedPlaylist = {
         ...playlistData,
         playlistTracks: playlistData.playlistTracks || [],
@@ -92,10 +91,9 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
           playlist.id,
           payload,
         );
-        // Keep the existing tracks when updating
         const normalizedUpdated = {
           ...updatedPlaylist,
-          playlistTracks: playlist.playlistTracks, // Keep existing tracks
+          playlistTracks: playlist.playlistTracks,
         };
         setPlaylist(normalizedUpdated);
       }
@@ -129,7 +127,6 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
 
       await removeTrackFromPlaylist(token, playlist.id, trackId);
 
-      // Update local state
       setPlaylist((prev) =>
         prev
           ? {
