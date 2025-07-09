@@ -53,14 +53,12 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
     if (searchTerm.trim()) {
       onSearch(searchTerm.trim());
 
-      // Save search query to history if user is logged in
       if (user) {
         const token = localStorage.getItem("token");
         if (token) {
           import("../lib/api").then(({ saveSearchQuery }) => {
             saveSearchQuery(token, searchTerm.trim()).catch((err) => {
               console.error("Failed to save search query:", err);
-              // Don't show error to user as this is not critical functionality
             });
           });
         }
@@ -77,7 +75,10 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
       <div className="w-full px-6 py-4 flex items-center relative h-[60px]">
         {/* Left Section */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <Link
+            to="/"
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
             <img
               src={logo || placeholder}
               alt="Logo"
@@ -86,7 +87,7 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
             <span className="font-bold text-[#8a2be2] text-xl">Vorplay</span>
           </Link>
         </div>
-        
+
         {/* Search Bar */}
         <div className="flex-grow flex justify-center mx-4">
           <SearchBar
@@ -96,14 +97,14 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
             }}
           />
         </div>
-        
+
         {/* Right Section */}
         <div className="flex items-center gap-4 flex-shrink-0">
           {!user ? (
             <>
               <Link
                 to="/signup"
-                className="text-white/80 hover:text-[#8a2be2] transition-colors font-medium"
+                className="hidden sm:block text-white/80 hover:text-[#8a2be2] transition-colors font-medium"
               >
                 Sign Up
               </Link>

@@ -15,6 +15,7 @@ import {
   type TrackSummaryDto,
 } from "../../../lib/api";
 import { handleFavoriteToggle } from "../../../lib/utils";
+import placeholder from "../../../assets/placeholder.svg";
 
 type TracksProps = {
   tracks: TrackSummaryDto[];
@@ -119,78 +120,90 @@ export default function Tracks({ tracks, query }: TracksProps) {
           return (
             <Card
               key={track.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white flex items-center gap-4 hover:bg-white/10 transition-colors relative cursor-pointer"
+              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white flex flex-col xs:flex-row items-start xs:items-center gap-4 hover:bg-white/10 transition-colors relative cursor-pointer"
               onClick={() => handleTrackClick(track)}
             >
+              {/* Album Art Image */}
               <img
-                src={track.imageUrl || "/placeholder.svg?height=48&width=48"}
+                src={track.imageUrl || placeholder}
                 alt={track.title}
                 className="w-12 h-12 rounded-md object-cover flex-shrink-0"
               />
 
-              <div className="flex-grow">
-                <h3 className="text-lg font-semibold truncate">
-                  {track.title}
-                </h3>
-                <p className="text-sm opacity-80 truncate">
-                  {track.artistNames.join(", ")} • {track.albumName}
-                </p>
-              </div>
-              <span className="text-sm opacity-70 flex-shrink-0">
-                {formatDuration(track.durationMs)}
-              </span>
-
-              {user && (
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleFavoriteToggle(
-                        track,
-                        user,
-                        userFavorites,
-                        setUserFavorites,
-                      );
-                    }}
-                    className="flex-shrink-0 p-2 bg-[#8a2be2] rounded-full text-white hover:scale-110 transition-transform"
-                    title={
-                      isFavorited ? "Already in Favorites" : "Add to Favorites"
-                    }
-                  >
-                    <FaHeart
-                      size={18}
-                      className={isFavorited ? "text-white" : "text-white/30"}
-                      style={{
-                        color: isFavorited
-                          ? "white"
-                          : "rgba(255, 255, 255, 0.3)",
-                      }}
-                    />
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handlePlaylistClick(track);
-                    }}
-                    className="p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
-                    title="Add to Playlist"
-                  >
-                    <FaPlus size={16} />
-                  </button>
-                  {!hasReviewed && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleReviewClick(track);
-                      }}
-                      className="p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
-                      title="Write a Review"
-                    >
-                      <FaPencilAlt size={16} />
-                    </button>
-                  )}
+              <div className="flex flex-col xs:flex-row flex-grow min-w-0 xs:items-center justify-between">
+                {/* Track Info (Title, Artist, Album) */}
+                <div className="flex flex-col flex-grow min-w-0">
+                  <h3 className="text-lg font-semibold line-clamp-1">
+                    {track.title}
+                  </h3>
+                  <p className="text-sm opacity-80 line-clamp-2">
+                    {track.artistNames.join(", ")} • {track.albumName}
+                  </p>
                 </div>
-              )}
+
+                {/* Duration and Buttons Group */}
+                {user && (
+                  <div className="flex items-center gap-2 flex-shrink-0 mt-1">
+                    <span className="text-sm opacity-70 flex-shrink-0">
+                      {formatDuration(track.durationMs)}
+                    </span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Favorite button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFavoriteToggle(
+                            track,
+                            user,
+                            userFavorites,
+                            setUserFavorites,
+                          );
+                        }}
+                        className="p-1 bg-black rounded-full text-white hover:scale-110 transition-transform"
+                        title={
+                          isFavorited
+                            ? "Already in Favorites"
+                            : "Add to Favorites"
+                        }
+                      >
+                        <FaHeart
+                          size={16}
+                          className={
+                            isFavorited ? "text-[#8a2be2]" : "text-white/50"
+                          }
+                          style={{
+                            color: isFavorited
+                              ? "#8a2be2"
+                              : "rgba(255, 255, 255, 0.5)",
+                          }}
+                        />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handlePlaylistClick(track);
+                        }}
+                        className="p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
+                        title="Add to Playlist"
+                      >
+                        <FaPlus size={16} />
+                      </button>
+                      {!hasReviewed && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleReviewClick(track);
+                          }}
+                          className="p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
+                          title="Write a Review"
+                        >
+                          <FaPencilAlt size={16} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </Card>
           );
         })}

@@ -1,11 +1,17 @@
 "use client";
 
+import type React from "react";
 import { useState, useEffect } from "react";
 import Tracks from "./searchContent/Tracks";
 import Artists from "./searchContent/Artists";
 import Users from "./searchContent/Users";
 import type { User } from "../../context/auth-context";
 import type { TrackSummaryDto, Artist } from "../../lib/api";
+import {
+  PiUserFill,
+  PiMicrophoneStageFill,
+  PiMusicNotesFill,
+} from "react-icons/pi";
 
 type ResultsProps = {
   query: string;
@@ -115,9 +121,7 @@ export default function Results({ query }: ResultsProps) {
       return <p className="text-white">Loading results for "{query}"...</p>;
     if (!query)
       return (
-        <p className="text-white">
-          Start typing to search for tracks, artists, or users.
-        </p>
+        <p className="text-white">Search for tracks, artists, or users.</p>
       );
 
     switch (activeTab) {
@@ -147,34 +151,49 @@ export default function Results({ query }: ResultsProps) {
   const tabs: {
     name: string;
     type: "tracks" | "artists" | "users";
+    icon: React.ElementType;
     count: number;
   }[] = [
-    { name: "Tracks", type: "tracks", count: tracks.length },
-    { name: "Artists", type: "artists", count: artists.length },
-    { name: "Users", type: "users", count: users.length },
+    {
+      name: "Tracks",
+      type: "tracks",
+      icon: PiMusicNotesFill,
+      count: tracks.length,
+    },
+    {
+      name: "Artists",
+      type: "artists",
+      icon: PiMicrophoneStageFill,
+      count: artists.length,
+    },
+    { name: "Users", type: "users", icon: PiUserFill, count: users.length },
   ];
 
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex gap-4 mb-2 overflow-x-auto pb-2 flex-shrink-0">
-        {" "}
-        {tabs.map((tab) => (
-          <button
-            key={tab.type}
-            onClick={() => setActiveTab(tab.type)}
-            className={`
-              px-4 py-2 rounded-full text-sm font-semibold
-              ${
-                activeTab === tab.type
-                  ? "bg-[#8a2be2] text-white"
-                  : "bg-neutral-800 text-white/70 hover:bg-neutral-700"
-              }
-              whitespace-nowrap
-            `}
-          >
-            {tab.name} ({tab.count})
-          </button>
-        ))}
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          return (
+            <button
+              key={tab.type}
+              onClick={() => setActiveTab(tab.type)}
+              className={`
+                        px-3 py-2 rounded-full text-sm font-semibold
+                        ${
+                          activeTab === tab.type
+                            ? "bg-[#8a2be2] text-white"
+                            : "bg-neutral-800 text-white/70 hover:bg-neutral-700"
+                        }
+                        whitespace-nowrap flex items-center justify-center gap-1
+                      `}
+            >
+              <Icon className="block xs:hidden" size={16} />
+              <span className="hidden xs:inline">{tab.name}</span>
+              <span className="text-xs ml-1">({tab.count})</span>
+            </button>
+          );
+        })}
       </div>
       <div className="flex-grow overflow-y-auto pr-2 min-h-0">
         {renderContent()}
