@@ -159,7 +159,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
                             setUserFavorites,
                           );
                         }}
-                        className="p-1 bg-black rounded-full text-white hover:scale-110 transition-transform"
+                        className="flex-shrink-0 p-2 bg-[#8a2be2] rounded-full text-white hover:scale-110 transition-transform"
                         title={
                           isFavorited
                             ? "Already in Favorites"
@@ -167,14 +167,14 @@ export default function Tracks({ tracks, query }: TracksProps) {
                         }
                       >
                         <FaHeart
-                          size={16}
+                          size={18}
                           className={
-                            isFavorited ? "text-[#8a2be2]" : "text-white/50"
+                            isFavorited ? "text-white" : "text-white/30"
                           }
                           style={{
                             color: isFavorited
-                              ? "#8a2be2"
-                              : "rgba(255, 255, 255, 0.5)",
+                              ? "white"
+                              : "rgba(255, 255, 255, 0.3)",
                           }}
                         />
                       </button>
