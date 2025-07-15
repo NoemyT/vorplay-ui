@@ -170,7 +170,7 @@ export default function Welcome() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col p-4">
+    <div className="h-full w-full flex flex-col items-center p-4">
       <Card
         className="
         flex flex-col items-center
