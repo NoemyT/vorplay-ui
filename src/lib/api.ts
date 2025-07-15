@@ -67,9 +67,11 @@ export type AlbumSummaryDto = {
 export type TrackSummaryDto = {
   id: string;
   title: string;
-  artistNames: string[];
+  artistNames?: string[];
+  artist?: string;
   albumName: string;
   imageUrl?: string;
+  coverUrl?: string;
   durationMs: number;
   popularity?: number;
   previewUrl?: string;
@@ -140,6 +142,41 @@ export type AddTrackToPlaylistPayload = {
   externalId: string;
   externalProvider: "Spotify";
   position?: number;
+};
+
+// New types for Feed and Stats
+export type UserSummaryDto = {
+  id: number;
+  name: string;
+  profilePicture?: string | null;
+};
+
+export type PlaylistSummaryDto = {
+  id: number;
+  name: string;
+  description?: string;
+  trackCount: number;
+};
+
+export type PublicFeedDto = {
+  id: string;
+  type: "review" | "favorite" | "playlist";
+  action: string;
+  user: UserSummaryDto;
+  track?: TrackSummaryDto;
+  playlist?: PlaylistSummaryDto;
+  rating?: number;
+  comment?: string;
+  createdAt: string;
+};
+
+export type PlatformStatsDto = {
+  totalUsers: number;
+  totalReviews: number;
+  totalFavorites: number;
+  totalPlaylists: number;
+  topRatedTracks: number;
+  mostActiveUsers: number;
 };
 
 export async function createReview(
@@ -654,4 +691,22 @@ export async function removeTrackFromPlaylist(
       errorData.message || "Failed to remove track from playlist.",
     );
   }
+}
+
+export async function fetchPlatformStats(): Promise<PlatformStatsDto> {
+  const res = await fetch(`${API_BASE}/feed/stats`);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch platform stats.");
+  }
+  return res.json();
+}
+
+export async function fetchPublicFeed(limit = 10): Promise<PublicFeedDto[]> {
+  const res = await fetch(`${API_BASE}/feed/public?limit=${limit}`);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch public feed.");
+  }
+  return res.json();
 }
