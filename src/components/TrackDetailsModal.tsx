@@ -49,7 +49,7 @@ export default function TrackDetailsModal({
         <div className="flex flex-col items-center text-center mb-6">
           <h2 className="text-2xl font-bold text-white mb-1">{track.title}</h2>
           <p className="text-base text-white/70 mb-2">
-            {track.artistNames.join(", ")}
+            {track.artistNames?.join(", ") || "Unknown Artist"}
           </p>
           <p className="text-sm text-white/50 mb-4">
             {track.albumName} • {formatDuration(track.durationMs)}

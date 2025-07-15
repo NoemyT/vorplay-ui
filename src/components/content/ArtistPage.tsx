@@ -143,7 +143,7 @@ export default function ArtistPage({ artistId }: ArtistPageProps) {
                         {track.title}
                       </h4>
                       <p className="text-sm opacity-70 truncate">
-                        {track.artistNames.join(", ")}
+                        {track.artistNames?.join(", ") || "Unknown Artist"}
                       </p>
                     </div>
                     <span className="text-sm opacity-70 flex-shrink-0">

@@ -137,7 +137,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
                     {track.title}
                   </h3>
                   <p className="text-sm opacity-80 line-clamp-2">
-                    {track.artistNames.join(", ")} • {track.albumName}
+                    {track.artistNames?.join(", ") || "Unknown Artist"} • {track.albumName}
                   </p>
                 </div>
 

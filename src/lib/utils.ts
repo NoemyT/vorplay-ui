@@ -76,7 +76,7 @@ export async function handleFavoriteToggle(
       const newFavorite = await addFavorite(token, {
         trackId: track.id,
         title: track.title,
-        artistNames: track.artistNames,
+        artistNames: track.artistNames || [],
         albumName: track.albumName,
         imageUrl: track.imageUrl,
       });

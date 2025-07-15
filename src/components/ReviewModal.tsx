@@ -105,7 +105,7 @@ export default function ReviewModal({
         <div className="flex flex-col items-center text-center mb-6 flex-shrink-0">
           <h2 className="text-2xl font-bold text-white mb-1">{track.title}</h2>
           <p className="text-base text-white/70">
-            {track.artistNames.join(", ")}
+            {track.artistNames?.join(", ") || "Unknown Artist"}
           </p>
         </div>
         <form

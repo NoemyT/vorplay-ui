@@ -137,7 +137,7 @@ export default function AddToPlaylistModal({
           <div className="text-center">
             <p className="text-white font-semibold">{track.title}</p>
             <p className="text-white/70 text-sm">
-              {track.artistNames.join(", ")}
+              {track.artistNames?.join(", ") || "Unknown Artist"}
             </p>
           </div>
         </div>
