@@ -2,20 +2,17 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Card } from "../../ui/Card";
-import { FaMusic, FaPencilAlt, FaHeart, FaPlus } from "react-icons/fa";
-import ReviewModal from "../../ReviewModal";
-import TrackDetailsModal from "../../TrackDetailsModal";
+import { FaMusic, FaHeart, FaPlus } from "react-icons/fa";
 import AddToPlaylistModal from "../../AddToPlaylistModal";
-import { useAuth } from "../../../hooks/use-auth";
+import { useAuth } from "../../../../src/hooks/use-auth"; // Corrected import path
+import { useNavigate, createSearchParams } from "react-router-dom";
 import {
-  fetchUserReviews,
-  type Review,
   fetchUserFavorites,
   type Favorite,
   type TrackSummaryDto,
-} from "../../../lib/api";
-import { handleFavoriteToggle } from "../../../lib/utils";
-import placeholder from "../../../assets/placeholder.svg";
+} from "../../../../src/lib/api"; // Corrected import path
+import { handleFavoriteToggle } from "../../../../src/lib/utils"; // Corrected import path
+import placeholder from "../../../assets/placeholder.svg"; // Corrected import path
 
 type TracksProps = {
   tracks: TrackSummaryDto[];
@@ -24,14 +21,13 @@ type TracksProps = {
 
 export default function Tracks({ tracks, query }: TracksProps) {
   const { user } = useAuth();
-  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const navigate = useNavigate();
+
   const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<TrackSummaryDto | null>(
     null,
   );
-  const [userReviews, setUserReviews] = useState<Review[]>([]);
   const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const refreshUserData = useCallback(async () => {
     if (!user) return;
@@ -39,11 +35,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
     try {
       const token = localStorage.getItem("token");
       if (token) {
-        const [reviews, favorites] = await Promise.all([
-          fetchUserReviews(token, user.id),
-          fetchUserFavorites(token, user.id),
-        ]);
-        setUserReviews(reviews);
+        const favorites = await fetchUserFavorites(token, user.id);
         setUserFavorites(favorites);
       }
     } catch (err) {
@@ -56,39 +48,29 @@ export default function Tracks({ tracks, query }: TracksProps) {
       if (user) {
         await refreshUserData();
       } else {
-        setUserReviews([]);
         setUserFavorites([]);
       }
     }
     loadUserData();
   }, [user, refreshUserData]);
 
-  const handleReviewClick = (track: TrackSummaryDto) => {
-    setSelectedTrack(track);
-    setIsReviewModalOpen(true);
-  };
-
   const handlePlaylistClick = (track: TrackSummaryDto) => {
     setSelectedTrack(track);
     setIsPlaylistModalOpen(true);
   };
 
-  const handleReviewSubmitted = () => {
-    refreshUserData();
-  };
-
   const handleTrackAdded = () => {
-    // Playlist refresh
+    // Playlist refresh logic if needed
   };
 
   const handleTrackClick = (track: TrackSummaryDto) => {
-    setSelectedTrack(track);
-    setIsDetailsModalOpen(true);
-  };
-
-  const closeDetailsModal = () => {
-    setIsDetailsModalOpen(false);
-    setSelectedTrack(null);
+    navigate({
+      pathname: "/",
+      search: createSearchParams({
+        section: "track",
+        trackId: track.id,
+      }).toString(),
+    });
   };
 
   if (!tracks.length) {
@@ -113,9 +95,6 @@ export default function Tracks({ tracks, query }: TracksProps) {
           const isFavorited = userFavorites.some((fav) => {
             return fav.externalId === track.id;
           });
-          const hasReviewed = userReviews.some((r) => {
-            return r.externalId === track.id;
-          });
 
           return (
             <Card
@@ -137,7 +116,8 @@ export default function Tracks({ tracks, query }: TracksProps) {
                     {track.title}
                   </h3>
                   <p className="text-sm opacity-80 line-clamp-2">
-                    {track.artistNames?.join(", ") || "Unknown Artist"} • {track.albumName}
+                    {track.artistNames?.join(", ") || "Unknown Artist"} •{" "}
+                    {track.albumName}
                   </p>
                 </div>
 
@@ -188,18 +168,6 @@ export default function Tracks({ tracks, query }: TracksProps) {
                       >
                         <FaPlus size={16} />
                       </button>
-                      {!hasReviewed && (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleReviewClick(track);
-                          }}
-                          className="p-2 bg-[#8a2be2] text-white rounded-full hover:bg-[#7a1fd1] transition-colors flex-shrink-0"
-                          title="Write a Review"
-                        >
-                          <FaPencilAlt size={16} />
-                        </button>
-                      )}
                     </div>
                   </div>
                 )}
@@ -210,27 +178,12 @@ export default function Tracks({ tracks, query }: TracksProps) {
       </div>
 
       {selectedTrack && (
-        <>
-          <ReviewModal
-            isOpen={isReviewModalOpen}
-            onClose={() => setIsReviewModalOpen(false)}
-            track={selectedTrack}
-            onReviewSubmitted={handleReviewSubmitted}
-          />
-
-          <AddToPlaylistModal
-            isOpen={isPlaylistModalOpen}
-            onClose={() => setIsPlaylistModalOpen(false)}
-            track={selectedTrack}
-            onTrackAdded={handleTrackAdded}
-          />
-
-          <TrackDetailsModal
-            isOpen={isDetailsModalOpen}
-            onClose={closeDetailsModal}
-            track={selectedTrack}
-          />
-        </>
+        <AddToPlaylistModal
+          isOpen={isPlaylistModalOpen}
+          onClose={() => setIsPlaylistModalOpen(false)}
+          track={selectedTrack}
+          onTrackAdded={handleTrackAdded}
+        />
       )}
     </>
   );

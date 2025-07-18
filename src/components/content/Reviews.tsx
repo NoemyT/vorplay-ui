@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { TiStarFullOutline } from "react-icons/ti";
-import { FaTrashAlt, FaTimes } from "react-icons/fa";
+import { FaTrashAlt } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../hooks/use-auth";
+import { useNavigate, createSearchParams } from "react-router-dom";
 import { fetchUserReviews, deleteReviewApi, type Review } from "../../lib/api";
 import placeholder from "../../assets/placeholder.svg";
 
@@ -13,10 +14,7 @@ export default function Reviews() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
-
-  const [isFullViewModalOpen, setIsFullViewModalOpen] = useState(false);
-  const [selectedReviewForView, setSelectedReviewForView] =
-    useState<Review | null>(null);
+  const navigate = useNavigate();
 
   const loadReviews = async () => {
     if (!user) {
@@ -70,14 +68,14 @@ export default function Reviews() {
     }
   }
 
-  const openFullViewModal = (review: Review) => {
-    setSelectedReviewForView(review);
-    setIsFullViewModalOpen(true);
-  };
-
-  const closeFullViewModal = () => {
-    setIsFullViewModalOpen(false);
-    setSelectedReviewForView(null);
+  const handleReviewCardClick = (review: Review) => {
+    navigate({
+      pathname: "/",
+      search: createSearchParams({
+        section: "track",
+        trackId: review.externalId,
+      }).toString(),
+    });
   };
 
   if (loading) {
@@ -133,7 +131,7 @@ export default function Reviews() {
               <Card
                 key={review.id}
                 className="bg-white/15 border border-white/10 p-4 rounded-xl text-white relative flex gap-4 h-[220px] hover:bg-white/20 transition-colors cursor-pointer"
-                onClick={() => openFullViewModal(review)}
+                onClick={() => handleReviewCardClick(review)}
               >
                 {/* Track Image */}
                 <img
@@ -189,74 +187,6 @@ export default function Reviews() {
               </Card>
             );
           })}
-        </div>
-      )}
-
-      {/* Full View Modal */}
-      {isFullViewModalOpen && selectedReviewForView && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) closeFullViewModal();
-          }}
-        >
-          <Card className="bg-neutral-800 rounded-[20px] p-6 w-full max-w-2xl relative max-h-[90vh] overflow-y-auto">
-            <button
-              onClick={closeFullViewModal}
-              className="absolute top-4 right-4 text-white/70 hover:text-white"
-            >
-              <FaTimes size={20} />
-            </button>
-
-            <div className="flex items-start gap-6 mb-6">
-              <img
-                src={selectedReviewForView.coverUrl || placeholder}
-                alt={selectedReviewForView.title}
-                className="w-32 h-32 rounded-md object-cover flex-shrink-0"
-              />
-              <div className="flex flex-col flex-grow min-w-0">
-                {/* Star Rating */}
-                <div className="flex gap-1 mb-2">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <TiStarFullOutline
-                      key={i}
-                      size={24}
-                      className={
-                        i < selectedReviewForView.rating
-                          ? "text-[#8a2be2]"
-                          : "text-white/30"
-                      }
-                    />
-                  ))}
-                </div>
-                {/* Track Title */}
-                <h3 className="text-2xl font-bold text-white leading-tight mb-1 break-all">
-                  {selectedReviewForView.title}
-                </h3>
-                {/* Artist(s) & Album */}
-                <p className="text-base text-white/70 mb-4 break-all">
-                  {typeof selectedReviewForView.artist === "string"
-                    ? selectedReviewForView.artist
-                    : selectedReviewForView.artist?.name ||
-                      "Unknown artist"}{" "}
-                  •{" "}
-                  {typeof selectedReviewForView.album === "string"
-                    ? selectedReviewForView.album
-                    : selectedReviewForView.album?.name || "Unknown album"}
-                </p>
-                {/* Review Comment */}
-                <p className="text-base opacity-90 whitespace-pre-wrap break-all">
-                  {selectedReviewForView.comment}
-                </p>
-                <p className="text-xs text-white/50 mt-4">
-                  Reviewed on{" "}
-                  {new Date(
-                    selectedReviewForView.createdAt,
-                  ).toLocaleDateString()}
-                </p>
-              </div>
-            </div>
-          </Card>
         </div>
       )}
     </div>

@@ -82,7 +82,7 @@ export default function History({ onSearch }: HistoryProps) {
           errorData.message ||
             "Failed to fetch search history. Please try again.",
         );
-        setHistory([]); // Clear history on error
+        setHistory([]);
       } else {
         const data = await res.json();
         console.log("History component: Fetched history data:", data);
@@ -96,7 +96,7 @@ export default function History({ onSearch }: HistoryProps) {
       setError(
         "An unexpected network error occurred while fetching search history. Please check your connection.",
       );
-      setHistory([]); // Clear history on network error
+      setHistory([]);
     } finally {
       setLoading(false);
     }

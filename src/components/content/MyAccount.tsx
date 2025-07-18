@@ -115,7 +115,7 @@ export default function MyAccount() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [favorites, setFavorites] = useState<Favorite[]>([]); // New state for favorites
+  const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [following, setFollowing] = useState<Follow[]>([]);
 
   const [loading, setLoading] = useState(true);
@@ -125,7 +125,6 @@ export default function MyAccount() {
   );
   const [uploading, setUploading] = useState(false);
 
-  // State to control which tooltip is active
   const [activeTooltip, setActiveTooltip] = useState<
     "name" | "email" | "password" | null
   >(null);
@@ -146,12 +145,12 @@ export default function MyAccount() {
 
       const [reviewsData, favoritesData, fetchedFollowing] = await Promise.all([
         fetchUserReviews(token!, user.id),
-        fetchUserFavorites(token!, user.id), // Fetch user favorites
+        fetchUserFavorites(token!, user.id),
         fetchMyFollows(token!),
       ]);
 
-      setReviews(reviewsData.sort((a, b) => b.rating - a.rating)); // Sort by rating for top reviews
-      setFavorites(favoritesData); // Set favorites
+      setReviews(reviewsData.sort((a, b) => b.rating - a.rating));
+      setFavorites(favoritesData);
       const processedFollowing = fetchedFollowing.map((f: Follow) => {
         let displayName = "";
         let displayPicture = placeholder;
@@ -443,7 +442,7 @@ export default function MyAccount() {
                     onMouseLeave={() => setActiveTooltip(null)}
                     onClick={() =>
                       setActiveTooltip(activeTooltip === "name" ? null : "name")
-                    } // Toggle on click for mobile
+                    }
                   >
                     <FaInfoCircle size={14} className="text-white/70" />
                     {activeTooltip === "name" && (
@@ -659,6 +658,15 @@ export default function MyAccount() {
                     <Card
                       key={favorite.id}
                       className="bg-white/5 border border-white/10 p-3 rounded-xl text-white flex flex-col items-center text-center flex-shrink-0 w-28 cursor-pointer hover:bg-white/10 transition-colors"
+                      onClick={() =>
+                        navigate({
+                          pathname: "/",
+                          search: createSearchParams({
+                            section: "track",
+                            trackId: favorite.externalId,
+                          }).toString(),
+                        })
+                      }
                     >
                       <img
                         src={favorite.coverUrl || placeholder}
@@ -697,7 +705,7 @@ export default function MyAccount() {
                     onClick={() => handleViewUser(follow.targetId)}
                   >
                     <img
-                      src={follow.targetProfilePicture || placeholder}
+                      src={follow.targetProfilePicture || "/placeholder.svg"}
                       alt={follow.targetName}
                       className="w-16 h-16 rounded-full object-cover mb-2"
                     />

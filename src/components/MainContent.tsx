@@ -10,6 +10,7 @@ import Results from "./content/Results";
 import AlbumDetails from "./content/AlbumDetails";
 import ArtistPage from "./content/ArtistPage";
 import PlaylistDetails from "./content/PlaylistDetails";
+import TrackDetailsPage from "./content/TrackDetailsPage";
 import Welcome from "./content/Welcome";
 
 type MainContentProps = {
@@ -19,6 +20,7 @@ type MainContentProps = {
   artistId?: string;
   albumId?: string;
   playlistId?: string;
+  trackId?: string;
   onSearch: (query: string) => void;
 };
 
@@ -29,6 +31,7 @@ export default function MainContent({
   artistId,
   albumId,
   playlistId,
+  trackId,
   onSearch,
 }: MainContentProps) {
   const renderContent = () => {
@@ -68,6 +71,12 @@ export default function MainContent({
           <PlaylistDetails playlistId={playlistId} />
         ) : (
           <p className="text-white">Playlist ID not provided.</p>
+        );
+      case "track":
+        return trackId ? (
+          <TrackDetailsPage trackId={trackId} />
+        ) : (
+          <p className="text-white">Track ID not provided.</p>
         );
       case "results":
         return <Results query={searchQuery ?? ""} />;

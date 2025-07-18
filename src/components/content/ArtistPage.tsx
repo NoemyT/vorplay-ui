@@ -40,15 +40,12 @@ export default function ArtistPage({ artistId }: ArtistPageProps) {
       setLoading(true);
       setError(null);
       try {
-        // Fetch artist details
         const artistData = await fetchArtistDetails(artistId);
         setArtist(artistData);
 
-        // Fetch artist's top tracks
         const tracksData = await fetchArtistTopTracks(artistId);
         setTopTracks(tracksData);
 
-        // Fetch artist's albums
         const albumsData = await fetchArtistAlbums(artistId, 40);
         setAlbums(albumsData);
       } catch (err) {

@@ -16,6 +16,7 @@ export default function Home() {
   const artistId = searchParams.get("artistId");
   const albumId = searchParams.get("albumId");
   const playlistId = searchParams.get("playlistId");
+  const trackId = searchParams.get("trackId");
 
   const handleSectionChange = (newSection: string) => {
     setSearchParams({ section: newSection.toLowerCase() });
@@ -38,6 +39,7 @@ export default function Home() {
           artistId={artistId ?? undefined}
           albumId={albumId ?? undefined}
           playlistId={playlistId ?? undefined}
+          trackId={trackId ?? undefined}
           onSearch={handleSearch}
         />
       </div>

@@ -126,10 +126,10 @@ export default function UserAccount({ userId }: { userId: string }) {
       const userData: User = await userRes.json();
       setProfile(userData);
 
-      const token = localStorage.getItem("token") || ""; // Ensure token is available for authenticated fetches
+      const token = localStorage.getItem("token") || "";
 
       const reviewsData = await fetchUserReviews(token, Number(userId));
-      setReviews(reviewsData.sort((a, b) => b.rating - a.rating)); // Sort by rating for top reviews
+      setReviews(reviewsData.sort((a, b) => b.rating - a.rating));
 
       const favoritesData = await fetchUserFavorites(token, Number(userId));
       setFavorites(favoritesData);
@@ -402,6 +402,15 @@ export default function UserAccount({ userId }: { userId: string }) {
                     <Card
                       key={favorite.id}
                       className="bg-white/5 border border-white/10 p-3 rounded-xl text-white flex flex-col items-center text-center flex-shrink-0 w-28 cursor-pointer hover:bg-white/10 transition-colors"
+                      onClick={() =>
+                        navigate({
+                          pathname: "/",
+                          search: createSearchParams({
+                            section: "track",
+                            trackId: favorite.externalId,
+                          }).toString(),
+                        })
+                      }
                     >
                       <img
                         src={favorite.coverUrl || placeholder}
@@ -440,10 +449,7 @@ export default function UserAccount({ userId }: { userId: string }) {
                     onClick={() => handleViewUser(follow.targetId)}
                   >
                     <img
-                      src={
-                        follow.targetProfilePicture ||
-                        "/placeholder.svg?height=64&width=64"
-                      }
+                      src={follow.targetProfilePicture || "/placeholder.svg"}
                       alt={follow.targetName}
                       className="w-16 h-16 rounded-full object-cover mb-2"
                     />

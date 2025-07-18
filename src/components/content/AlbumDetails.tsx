@@ -3,16 +3,14 @@
 import { useEffect, useState } from "react";
 import { FaCompactDisc, FaArrowLeft } from "react-icons/fa";
 import { Card } from "../ui/Card";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, createSearchParams } from "react-router-dom";
 import { fetchArtistAlbums, fetchArtistDetails } from "../../lib/api";
 import {
   fetchTracksForAlbum,
   type AlbumTrackItemDto,
   type AlbumSummaryDto,
-  type TrackSummaryDto,
   type Artist,
 } from "../../lib/api";
-import TrackDetailsModal from "../TrackDetailsModal";
 
 type AlbumDetailsProps = {
   albumId: string;
@@ -26,11 +24,6 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
   const [albumTracks, setAlbumTracks] = useState<AlbumTrackItemDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-  const [selectedTrack, setSelectedTrack] = useState<TrackSummaryDto | null>(
-    null,
-  );
 
   useEffect(() => {
     async function loadAlbumDetails() {
@@ -88,33 +81,13 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
   };
 
   const handleTrackClick = (trackItem: AlbumTrackItemDto) => {
-    // console.log("Album track clicked for details:", trackItem);
-    if (!album || !artist) {
-      console.error(
-        "Album or Artist data not available for track details modal.",
-      );
-      return;
-    }
-
-    const fullTrackDetails: TrackSummaryDto = {
-      id: trackItem.id,
-      title: trackItem.title,
-      artistNames: [artist.name],
-      albumName: album.title,
-      imageUrl: album.imageUrl,
-      durationMs: trackItem.durationMs,
-      popularity: undefined,
-      previewUrl: undefined,
-      href: trackItem.previewUrl,
-    };
-    // console.log("Constructed TrackSummaryDto for modal:", fullTrackDetails);
-    setSelectedTrack(fullTrackDetails);
-    setIsDetailsModalOpen(true);
-  };
-
-  const closeDetailsModal = () => {
-    setIsDetailsModalOpen(false);
-    setSelectedTrack(null);
+    navigate({
+      pathname: "/",
+      search: createSearchParams({
+        section: "track",
+        trackId: trackItem.id,
+      }).toString(),
+    });
   };
 
   const formatDuration = (ms: number) => {
@@ -210,14 +183,6 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
           </div>
         </Card>
       </div>
-
-      {selectedTrack && (
-        <TrackDetailsModal
-          isOpen={isDetailsModalOpen}
-          onClose={closeDetailsModal}
-          track={selectedTrack}
-        />
-      )}
     </>
   );
 }
