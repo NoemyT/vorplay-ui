@@ -21,15 +21,14 @@ export default function Home() {
     setSearchParams({ section: newSection.toLowerCase() });
   };
 
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
+    setSearchParams({ section: "results", query: query });
+  };
+
   return (
     <>
-      <Header
-        onSelectSection={handleSectionChange}
-        onSearch={(query) => {
-          setSearchQuery(query);
-          setSearchParams({ section: "results", query: query });
-        }}
-      />
+      <Header onSelectSection={handleSectionChange} onSearch={handleSearch} />
       <div>
         <Sidebar onSelectSection={handleSectionChange} />
         <MainContent
@@ -39,6 +38,7 @@ export default function Home() {
           artistId={artistId ?? undefined}
           albumId={albumId ?? undefined}
           playlistId={playlistId ?? undefined}
+          onSearch={handleSearch}
         />
       </div>
     </>

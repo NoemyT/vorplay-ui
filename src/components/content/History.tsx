@@ -12,7 +12,11 @@ type SearchHistoryItem = {
   createdAt: string;
 };
 
-export default function History() {
+type HistoryProps = {
+  onSearch: (query: string) => void;
+};
+
+export default function History({ onSearch }: HistoryProps) {
   const [history, setHistory] = useState<SearchHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -202,6 +206,10 @@ export default function History() {
     }
   }
 
+  const handleHistoryItemClick = (query: string) => {
+    onSearch(query);
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center flex-1 text-white text-center opacity-70">
@@ -254,7 +262,8 @@ export default function History() {
           {history.map((item) => (
             <Card
               key={item.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative flex items-center justify-between hover:bg-white/10 transition-colors"
+              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer"
+              onClick={() => handleHistoryItemClick(item.query)}
             >
               <div>
                 <p className="text-lg font-semibold">{item.query}</p>
@@ -263,7 +272,10 @@ export default function History() {
                 </p>
               </div>
               <button
-                onClick={() => handleDeleteItem(item.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDeleteItem(item.id);
+                }}
                 className="text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
               >
                 <FaTrashAlt size={16} />

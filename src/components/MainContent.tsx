@@ -19,6 +19,7 @@ type MainContentProps = {
   artistId?: string;
   albumId?: string;
   playlistId?: string;
+  onSearch: (query: string) => void;
 };
 
 export default function MainContent({
@@ -28,6 +29,7 @@ export default function MainContent({
   artistId,
   albumId,
   playlistId,
+  onSearch,
 }: MainContentProps) {
   const renderContent = () => {
     switch (selectedSection.toLowerCase()) {
@@ -36,7 +38,7 @@ export default function MainContent({
       case "favorites":
         return <Favorites />;
       case "history":
-        return <History />;
+        return <History onSearch={onSearch} />;
       case "playlists":
         return <Playlists />;
       case "follows":
@@ -77,20 +79,20 @@ export default function MainContent({
   return (
     <div
       className="
-      w-full px-4 mt-4 mb-4 md:mb-0
-      flex-1
-      md:fixed md:top-[82px] md:bottom-[10px] md:left-[280px]
-      md:w-[calc(100%-288px)] md:mt-0
-      md:flex md:flex-col
-    "
+    w-full px-4 mt-4 mb-4 md:mb-0
+    flex-1
+    md:fixed md:top-[82px] md:bottom-[10px] md:left-[280px]
+    md:w-[calc(100%-288px)] md:mt-0
+    md:flex md:flex-col
+  "
     >
       <Card
         className="
-        bg-[#696969]/40 rounded-[20px]
-        flex flex-col flex-grow
-        px-6 py-4 h-full
-        min-h-[364px]
-      "
+      bg-[#696969]/40 rounded-[20px]
+      flex flex-col flex-grow
+      px-6 py-4 h-full
+      min-h-[364px]
+    "
       >
         <div className="flex flex-col items-center justify-center overflow-y-auto flex-grow">
           {renderContent()}
