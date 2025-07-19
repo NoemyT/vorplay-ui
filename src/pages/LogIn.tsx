@@ -56,7 +56,7 @@ export default function LogIn() {
               <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Log in to</span>
               <span className="bg-gradient-to-r from-[#8a2be2] to-[#a855f7] bg-clip-text text-transparent">Vorplay</span>
             </div>
-            <p className="text-white/60 text-sm">Welcome back to your music universe</p>
+            <p className="text-white/60 text-sm">Welcome back to your music vorpverse</p>
           </div>
         </div>
 
