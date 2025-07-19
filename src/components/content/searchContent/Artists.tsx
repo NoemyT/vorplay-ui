@@ -38,7 +38,7 @@ export default function Artists({ artists, query }: ArtistsProps) {
       {artists.map((artist) => (
         <Card
           key={artist.id}
-          className="bg-white/5 border border-white/10 p-4 rounded-xl text-white text-center flex flex-col items-center justify-center hover:bg-white/10 transition-colors cursor-pointer" // ADDED: cursor-pointer
+          className="bg-white/5 border border-white/10 p-4 rounded-xl text-white text-center flex flex-col items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
           onClick={() => handleArtistClick(artist.id)}
         >
           <img

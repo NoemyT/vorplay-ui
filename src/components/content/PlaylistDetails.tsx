@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { FaArrowLeft, FaTrashAlt, FaPencilAlt, FaPlay } from "react-icons/fa";
 import { Card } from "../ui/Card";
 import { useAuth } from "../../hooks/use-auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, createSearchParams } from "react-router-dom";
 import {
   fetchPlaylistDetails,
   updatePlaylist,
@@ -93,7 +93,7 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
         );
         const normalizedUpdated = {
           ...updatedPlaylist,
-          playlistTracks: playlist.playlistTracks,
+          playlistTracks: updatedPlaylist.playlistTracks,
         };
         setPlaylist(normalizedUpdated);
       }
@@ -154,6 +154,16 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
       return playlist.playlistTracks[0]?.track?.coverUrl || placeholder;
     }
     return placeholder;
+  };
+
+  const handleTrackClick = (trackExternalId: string) => {
+    navigate({
+      pathname: "/",
+      search: createSearchParams({
+        section: "track",
+        trackId: trackExternalId,
+      }).toString(),
+    });
   };
 
   if (loading) {
@@ -275,7 +285,10 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
                 .map((playlistTrack) => (
                   <Card
                     key={`${playlistTrack.playlistId}-${playlistTrack.trackId}`}
-                    className="bg-white/5 border border-white/10 p-3 rounded-xl text-white flex items-center justify-between hover:bg-white/10 transition-colors"
+                    className="bg-white/5 border border-white/10 p-3 rounded-xl text-white flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer"
+                    onClick={() =>
+                      handleTrackClick(playlistTrack.track.externalId)
+                    }
                   >
                     <div className="flex items-center gap-3">
                       <img

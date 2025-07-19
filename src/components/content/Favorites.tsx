@@ -11,12 +11,14 @@ import {
   type Favorite,
 } from "../../lib/api";
 import placeholder from "../../assets/placeholder.svg";
+import { useNavigate } from "react-router-dom";
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState<Favorite[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const loadFavorites = async () => {
     if (!user) {
@@ -72,17 +74,10 @@ export default function Favorites() {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Authentication token missing.");
 
-      /* console.log(
-        `Making DELETE request to: ${import.meta.env.VITE_API_URL}/favorites/track/${favoriteToDelete.trackId}`,
-      ); */
       await removeFavorite(token, favoriteToDelete.trackId);
 
-      /* console.log(
-        `Successfully deleted favorite with trackId ${favoriteToDelete.trackId}, updating state`,
-      ); */
       setFavorites((prev) => {
         const updated = prev.filter((fav) => fav.id !== favoriteId);
-        // console.log("Updated favorites after deletion:", updated);
         return updated;
       });
 
@@ -94,10 +89,8 @@ export default function Favorites() {
         "An unexpected error occurred while removing the favorite.";
 
       if (errorMessage.includes("not found") || errorMessage.includes("404")) {
-        // console.log("Favorite not found on server, removing from local state");
         setFavorites((prev) => {
           const updated = prev.filter((fav) => fav.id !== favoriteId);
-          // console.log("Updated favorites after local removal:", updated);
           return updated;
         });
         alert("Item was already removed from favorites (locally).");
@@ -162,10 +155,16 @@ export default function Favorites() {
               <Card
                 key={favorite.id}
                 className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative"
+                onClick={() =>
+                  navigate(`/?section=track&trackId=${favorite.externalId}`)
+                }
               >
                 {/* Trash icon */}
                 <button
-                  onClick={() => handleDeleteFavorite(favorite.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleDeleteFavorite(favorite.id);
+                  }}
                   className="absolute top-3 right-3 text-red-400 hover:text-red-300 bg-transparent p-1 rounded-full"
                 >
                   <FaTrashAlt size={16} />

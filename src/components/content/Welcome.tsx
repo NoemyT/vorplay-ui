@@ -19,6 +19,7 @@ import {
   type PublicFeedDto,
 } from "../../lib/api";
 import placeholder from "../../assets/placeholder.svg";
+import { useNavigate, createSearchParams } from "react-router-dom";
 
 export default function Welcome() {
   const [stats, setStats] = useState<PlatformStatsDto | null>(null);
@@ -27,6 +28,7 @@ export default function Welcome() {
   const [loadingFeed, setLoadingFeed] = useState(true);
   const [errorStats, setErrorStats] = useState<string | null>(null);
   const [errorFeed, setErrorFeed] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function loadStats() {
@@ -89,10 +91,27 @@ export default function Welcome() {
       );
     };
 
+    const handleItemClick = () => {
+      if (
+        (item.type === "review" || item.type === "favorite") &&
+        item.track &&
+        item.track.id
+      ) {
+        navigate({
+          pathname: "/",
+          search: createSearchParams({
+            section: "track",
+            trackId: item.track.externalId,
+          }).toString(),
+        });
+      }
+    };
+
     return (
       <Card
         key={item.id}
-        className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white flex items-start gap-4 hover:shadow-md hover:shadow-[#8a2be2]/20"
+        className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white flex items-start gap-4 hover:shadow-md hover:shadow-[#8a2be2]/20 cursor-pointer" // Added cursor-pointer
+        onClick={handleItemClick}
       >
         <img
           src={item.user.profilePicture || placeholder}
@@ -173,15 +192,15 @@ export default function Welcome() {
     <div className="h-full w-full flex flex-col items-center p-4">
       <Card
         className="
-        flex flex-col items-center
-        justify-center
-        gap-1
-        w-full max-w-[900px]
-        min-h-[250px]
-        bg-slate-800/60 backdrop-blur-sm px-6 py-6
-        shadow-xl border border-white/10 text-center rounded-[20px] mb-7
-        group hover:shadow-xl hover:shadow-[#8a2be2]/20 transition-all duration-300
-      "
+      flex flex-col items-center
+      justify-center
+      gap-1
+      w-full max-w-[900px]
+      min-h-[250px]
+      bg-slate-800/60 backdrop-blur-sm px-6 py-6
+      shadow-xl border border-white/10 text-center rounded-[20px] mb-7
+      group hover:shadow-xl hover:shadow-[#8a2be2]/20 transition-all duration-300
+    "
       >
         <img
           src={logo || placeholder}
@@ -276,12 +295,12 @@ function StatCard({ icon, label, value }: StatCardProps) {
   return (
     <Card
       className="
-      bg-slate-800/60 backdrop-blur-sm rounded-[16px] p-4
-      text-white shadow-lg border border-white/10
-      flex flex-col items-center text-center gap-2 h-full
-      justify-center
-      transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[#8a2be2]/20
-    "
+    bg-slate-800/60 backdrop-blur-sm rounded-[16px] p-4
+    text-white shadow-lg border border-white/10
+    flex flex-col items-center text-center gap-2 h-full
+    justify-center
+    transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[#8a2be2]/20
+  "
     >
       <div className="mb-1">{icon}</div>
       <p className="text-2xl font-bold text-[#8a2be2]">{value}</p>

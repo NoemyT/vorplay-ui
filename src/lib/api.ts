@@ -12,6 +12,11 @@ export type Review = {
   comment: string;
   userId: number;
   userName: string;
+  user?: {
+    id: number;
+    name: string;
+    profilePicture?: string | null;
+  };
   createdAt: string;
 };
 
@@ -66,6 +71,7 @@ export type AlbumSummaryDto = {
 
 export type TrackSummaryDto = {
   id: string;
+  externalId: string;
   title: string;
   artistNames?: string[];
   artist?: string;
@@ -239,9 +245,17 @@ export async function deleteReviewApi(
 
 export async function fetchUserReviews(
   token: string,
-  userId: number,
+  userId?: number,
+  trackId?: string,
 ): Promise<Review[]> {
-  const res = await fetch(`${API_BASE}/reviews/user/${userId}`, {
+  let url = `${API_BASE}/reviews`;
+  if (userId) {
+    url = `${API_BASE}/reviews/user/${userId}`;
+  } else if (trackId) {
+    url = `${API_BASE}/reviews/track/${trackId}`;
+  }
+
+  const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -249,6 +263,13 @@ export async function fetchUserReviews(
 
   if (!res.ok) {
     const errorData = await res.json();
+    if (
+      errorData.message &&
+      (errorData.message.includes("Nenhum review encontrado para a faixa") ||
+        errorData.message.includes("Faixa não encontrada"))
+    ) {
+      return [];
+    }
     throw new Error(errorData.message || "Failed to fetch user reviews.");
   }
   return res.json();
@@ -535,6 +556,17 @@ export async function fetchTracksForAlbum(
   const data = await res.json();
   // console.log("API: fetchTracksForAlbum raw response:", data);
   return data;
+}
+
+export async function fetchTrackDetails(
+  trackId: string,
+): Promise<TrackSummaryDto> {
+  const res = await fetch(`${API_BASE}/tracks/${trackId}`);
+  if (!res.ok) {
+    const errorData = await res.json();
+    throw new Error(errorData.message || "Failed to fetch track details.");
+  }
+  return res.json();
 }
 
 export async function saveSearchQuery(
