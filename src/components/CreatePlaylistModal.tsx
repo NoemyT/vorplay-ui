@@ -2,7 +2,7 @@
 
 import type React from "react";
 import { useState } from "react";
-import { FaTimes } from "react-icons/fa";
+import { FaTimes, FaMusic, FaPlus } from "react-icons/fa";
 import { Card } from "./ui/Card";
 import { useAuth } from "../hooks/use-auth";
 import { createPlaylist, type CreatePlaylistPayload } from "../lib/api";
@@ -83,79 +83,87 @@ export default function CreatePlaylistModal({
         if (e.target === e.currentTarget) handleClose();
       }}
     >
-      <Card className="bg-neutral-800 rounded-[20px] p-6 w-full max-w-md relative">
+      <Card className="auth-card-modern flex flex-col w-full max-w-md rounded-[20px] p-6 relative">
+        {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute top-4 right-4 text-white/70 hover:text-white"
+          className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors duration-200"
         >
-          <FaTimes size={20} />
+          <FaTimes size={16} />
         </button>
 
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold text-white text-center">
-            Create New Playlist
-          </h2>
+        {/* Header */}
+        <div className="text-center mb-6">
+          <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-[#8a2be2] to-[#a855f7] rounded-full mb-3">
+            <FaMusic size={18} className="text-white" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-1">Create New Playlist</h2>
+          <p className="text-white/60 text-sm">Build your perfect music collection</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-white text-sm font-medium mb-2"
-            >
-              Playlist Name *
-            </label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
+          <div className="space-y-3">
             <input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               type="text"
-              placeholder="My Awesome Playlist"
+              placeholder="Playlist Name"
               maxLength={15}
-              className="w-full p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none"
+              className="auth-input-modern w-full p-3 rounded-xl text-white placeholder-white/50 focus:outline-none"
             />
-            <p className="text-right text-xs text-white/70 mt-1">
-              {name.length}/15
-            </p>
-          </div>
-
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-white text-sm font-medium mb-2"
-            >
-              Description (optional)
-            </label>
+            <div className="flex justify-between items-center text-xs px-1">
+              <span className="text-white/50">Choose a memorable name</span>
+              <span className="text-white/60 font-mono">{name.length}/15</span>
+            </div>
+            
             <textarea
               id="description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-              placeholder="Describe your playlist..."
+              rows={2}
+              placeholder="Description (optional)"
               maxLength={50}
-              className="w-full p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none resize-none"
+              className="auth-input-modern w-full p-3 rounded-xl text-white placeholder-white/50 focus:outline-none resize-none"
             />
-            <p className="text-right text-xs text-white/70 mt-1">
-              {description.length}/50
-            </p>
+            <div className="flex justify-between items-center text-xs px-1">
+              <span className="text-white/50">Add some context</span>
+              <span className="text-white/60 font-mono">{description.length}/50</span>
+            </div>
           </div>
 
-          {error && <p className="text-red-400 text-center">{error}</p>}
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
+              <p className="text-center text-red-300 text-sm">{error}</p>
+            </div>
+          )}
 
-          <div className="flex gap-3 justify-center mt-4">
+          {/* Action Buttons */}
+          <div className="flex gap-3 pt-2">
             <button
               type="button"
               onClick={handleClose}
-              className="bg-neutral-700 text-white py-2.5 px-8 rounded-full font-semibold hover:bg-neutral-600 transition"
+              className="flex-1 bg-white/10 hover:bg-white/20 text-white py-2.5 px-4 rounded-xl font-medium transition-all duration-200 border border-white/20 text-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="bg-[#8a2be2] text-white py-2.5 px-8 rounded-full font-semibold hover:bg-[#7a1fd1] transition"
+              className="flex-1 auth-button-modern text-white py-2.5 px-4 rounded-xl font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm"
               disabled={loading}
             >
-              {loading ? "Creating..." : "Create Playlist"}
+              {loading ? (
+                <>
+                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Creating...
+                </>
+              ) : (
+                <>
+                  <FaPlus size={12} />
+                  Create
+                </>
+              )}
             </button>
           </div>
         </form>
