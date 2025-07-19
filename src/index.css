@@ -100,9 +100,33 @@ button:focus-visible {
   -webkit-backdrop-filter: blur(10px);
 }
 
-/* Smooth transitions for all interactive elements */
-* {
-  transition: all 0.2s ease-in-out;
+/* Modern auth styles */
+.auth-card-modern {
+  background: linear-gradient(145deg, rgba(105, 105, 105, 0.15), rgba(105, 105, 105, 0.25));
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(138, 43, 226, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.auth-input-modern {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.auth-input-modern:focus {
+  border-color: rgba(138, 43, 226, 0.8);
+  background: rgba(30, 41, 59, 0.8);
+  box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.1);
+}
+
+.auth-button-modern {
+  background: linear-gradient(135deg, #8a2be2 0%, #6a1b9a 100%);
+  box-shadow: 0 4px 15px rgba(138, 43, 226, 0.4);
+}
+
+.auth-button-modern:hover {
+  box-shadow: 0 6px 20px rgba(138, 43, 226, 0.6);
 }
 
 @media (prefers-color-scheme: light) {
