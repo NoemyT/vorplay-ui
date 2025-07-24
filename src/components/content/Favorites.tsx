@@ -154,7 +154,7 @@ export default function Favorites() {
             return (
               <Card
                 key={favorite.id}
-                className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative"
+                className="bg-white/15 border border-white/10 p-4 rounded-xl text-white relative hover:bg-white/20 transition-colors cursor-pointer"
                 onClick={() =>
                   navigate(`/?section=track&trackId=${favorite.externalId}`)
                 }

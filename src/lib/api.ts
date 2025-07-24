@@ -12,11 +12,7 @@ export type Review = {
   comment: string;
   userId: number;
   userName: string;
-  user?: {
-    id: number;
-    name: string;
-    profilePicture?: string | null;
-  };
+  profilePicture?: string;
   createdAt: string;
 };
 
@@ -150,7 +146,6 @@ export type AddTrackToPlaylistPayload = {
   position?: number;
 };
 
-// New types for Feed and Stats
 export type UserSummaryDto = {
   id: number;
   name: string;

@@ -255,7 +255,7 @@ export default function TrackDetailsPage({ trackId }: TrackDetailsPageProps) {
   return (
     <>
       <div className="flex flex-col w-full h-full items-center">
-        <Card className="flex flex-col w-full max-w-[800px] bg-white/5 rounded-[20px] p-6 relative">
+        <Card className="flex flex-col w-full max-w-[900px] bg-slate-800/60 rounded-[20px] p-6 relative">
           <button
             onClick={handleGoBack}
             className="absolute top-4 left-6 text-white/70 hover:text-white bg-transparent p-2 rounded-full"
@@ -431,7 +431,7 @@ export default function TrackDetailsPage({ trackId }: TrackDetailsPageProps) {
                   >
                     <div className="flex items-start gap-4">
                       <img
-                        src={review.user?.profilePicture || placeholder}
+                        src={review.profilePicture || placeholder}
                         alt={review.userName}
                         className="w-10 h-10 rounded-full object-cover flex-shrink-0 border border-[#8a2be2]"
                       />

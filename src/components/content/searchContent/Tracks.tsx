@@ -4,15 +4,15 @@ import { useState, useEffect, useCallback } from "react";
 import { Card } from "../../ui/Card";
 import { FaMusic, FaHeart, FaPlus } from "react-icons/fa";
 import AddToPlaylistModal from "../../AddToPlaylistModal";
-import { useAuth } from "../../../../src/hooks/use-auth"; // Corrected import path
+import { useAuth } from "../../../../src/hooks/use-auth";
 import { useNavigate, createSearchParams } from "react-router-dom";
 import {
   fetchUserFavorites,
   type Favorite,
   type TrackSummaryDto,
-} from "../../../../src/lib/api"; // Corrected import path
-import { handleFavoriteToggle } from "../../../../src/lib/utils"; // Corrected import path
-import placeholder from "../../../assets/placeholder.svg"; // Corrected import path
+} from "../../../../src/lib/api";
+import { handleFavoriteToggle } from "../../../../src/lib/utils";
+import placeholder from "../../../assets/placeholder.svg";
 
 type TracksProps = {
   tracks: TrackSummaryDto[];
