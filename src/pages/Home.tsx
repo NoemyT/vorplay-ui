@@ -10,6 +10,7 @@ import MainContent from "../components/MainContent";
 export default function Home() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState("");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const section = searchParams.get("section") || "default";
   const userId = searchParams.get("userId");
@@ -27,11 +28,15 @@ export default function Home() {
     setSearchParams({ section: "results", query: query });
   };
 
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed)
+  }
+
   return (
     <>
       <Header onSelectSection={handleSectionChange} onSearch={handleSearch} />
       <div>
-        <Sidebar onSelectSection={handleSectionChange} />
+        <Sidebar onSelectSection={handleSectionChange} collapsed={sidebarCollapsed} onToggle={toggleSidebar} />
         <MainContent
           selectedSection={section}
           searchQuery={searchQuery}
@@ -41,6 +46,7 @@ export default function Home() {
           playlistId={playlistId ?? undefined}
           trackId={trackId ?? undefined}
           onSearch={handleSearch}
+          sidebarCollapsed={sidebarCollapsed}
         />
       </div>
     </>

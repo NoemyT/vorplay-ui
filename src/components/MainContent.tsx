@@ -1,3 +1,5 @@
+"use client";
+
 import { Card } from "../components/ui/Card";
 import Reviews from "./content/Reviews";
 import Favorites from "./content/Favorites";
@@ -22,6 +24,7 @@ type MainContentProps = {
   playlistId?: string;
   trackId?: string;
   onSearch: (query: string) => void;
+  sidebarCollapsed: boolean;
 };
 
 export default function MainContent({
@@ -33,6 +36,7 @@ export default function MainContent({
   playlistId,
   trackId,
   onSearch,
+  sidebarCollapsed,
 }: MainContentProps) {
   const renderContent = () => {
     switch (selectedSection.toLowerCase()) {
@@ -87,13 +91,16 @@ export default function MainContent({
 
   return (
     <div
-      className="
-    w-full px-4 mt-4 mb-4 md:mb-0
-    flex-1
-    md:fixed md:top-[82px] md:bottom-[10px] md:left-[280px]
-    md:w-[calc(100%-288px)] md:mt-0
-    md:flex md:flex-col
-  "
+      className={`
+        w-full px-4 mt-4 mb-4 md:mb-0 flex-1 transition-all duration-300
+        md:fixed md:top-[82px] md:bottom-[10px]
+        md:flex md:flex-col md:mt-0
+        ${
+          sidebarCollapsed
+            ? "md:left-[80px] md:w-[calc(100%-83px)]"
+            : "md:left-[280px] md:w-[calc(100%-288px)]"
+        }
+      `}
     >
       <Card
         className="

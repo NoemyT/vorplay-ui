@@ -46,11 +46,11 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         </button>
 
         {open && (
-          <div className="fixed inset-0 z-50 flex items-start justify-center mt-20 px-4">
-            <div className="w-full max-w-sm bg-slate-800/95 backdrop-blur-sm border border-white/20 rounded-xl shadow-2xl p-4">
+          <div className="fixed inset-0 z-50 flex items-start justify-center mt-12 px-3">
+            <div className="w-full max-w-[300px] bg-slate-800/95 backdrop-blur-sm border border-white/20 rounded-xl shadow-2xl p-3">
               <form
                 onSubmit={handleSearch}
-                className="flex items-center bg-slate-700/80 rounded-full px-4 py-3 text-white border border-white/10"
+                className="flex items-center bg-slate-700/80 rounded-full px-3 py-2 text-white border border-white/10"
               >
                 <FaSearch className="mr-3 text-[#8a2be2]" />
                 <input
@@ -64,7 +64,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="ml-2 text-white/70 hover:text-white text-lg transition-colors"
+                  className="ml-1 text-white/70 hover:text-white text-base transition-colors bg-transparent appearance-none"
                 >
                   ✕
                 </button>

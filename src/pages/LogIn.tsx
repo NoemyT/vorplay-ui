@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Card } from "../components/ui/Card";
@@ -39,7 +41,8 @@ export default function LogIn() {
 
   return (
     <div className="flex items-center justify-center min-h-screen px-4">
-      <Card className="auth-card-modern flex flex-col w-full max-w-[420px] rounded-[24px] p-8">{/* Background decorative elements */}
+      <Card className="auth-card-modern flex flex-col w-full max-w-[420px] rounded-[24px] p-8">
+        {/* Background decorative elements */}
         <div className="flex flex-col items-center gap-4 mb-8">
           <div className="relative">
             <div className="absolute inset-0 bg-[#8a2be2]/20 rounded-full blur-lg"></div>
@@ -53,10 +56,16 @@ export default function LogIn() {
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 font-extrabold text-2xl sm:text-3xl mb-2">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Log in to</span>
-              <span className="bg-gradient-to-r from-[#8a2be2] to-[#a855f7] bg-clip-text text-transparent">Vorplay</span>
+              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                Log in to
+              </span>
+              <span className="bg-gradient-to-r from-[#8a2be2] to-[#a855f7] bg-clip-text text-transparent">
+                Vorplay
+              </span>
             </div>
-            <p className="text-white/60 text-sm">Welcome back to your music vorpverse</p>
+            <p className="text-white/60 text-sm">
+              Welcome back to your music vorpverse
+            </p>
           </div>
         </div>
 
@@ -95,7 +104,10 @@ export default function LogIn() {
 
         <div className="text-center mt-6 text-white/70 text-sm">
           Don't have an account?{" "}
-          <Link to="/signup" className="text-[#8a2be2] hover:text-[#a855f7] font-medium">
+          <Link
+            to="/signup"
+            className="text-[#8a2be2] hover:text-[#a855f7] font-medium"
+          >
             Sign up
           </Link>
         </div>

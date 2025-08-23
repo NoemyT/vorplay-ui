@@ -7,7 +7,6 @@ import logo from "../../assets/vorp.png";
 import {
   FaStar,
   FaUsers,
-  FaMusic,
   FaHeart,
   FaList,
   FaUserCircle,
@@ -223,7 +222,7 @@ export default function Welcome() {
         ) : errorStats ? (
           <div className="text-center text-red-400">Error: {errorStats}</div>
         ) : stats ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <StatCard
               icon={<FaUsers size={24} className="text-[#8a2be2]" />}
               label="Total Users"
@@ -244,16 +243,15 @@ export default function Welcome() {
               label="Total Playlists"
               value={formatNumber(stats.totalPlaylists)}
             />
-            <StatCard
-              icon={<FaMusic size={24} className="text-[#8a2be2]" />}
-              label="Top Tracks"
-              value={formatNumber(stats.topRatedTracks)}
-            />
-            <StatCard
-              icon={<FaUserCircle size={24} className="text-[#8a2be2]" />}
-              label="Active Users"
-              value={formatNumber(stats.mostActiveUsers)}
-            />
+            <div className="flex justify-center md:col-span-2 lg:col-span-1">
+              <div className="w-full max-w-[300px]"> {/* adjust max width as needed */}
+                <StatCard
+                  icon={<FaUserCircle size={24} className="text-[#8a2be2]" />}
+                  label="Active Users"
+                  value={formatNumber(stats.mostActiveUsers)}
+                />
+               </div>
+            </div>
           </div>
         ) : (
           <div className="text-center text-white/70">No stats available.</div>

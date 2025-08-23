@@ -112,11 +112,11 @@ export default function TrackDetailsPage({ trackId }: TrackDetailsPageProps) {
 
       otherReviews.sort(
         (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
 
       setReviews(
-        currentUserReview ? [currentUserReview, ...otherReviews] : otherReviews,
+        currentUserReview ? [currentUserReview, ...otherReviews] : otherReviews
       );
 
       if (user && token) {
@@ -246,7 +246,7 @@ export default function TrackDetailsPage({ trackId }: TrackDetailsPageProps) {
   const spotifyEmbedUrl = track.href
     ? track.href.replace(
         "open.spotify.com/track/",
-        "open.spotify.com/embed/track/",
+        "open.spotify.com/embed/track/"
       )
     : null;
 
@@ -288,7 +288,7 @@ export default function TrackDetailsPage({ trackId }: TrackDetailsPageProps) {
                       track,
                       user,
                       userFavorites,
-                      setUserFavorites,
+                      setUserFavorites
                     )
                   }
                   className="flex-shrink-0 p-3 bg-[#8a2be2] rounded-full text-white hover:scale-110 transition-transform"
@@ -317,7 +317,7 @@ export default function TrackDetailsPage({ trackId }: TrackDetailsPageProps) {
             {spotifyEmbedUrl && (
               <div className="w-full mt-6 rounded-md overflow-hidden">
                 <h3 className="text-white text-lg font-semibold mb-2 text-left">
-                  Listen Preview:
+                  Preview:
                 </h3>
                 <iframe
                   src={spotifyEmbedUrl}
@@ -373,7 +373,7 @@ export default function TrackDetailsPage({ trackId }: TrackDetailsPageProps) {
                       value={userComment}
                       onChange={(e) =>
                         setUserComment(
-                          e.target.value.slice(0, MAX_COMMENT_LENGTH),
+                          e.target.value.slice(0, MAX_COMMENT_LENGTH)
                         )
                       }
                       rows={4}
@@ -385,7 +385,11 @@ export default function TrackDetailsPage({ trackId }: TrackDetailsPageProps) {
                     </p>
                     {reviewMessage && (
                       <p
-                        className={`text-center mt-2 ${reviewMessageType === "error" ? "text-red-400" : "text-green-400"}`}
+                        className={`text-center mt-2 ${
+                          reviewMessageType === "error"
+                            ? "text-red-400"
+                            : "text-green-400"
+                        }`}
                       >
                         {reviewMessage}
                       </p>
