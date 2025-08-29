@@ -121,7 +121,7 @@ export default function MyAccount() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [messageType, setMessageType] = useState<"success" | "error" | null>(
-    null,
+    null
   );
   const [uploading, setUploading] = useState(false);
 
@@ -248,7 +248,7 @@ export default function MyAccount() {
   const handleDeleteAccount = async () => {
     if (
       !window.confirm(
-        "Are you sure you want to delete your account? This action cannot be undone.",
+        "Are you sure you want to delete your account? This action cannot be undone."
       )
     ) {
       return;
@@ -283,7 +283,7 @@ export default function MyAccount() {
       }
     } catch (err) {
       setMessage(
-        (err as Error).message || "An error occurred during account deletion.",
+        (err as Error).message || "An error occurred during account deletion."
       );
       setMessageType("error");
       console.error("Account deletion error:", err);
@@ -293,7 +293,7 @@ export default function MyAccount() {
   };
 
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -371,7 +371,7 @@ export default function MyAccount() {
   return (
     <>
       <div className="flex flex-col w-full h-full items-center">
-        <Card className="flex flex-col w-full max-w-[800px] bg-white/5 rounded-[20px] p-6">
+        <Card className="flex flex-col w-full max-w-[820px] lg:max-w-[1020px] xl:max-w-[1220px] bg-slate-800/60 rounded-[20px] p-6">
           {/* Profile Header */}
           <div className="flex flex-col items-center gap-4 mb-6">
             <div className="relative">
@@ -427,13 +427,13 @@ export default function MyAccount() {
               onSubmit={handleUpdateProfile}
               className="flex flex-col gap-5 w-full mb-8"
             >
-              <h3 className="text-xl font-bold text-white mb-2 text-center">
+              <h3 className="text-xl font-bold text-[#8a2be2] mb-2 text-center">
                 Edit Profile
               </h3>
               <div>
                 <label
                   htmlFor="name"
-                  className="block text-white text-sm font-medium mb-1"
+                  className="block text-white text-sm font-medium ml-1 mb-1"
                 >
                   Username
                   <span
@@ -446,7 +446,7 @@ export default function MyAccount() {
                   >
                     <FaInfoCircle size={14} className="text-white/70" />
                     {activeTooltip === "name" && (
-                      <div className="absolute z-10 bg-neutral-700 text-white text-sm rounded py-1 px-2 w-64 -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap shadow-lg before:content-[''] before:absolute before:bottom-[-5px] before:left-1/2 before:-translate-x-1/2 before:border-t-neutral-700 before:border-x-transparent before:border-b-transparent before:border-[6px]">
+                      <div className="absolute bg-neutral-700 text-white text-sm rounded py-1 px-2 w-66 -top-8 left-20 -translate-x-1/2 whitespace-nowrap">
                         To keep current username, leave as is.
                       </div>
                     )}
@@ -458,13 +458,13 @@ export default function MyAccount() {
                   onChange={(e) => setName(e.target.value)}
                   type="text"
                   placeholder="Username"
-                  className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none w-full"
+                  className="auth-input-modern w-full p-3 rounded-xl text-white placeholder-white/50 focus:outline-none"
                 />
               </div>
               <div>
                 <label
                   htmlFor="email"
-                  className="block text-white text-sm font-medium mb-1"
+                  className="block text-white text-sm font-medium ml-1 mb-1"
                 >
                   Email
                   <span
@@ -473,13 +473,13 @@ export default function MyAccount() {
                     onMouseLeave={() => setActiveTooltip(null)}
                     onClick={() =>
                       setActiveTooltip(
-                        activeTooltip === "email" ? null : "email",
+                        activeTooltip === "email" ? null : "email"
                       )
                     }
                   >
                     <FaInfoCircle size={14} className="text-white/70" />
                     {activeTooltip === "email" && (
-                      <div className="absolute z-10 bg-neutral-700 text-white text-sm rounded py-1 px-2 w-54 -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap shadow-lg before:content-[''] before:absolute before:bottom-[-5px] before:left-1/2 before:-translate-x-1/2 before:border-t-neutral-700 before:border-x-transparent before:border-b-transparent before:border-[6px]">
+                      <div className="absolute bg-neutral-700 text-white text-sm rounded py-1 px-2 w-54 -top-8 left-20 -translate-x-1/2 whitespace-nowrap">
                         To keep current email, leave as is.
                       </div>
                     )}
@@ -491,13 +491,13 @@ export default function MyAccount() {
                   onChange={(e) => setEmail(e.target.value)}
                   type="email"
                   placeholder="Email"
-                  className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none w-full"
+                  className="auth-input-modern w-full p-3 rounded-xl text-white placeholder-white/50 focus:outline-none"
                 />
               </div>
               <div>
                 <label
                   htmlFor="password"
-                  className="block text-white text-sm font-medium mb-1"
+                  className="block text-white text-sm font-medium ml-1 mb-1"
                 >
                   New Password
                   <span
@@ -506,13 +506,13 @@ export default function MyAccount() {
                     onMouseLeave={() => setActiveTooltip(null)}
                     onClick={() =>
                       setActiveTooltip(
-                        activeTooltip === "password" ? null : "password",
+                        activeTooltip === "password" ? null : "password"
                       )
                     }
                   >
                     <FaInfoCircle size={14} className="text-white/70" />
                     {activeTooltip === "password" && (
-                      <div className="absolute z-10 bg-neutral-700 text-white text-sm rounded py-1 px-2 w-66 -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap shadow-lg before:content-[''] before:absolute before:bottom-[-5px] before:left-1/2 before:-translate-x-1/2 before:border-t-neutral-700 before:border-x-transparent before:border-b-transparent before:border-[6px]">
+                      <div className="absolute bg-neutral-700 text-white text-sm rounded py-1 px-2 w-66 -top-8 left-20 -translate-x-1/2 whitespace-nowrap">
                         Leave blank to keep current password.
                       </div>
                     )}
@@ -524,13 +524,13 @@ export default function MyAccount() {
                   onChange={(e) => setPassword(e.target.value)}
                   type="password"
                   placeholder="New Password"
-                  className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none w-full"
+                  className="auth-input-modern w-full p-3 rounded-xl text-white placeholder-white/50 focus:outline-none"
                 />
               </div>
               <div>
                 <label
                   htmlFor="confirmPassword"
-                  className="block text-white text-sm font-medium mb-1"
+                  className="block text-white text-sm font-medium ml-1 mb-1"
                 >
                   Confirm New Password
                 </label>
@@ -540,13 +540,15 @@ export default function MyAccount() {
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   type="password"
                   placeholder="Confirm New Password"
-                  className="p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none w-full"
+                  className="auth-input-modern w-full p-3 rounded-xl text-white placeholder-white/50 focus:outline-none"
                 />
               </div>
 
               {message && (
                 <p
-                  className={`text-center ${messageType === "error" ? "text-red-400" : "text-green-400"}`}
+                  className={`text-center ${
+                    messageType === "error" ? "text-red-400" : "text-green-400"
+                  }`}
                 >
                   {message}
                 </p>
@@ -626,7 +628,7 @@ export default function MyAccount() {
                         ))}
                       </div>
                       {review.comment && (
-                        <p className="text-xs opacity-90 mt-2 line-clamp-2 overflow-hidden text-center px-1">
+                        <p className="text-xs opacity-90 mt-2 line-clamp-1 overflow-hidden text-center px-1 break-all">
                           {review.comment}
                         </p>
                       )}

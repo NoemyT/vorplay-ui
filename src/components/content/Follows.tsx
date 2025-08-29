@@ -58,8 +58,7 @@ export default function Follows() {
         setError(null);
       } catch (err) {
         setError(
-          (err as Error).message ||
-            "Failed to fetch follows. Please try again.",
+          (err as Error).message || "Failed to fetch follows. Please try again."
         );
         console.error("Error:", err);
       } finally {
@@ -120,11 +119,11 @@ export default function Follows() {
           <p className="text-sm">Find users or artists to follow!</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
           {follows.map((follow) => (
             <Card
               key={follow.id}
-              className={`bg-white/5 border border-white/10 p-4 rounded-xl text-white relative flex flex-col items-center text-center hover:bg-white/10 transition-colors ${
+              className={`bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white relative flex flex-col items-center text-center hover:bg-slate-600/40 transition-colors ${
                 follow.targetType === "usuario" ? "cursor-pointer" : ""
               }`}
               onClick={() => handleCardClick(follow)}

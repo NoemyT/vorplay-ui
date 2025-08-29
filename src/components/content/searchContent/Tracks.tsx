@@ -25,7 +25,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
 
   const [isPlaylistModalOpen, setIsPlaylistModalOpen] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<TrackSummaryDto | null>(
-    null,
+    null
   );
   const [userFavorites, setUserFavorites] = useState<Favorite[]>([]);
 
@@ -99,7 +99,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
           return (
             <Card
               key={track.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white flex flex-col xs:flex-row items-start xs:items-center gap-4 hover:bg-white/10 transition-colors relative cursor-pointer"
+              className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white flex flex-col xs:flex-row items-start xs:items-center gap-4 hover:bg-slate-600/40 transition-colors relative cursor-pointer"
               onClick={() => handleTrackClick(track)}
             >
               {/* Album Art Image */}
@@ -136,7 +136,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
                             track,
                             user,
                             userFavorites,
-                            setUserFavorites,
+                            setUserFavorites
                           );
                         }}
                         className="flex-shrink-0 p-2 bg-[#8a2be2] rounded-full text-white hover:scale-110 transition-transform"

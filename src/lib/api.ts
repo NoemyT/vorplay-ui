@@ -176,13 +176,12 @@ export type PlatformStatsDto = {
   totalReviews: number;
   totalFavorites: number;
   totalPlaylists: number;
-  topRatedTracks: number;
   mostActiveUsers: number;
 };
 
 export async function createReview(
   token: string,
-  payload: ReviewPayload,
+  payload: ReviewPayload
 ): Promise<Review> {
   // console.log("API: Creating review with payload:", payload);
 
@@ -210,7 +209,7 @@ export async function createReview(
 
 export async function deleteReviewApi(
   token: string,
-  reviewId: number,
+  reviewId: number
 ): Promise<void> {
   // console.log("API: Deleting review with ID:", reviewId);
 
@@ -241,7 +240,7 @@ export async function deleteReviewApi(
 export async function fetchUserReviews(
   token: string,
   userId?: number,
-  trackId?: string,
+  trackId?: string
 ): Promise<Review[]> {
   let url = `${API_BASE}/reviews`;
   if (userId) {
@@ -278,7 +277,7 @@ export async function addFavorite(
     artistNames: string[];
     albumName: string;
     imageUrl?: string;
-  },
+  }
 ): Promise<Favorite> {
   const res = await fetch(`${API_BASE}/favorites`, {
     method: "POST",
@@ -308,7 +307,7 @@ export async function addFavorite(
 
 export async function removeFavorite(
   token: string,
-  trackId: number,
+  trackId: number
 ): Promise<void> {
   // console.log(`API: Attempting to remove favorite with trackId: ${trackId}`);
 
@@ -338,7 +337,7 @@ export async function removeFavorite(
 
 export async function fetchUserFavorites(
   token: string,
-  userId: number,
+  userId: number
 ): Promise<Favorite[]> {
   // console.log(`API: Fetching favorites for user ${userId}`);
 
@@ -372,7 +371,7 @@ export async function fetchUserFavorites(
 
 export async function uploadProfilePicture(
   token: string,
-  file: File,
+  file: File
 ): Promise<{ url: string }> {
   // console.log("API: Uploading profile picture...");
   const formData = new FormData();
@@ -400,7 +399,7 @@ export async function uploadProfilePicture(
 }
 
 export async function fetchProfilePictureByUserId(
-  userId: number,
+  userId: number
 ): Promise<string> {
   // console.log(`API: Fetching profile picture for user ID: ${userId}`);
   const res = await fetch(`${API_BASE}/users/profile-picture/user/${userId}`);
@@ -425,7 +424,7 @@ export async function fetchProfilePictureByUserId(
   } else {
     console.warn(
       `API: Unexpected response for profile picture for user ${userId}:`,
-      data,
+      data
     );
     return "/placeholder.svg?height=96&width=96";
   }
@@ -433,7 +432,7 @@ export async function fetchProfilePictureByUserId(
 
 export async function fetchUserFollows(
   token: string,
-  userId: number,
+  userId: number
 ): Promise<Follow[]> {
   // console.log(`API: Fetching follows for user ID: ${userId}`);
   const res = await fetch(`${API_BASE}/follows/user/${userId}`, {
@@ -476,13 +475,13 @@ export async function fetchMyFollows(token: string): Promise<Follow[]> {
 export async function fetchArtistAllTracks(
   artistId: string,
   limit: number,
-  offset: number,
+  offset: number
 ): Promise<{ items: TrackSummaryDto[]; total: number }> {
   /* console.log(
     `API: Fetching all tracks for artist ID: ${artistId} with limit=${limit}, offset=${offset}`,
   ); */
   const res = await fetch(
-    `${API_BASE}/artists/${artistId}/tracks?limit=${limit}&offset=${offset}`,
+    `${API_BASE}/artists/${artistId}/tracks?limit=${limit}&offset=${offset}`
   );
   if (!res.ok) {
     const errorData = await res.json();
@@ -504,7 +503,7 @@ export async function fetchArtistDetails(artistId: string): Promise<Artist> {
 }
 
 export async function fetchArtistTopTracks(
-  artistId: string,
+  artistId: string
 ): Promise<TrackSummaryDto[]> {
   // console.log(`API: Fetching top tracks for artist ID: ${artistId}`);
   const res = await fetch(`${API_BASE}/artists/${artistId}/top-tracks`);
@@ -517,13 +516,13 @@ export async function fetchArtistTopTracks(
 
 export async function fetchArtistAlbums(
   artistId: string,
-  limit = 20,
+  limit = 20
 ): Promise<AlbumSummaryDto[]> {
   /* console.log(
     `API: Fetching albums for artist ID: ${artistId} with limit=${limit}`,
   ); */
   const res = await fetch(
-    `${API_BASE}/artists/${artistId}/albums?limit=${limit}`,
+    `${API_BASE}/artists/${artistId}/albums?limit=${limit}`
   );
   if (!res.ok) {
     const errorData = await res.json();
@@ -534,7 +533,7 @@ export async function fetchArtistAlbums(
 
 export async function fetchTracksForAlbum(
   albumId: string,
-  token?: string,
+  token?: string
 ): Promise<AlbumTrackItemDto[]> {
   /* console.log(
     `API: Fetching tracks for album ID: ${albumId} from /tracks/${albumId}/tracks`,
@@ -554,7 +553,7 @@ export async function fetchTracksForAlbum(
 }
 
 export async function fetchTrackDetails(
-  trackId: string,
+  trackId: string
 ): Promise<TrackSummaryDto> {
   const res = await fetch(`${API_BASE}/tracks/${trackId}`);
   if (!res.ok) {
@@ -566,7 +565,7 @@ export async function fetchTrackDetails(
 
 export async function saveSearchQuery(
   token: string,
-  query: string,
+  query: string
 ): Promise<void> {
   const res = await fetch(`${API_BASE}/search-history`, {
     method: "POST",
@@ -600,7 +599,7 @@ export async function fetchUserPlaylists(token: string): Promise<Playlist[]> {
 
 export async function fetchPlaylistDetails(
   token: string,
-  playlistId: number,
+  playlistId: number
 ): Promise<Playlist> {
   const res = await fetch(`${API_BASE}/playlists/${playlistId}`, {
     headers: {
@@ -619,7 +618,7 @@ export async function fetchPlaylistDetails(
 
 export async function createPlaylist(
   token: string,
-  payload: CreatePlaylistPayload,
+  payload: CreatePlaylistPayload
 ): Promise<Playlist> {
   const res = await fetch(`${API_BASE}/playlists`, {
     method: "POST",
@@ -641,7 +640,7 @@ export async function createPlaylist(
 export async function updatePlaylist(
   token: string,
   playlistId: number,
-  payload: UpdatePlaylistPayload,
+  payload: UpdatePlaylistPayload
 ): Promise<Playlist> {
   const res = await fetch(`${API_BASE}/playlists/${playlistId}`, {
     method: "PUT",
@@ -662,7 +661,7 @@ export async function updatePlaylist(
 
 export async function deletePlaylist(
   token: string,
-  playlistId: number,
+  playlistId: number
 ): Promise<void> {
   const res = await fetch(`${API_BASE}/playlists/${playlistId}`, {
     method: "DELETE",
@@ -680,7 +679,7 @@ export async function deletePlaylist(
 export async function addTrackToPlaylist(
   token: string,
   playlistId: number,
-  payload: AddTrackToPlaylistPayload,
+  payload: AddTrackToPlaylistPayload
 ): Promise<void> {
   const res = await fetch(`${API_BASE}/playlists/${playlistId}/tracks`, {
     method: "POST",
@@ -700,7 +699,7 @@ export async function addTrackToPlaylist(
 export async function removeTrackFromPlaylist(
   token: string,
   playlistId: number,
-  trackId: number,
+  trackId: number
 ): Promise<void> {
   const res = await fetch(
     `${API_BASE}/playlists/${playlistId}/tracks/${trackId}`,
@@ -709,13 +708,13 @@ export async function removeTrackFromPlaylist(
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    },
+    }
   );
 
   if (!res.ok) {
     const errorData = await res.json();
     throw new Error(
-      errorData.message || "Failed to remove track from playlist.",
+      errorData.message || "Failed to remove track from playlist."
     );
   }
 }

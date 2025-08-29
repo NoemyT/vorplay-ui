@@ -49,7 +49,7 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
 
       const playlistData = await fetchPlaylistDetails(
         token,
-        Number(playlistId),
+        Number(playlistId)
       );
       const normalizedPlaylist = {
         ...playlistData,
@@ -89,7 +89,7 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
         const updatedPlaylist = await updatePlaylist(
           token,
           playlist.id,
-          payload,
+          payload
         );
         const normalizedUpdated = {
           ...updatedPlaylist,
@@ -112,7 +112,7 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
 
     if (
       !window.confirm(
-        "Are you sure you want to remove this track from the playlist?",
+        "Are you sure you want to remove this track from the playlist?"
       )
     ) {
       return;
@@ -132,14 +132,14 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
           ? {
               ...prev,
               playlistTracks: (prev.playlistTracks || []).filter(
-                (pt) => pt.trackId !== trackId,
+                (pt) => pt.trackId !== trackId
               ),
             }
-          : null,
+          : null
       );
     } catch (err) {
       setError(
-        (err as Error).message || "Failed to remove track from playlist.",
+        (err as Error).message || "Failed to remove track from playlist."
       );
       console.error("Remove track error:", err);
     }
@@ -196,7 +196,7 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
 
   return (
     <div className="flex flex-col w-full h-full items-center">
-      <Card className="flex flex-col w-full max-w-[800px] bg-white/5 rounded-[20px] p-6 relative">
+      <Card className="flex flex-col w-full max-w-[820px] lg:max-w-[1020px] xl:max-w-[1220px] bg-slate-800/60 rounded-[20px] p-6 relative">
         <button
           onClick={handleGoBack}
           className="absolute top-4 left-6 text-white/70 hover:text-white bg-transparent p-2 rounded-full"
@@ -213,22 +213,35 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
           />
 
           {isEditing ? (
-            <div className="flex flex-col gap-3 w-full max-w-md">
-              <input
-                value={editName}
-                onChange={(e) => setEditName(e.target.value)}
-                maxLength={50}
-                className="text-center text-2xl font-bold bg-white/10 text-white rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#8a2be2]"
-                placeholder="Playlist name"
-              />
-              <textarea
-                value={editDescription}
-                onChange={(e) => setEditDescription(e.target.value)}
-                maxLength={50}
-                rows={2}
-                className="text-center bg-white/10 text-white/70 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#8a2be2] resize-none"
-                placeholder="Playlist description (optional)"
-              />
+            <div className="flex flex-col gap-2 w-full max-w-[1220px]">
+              <h3 className="text-xl font-bold text-[#8a2be2] mb-1/2 text-center">
+                Edit Playlist
+              </h3>
+              <div>
+                <label className="block text-white text-sm font-medium ml-1 mb-1">
+                  New playlist name
+                </label>
+                <input
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  maxLength={15}
+                  className="auth-input-modern w-full p-3 rounded-xl text-white placeholder-white/50 focus:outline-none"
+                  placeholder="Playlist name"
+                />
+              </div>
+              <div>
+                <label className="block text-white text-sm font-medium ml-1 mb-1">
+                  New playlist description
+                </label>
+                <textarea
+                  value={editDescription}
+                  onChange={(e) => setEditDescription(e.target.value)}
+                  maxLength={50}
+                  rows={2}
+                  className="auth-input-modern w-full p-3 rounded-xl text-white placeholder-white/50 focus:outline-none"
+                  placeholder="Playlist description (optional)"
+                />
+              </div>
               <div className="flex gap-2 justify-center">
                 <button
                   onClick={handleUpdatePlaylist}
@@ -309,7 +322,7 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={() => handleRemoveTrack(playlistTrack.trackId)}
-                        className="text-red-400 hover:text-red-300 p-2 rounded-full transition-colors"
+                        className="text-red-400 hover:text-red-300 bg-transparent p-2 rounded-full transition-colors"
                         title="Remove from playlist"
                       >
                         <FaTrashAlt size={16} />

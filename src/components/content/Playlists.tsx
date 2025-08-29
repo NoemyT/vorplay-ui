@@ -33,7 +33,7 @@ export default function Playlists() {
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deletingPlaylistId, setDeletingPlaylistId] = useState<number | null>(
-    null,
+    null
   );
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -66,8 +66,7 @@ export default function Playlists() {
       setPlaylistsWithColors(normalizedData);
     } catch (err) {
       setError(
-        (err as Error).message ||
-          "Failed to fetch playlists. Please try again.",
+        (err as Error).message || "Failed to fetch playlists. Please try again."
       );
       console.error("Playlists.tsx: Error fetching playlists:", err);
     } finally {
@@ -107,7 +106,7 @@ export default function Playlists() {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       /* console.log(
@@ -118,7 +117,7 @@ export default function Playlists() {
         const errorText = await response.text();
         console.error(
           "Playlists.tsx: Delete playlist (final step) error response:",
-          errorText,
+          errorText
         );
 
         let errorData;
@@ -137,11 +136,10 @@ export default function Playlists() {
     } catch (err) {
       console.error(
         "Playlists.tsx: Error during playlist deletion process:",
-        err,
+        err
       );
       alert(
-        (err as Error).message ||
-          "Failed to delete playlist. Please try again.",
+        (err as Error).message || "Failed to delete playlist. Please try again."
       );
     } finally {
       setDeletingPlaylistId(null);
@@ -207,12 +205,12 @@ export default function Playlists() {
             <p className="text-sm">Click "New Playlist" to get started!</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
             {playlistsWithColors.map((playlist) => {
               return (
                 <Card
                   key={playlist.id}
-                  className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative flex flex-col items-center text-center hover:bg-white/10 transition-colors cursor-pointer"
+                  className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white relative flex flex-col items-center text-center hover:bg-slate-600/40 transition-colors cursor-pointer"
                   onClick={() => handlePlaylistClick(playlist.id)}
                 >
                   <button
@@ -230,10 +228,7 @@ export default function Playlists() {
                     )}
                   </button>
                   <div className="w-32 h-32 rounded-md bg-neutral-700 flex items-center justify-center mb-3">
-                    <TiNotes
-                      size={64}
-                      className={playlist.displayColorClass}
-                    />{" "}
+                    <TiNotes size={64} className={playlist.displayColorClass} />{" "}
                   </div>
                   <h3 className="text-lg font-semibold truncate w-full px-1">
                     {playlist.name}
@@ -243,8 +238,7 @@ export default function Playlists() {
                       {playlist.description}
                     </p>
                   )}
-                  <p className="text-xs text-white/50 mt-1">Playlist</p>
-                  <p className="text-xs text-white/50">
+                  <p className="pt-2 text-xs text-white/50">
                     Created on{" "}
                     {new Date(playlist.createdAt).toLocaleDateString()}
                   </p>

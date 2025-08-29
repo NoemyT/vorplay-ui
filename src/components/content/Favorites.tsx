@@ -38,8 +38,7 @@ export default function Favorites() {
       setError(null);
     } catch (err) {
       setError(
-        (err as Error).message ||
-          "Failed to fetch favorites. Please try again.",
+        (err as Error).message || "Failed to fetch favorites. Please try again."
       );
       console.error("Error:", err);
     } finally {
@@ -64,7 +63,7 @@ export default function Favorites() {
 
     if (
       !window.confirm(
-        "Are you sure you want to remove this track from your favorites?",
+        "Are you sure you want to remove this track from your favorites?"
       )
     ) {
       return;
@@ -140,7 +139,7 @@ export default function Favorites() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
           {favorites.map((favorite) => {
             const artistName =
               typeof favorite.artist === "string"
@@ -154,7 +153,7 @@ export default function Favorites() {
             return (
               <Card
                 key={favorite.id}
-                className="bg-white/15 border border-white/10 p-4 rounded-xl text-white relative hover:bg-white/20 transition-colors cursor-pointer"
+                className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white relative hover:bg-slate-600/40 transition-colors cursor-pointer"
                 onClick={() =>
                   navigate(`/?section=track&trackId=${favorite.externalId}`)
                 }

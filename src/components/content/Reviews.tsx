@@ -35,7 +35,7 @@ export default function Reviews() {
       setError(null);
     } catch (err) {
       setError(
-        (err as Error).message || "Failed to fetch reviews. Please try again.",
+        (err as Error).message || "Failed to fetch reviews. Please try again."
       );
       console.error("Error:", err);
     } finally {
@@ -49,7 +49,7 @@ export default function Reviews() {
 
   async function handleDeleteReview(id: number) {
     const confirmDelete = window.confirm(
-      "Are you sure you want to delete this review?",
+      "Are you sure you want to delete this review?"
     );
     if (!confirmDelete) return;
 
@@ -62,7 +62,7 @@ export default function Reviews() {
     } catch (err) {
       alert(
         (err as Error).message ||
-          "An unexpected error occurred while deleting the review.",
+          "An unexpected error occurred while deleting the review."
       );
       console.error("Error:", err);
     }
@@ -116,7 +116,7 @@ export default function Reviews() {
           <p className="text-sm">Search for tracks and share your thoughts!</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
+        <div className="grid lg:grid-cols-2 sm:grid-cols-2 md:grid-cols-1 gap-4 overflow-y-auto pr-2 max-h-[calc(100%-64px)]">
           {reviews.map((review) => {
             const artistName =
               typeof review.artist === "string"
@@ -130,7 +130,7 @@ export default function Reviews() {
             return (
               <Card
                 key={review.id}
-                className="bg-white/15 border border-white/10 p-4 rounded-xl text-white relative flex gap-4 h-[220px] hover:bg-white/20 transition-colors cursor-pointer"
+                className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white relative flex gap-4 h-[220px] hover:bg-slate-600/40 transition-colors cursor-pointer"
                 onClick={() => handleReviewCardClick(review)}
               >
                 {/* Track Image */}
@@ -150,24 +150,28 @@ export default function Reviews() {
                     {artistName} • {albumName}
                   </p>
                   {/* Star Rating */}
-                  <div className="flex gap-[2px] mb-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <TiStarFullOutline
-                        key={i}
-                        size={20}
-                        className={
-                          i < review.rating ? "text-[#8a2be2]" : "text-white/30"
-                        }
-                      />
-                    ))}
+                  <div className="xl:flex xl:justify-between mb-2">
+                    <div className="flex gap-[2px] mb-2">
+                      {Array.from({ length: 5 }).map((_, i) => (
+                        <TiStarFullOutline
+                          key={i}
+                          size={20}
+                          className={
+                            i < review.rating
+                              ? "text-[#8a2be2]"
+                              : "text-white/30"
+                          }
+                        />
+                      ))}
+                    </div>
+                    <p className="text-xs text-white/50 pt-1">
+                      Reviewed on{" "}
+                      {new Date(review.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                   {/* Review Comment */}
-                  <p className="text-sm opacity-90 break-all line-clamp-3 overflow-hidden">
+                  <p className="text-sm opacity-90 break-all line-clamp-3 overflow-y-auto">
                     {review.comment}
-                  </p>
-                  <p className="text-xs text-white/50 mt-auto pt-2">
-                    Reviewed on{" "}
-                    {new Date(review.createdAt).toLocaleDateString()}
                   </p>
                 </div>
 

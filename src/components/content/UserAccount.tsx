@@ -119,7 +119,7 @@ export default function UserAccount({ userId }: { userId: string }) {
     setError(null);
     try {
       const userRes = await fetch(
-        `${import.meta.env.VITE_API_URL}/users/${userId}`,
+        `${import.meta.env.VITE_API_URL}/users/${userId}`
       );
       if (!userRes.ok)
         throw new Error(`Failed to fetch user profile: ${userRes.status}`);
@@ -163,7 +163,7 @@ export default function UserAccount({ userId }: { userId: string }) {
         const myFollows = await fetchUserFollows(token, currentUser.id);
         const existingFollow = myFollows.find(
           (f: { targetId: number; targetType: string }) =>
-            f.targetId === Number(userId) && f.targetType === "usuario",
+            f.targetId === Number(userId) && f.targetType === "usuario"
         );
         if (existingFollow) {
           setIsFollowing(true);
@@ -203,7 +203,7 @@ export default function UserAccount({ userId }: { userId: string }) {
           {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` },
-          },
+          }
         );
         if (!res.ok) throw new Error("Failed to unfollow.");
         setIsFollowing(false);
@@ -284,7 +284,7 @@ export default function UserAccount({ userId }: { userId: string }) {
   return (
     <>
       <div className="flex flex-col w-full h-full items-center">
-        <Card className="flex flex-col w-full max-w-[800px] mt-5 bg-white/5 rounded-[20px] p-6 relative">
+        <Card className="flex flex-col w-full max-w-[820px] lg:max-w-[1020px] xl:max-w-[1220px] bg-slate-800/60 rounded-[20px] p-6 relative">
           <button
             onClick={handleGoBack}
             className="absolute top-4 left-6 text-white/70 hover:text-white bg-transparent p-2 rounded-full"
@@ -319,8 +319,8 @@ export default function UserAccount({ userId }: { userId: string }) {
                 {loading
                   ? "Processing..."
                   : isFollowing
-                    ? "Unfollow"
-                    : "Follow"}
+                  ? "Unfollow"
+                  : "Follow"}
               </button>
             )}
           </div>
@@ -372,7 +372,7 @@ export default function UserAccount({ userId }: { userId: string }) {
                         ))}
                       </div>
                       {review.comment && (
-                        <p className="text-xs opacity-90 mt-2 line-clamp-2 overflow-hidden text-center px-1">
+                        <p className="text-xs opacity-90 mt-2 line-clamp-1 overflow-hidden text-center px-1 break-all">
                           {review.comment}
                         </p>
                       )}

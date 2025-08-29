@@ -32,7 +32,7 @@ export default function ArtistPage({ artistId }: ArtistPageProps) {
 
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedTrack, setSelectedTrack] = useState<TrackSummaryDto | null>(
-    null,
+    null
   );
 
   useEffect(() => {
@@ -100,7 +100,7 @@ export default function ArtistPage({ artistId }: ArtistPageProps) {
   return (
     <>
       <div className="flex flex-col w-full h-full items-center">
-        <Card className="flex flex-col w-full max-w-[800px] bg-white/5 rounded-[20px] p-6 relative">
+        <Card className="flex flex-col w-full max-w-[820px] lg:max-w-[1020px] xl:max-w-[1220px] bg-slate-800/60 rounded-[20px] p-6 relative">
           <button
             onClick={handleGoBack}
             className="absolute top-4 left-6 text-white/70 hover:text-white bg-transparent p-2 rounded-full"
@@ -136,10 +136,10 @@ export default function ArtistPage({ artistId }: ArtistPageProps) {
                     onClick={() => handleTrackClick(track)}
                   >
                     <div>
-                      <h4 className="font-semibold text-base truncate">
+                      <h4 className="font-semibold text-base line-clamp-1">
                         {track.title}
                       </h4>
-                      <p className="text-sm opacity-70 truncate">
+                      <p className="text-sm opacity-70 line-clamp-1">
                         {track.artistNames?.join(", ") || "Unknown Artist"}
                       </p>
                     </div>
@@ -162,7 +162,7 @@ export default function ArtistPage({ artistId }: ArtistPageProps) {
               <FaCompactDisc className="text-[#8a2be2]" /> Albums
             </h3>
             {albums.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 {albums.map((album) => (
                   <Card
                     key={album.id}

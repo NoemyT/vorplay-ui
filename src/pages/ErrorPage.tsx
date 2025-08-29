@@ -7,12 +7,12 @@ import logo from "../assets/vorp.png";
 export default function ErrorPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen text-white px-4">
-      <div className="flex items-center justify-center text-[250px] font-extrabold mb-6">
+      <div className="flex items-center justify-center text-[80px] md:text-[250px] font-extrabold mb-6">
         <span className="text-[#8a2be2]">4</span>
         <img
           src={logo}
           alt="Logo"
-          className="h-[250px] w-[250px] rounded-full mx-2"
+          className="h-[80px] md:h-[250px] w-[80px] md:w-[250px] rounded-full mx-2"
         />
         <span className="text-[#8a2be2]">4</span>
       </div>
@@ -23,7 +23,7 @@ export default function ErrorPage() {
 
       <Link
         to="/"
-        className="bg-[#8a2be2] hover:bg-[#7a1fd1] text-white font-semibold py-2 px-6 rounded-md transition"
+        className="bg-[#8a2be2] hover:bg-[#7a1fd1] text-white font-semibold py-2 px-6 rounded transition"
       >
         Home
       </Link>

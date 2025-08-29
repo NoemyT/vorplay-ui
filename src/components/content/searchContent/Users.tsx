@@ -34,11 +34,11 @@ export default function Users({ users, query }: UsersProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+    <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
       {users.map((user) => (
         <Card
           key={user.id}
-          className="bg-white/5 border border-white/10 p-4 rounded-xl text-white text-center flex flex-col items-center justify-center hover:bg-white/10 transition-colors cursor-pointer"
+          className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white text-center flex flex-col items-center justify-center hover:bg-slate-600/40 transition-colors cursor-pointer"
           onClick={() => handleUserClick(user.id)}
         >
           <img

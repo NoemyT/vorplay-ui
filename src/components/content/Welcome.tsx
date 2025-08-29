@@ -4,13 +4,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { Card } from "../ui/Card";
 import logo from "../../assets/vorp.png";
-import {
-  FaStar,
-  FaUsers,
-  FaHeart,
-  FaList,
-  FaUserCircle,
-} from "react-icons/fa";
+import { FaStar, FaUsers, FaHeart, FaList, FaUserCircle } from "react-icons/fa";
 import {
   fetchPlatformStats,
   fetchPublicFeed,
@@ -20,7 +14,11 @@ import {
 import placeholder from "../../assets/placeholder.svg";
 import { useNavigate, createSearchParams } from "react-router-dom";
 
-export default function Welcome() {
+type WelcomeProps = {
+  sidebarCollapsed: boolean;
+};
+
+export default function Welcome({ sidebarCollapsed }: WelcomeProps) {
   const [stats, setStats] = useState<PlatformStatsDto | null>(null);
   const [feed, setFeed] = useState<PublicFeedDto[]>([]);
   const [loadingStats, setLoadingStats] = useState(true);
@@ -38,7 +36,7 @@ export default function Welcome() {
         setStats(data);
       } catch (err) {
         setErrorStats(
-          (err as Error).message || "Failed to load platform stats.",
+          (err as Error).message || "Failed to load platform stats."
         );
         console.error("Error fetching platform stats:", err);
       } finally {
@@ -109,7 +107,7 @@ export default function Welcome() {
     return (
       <Card
         key={item.id}
-        className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white flex items-start gap-4 hover:shadow-md hover:shadow-[#8a2be2]/20 cursor-pointer" // Added cursor-pointer
+        className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white flex items-start gap-4 hover:shadow-md hover:shadow-[#8a2be2]/20 cursor-pointer"
         onClick={handleItemClick}
       >
         <img
@@ -188,14 +186,14 @@ export default function Welcome() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col items-center p-4">
+    <div className="h-full w-full flex flex-col items-center p-2">
       <Card
         className="
       flex flex-col items-center
       justify-center
       gap-1
-      w-full max-w-[900px]
-      min-h-[250px]
+      w-full max-w-[900px] xl:max-w-[1220px]
+      h-[360px]
       bg-slate-800/60 backdrop-blur-sm px-6 py-6
       shadow-xl border border-white/10 text-center rounded-[20px] mb-7
       group hover:shadow-xl hover:shadow-[#8a2be2]/20 transition-all duration-300
@@ -206,17 +204,17 @@ export default function Welcome() {
           alt="Vorplay Logo"
           className="w-24 h-24 rounded-full mb-2"
         />
-        <h1 className="text-[#8a2be2] text-4xl sm:text-5xl font-bold leading-tight">
+        <h1 className="text-[#8a2be2] text-4xl lg:text-5xl font-bold leading-tight">
           Welcome to Vorplay!
         </h1>
-        <p className="text-white/80 text-lg sm:text-xl max-w-xl">
+        <p className="text-white/80 text-lg lg:text-xl max-w-xl">
           Your ultimate platform for music reviews, personalized playlists, and
           connecting with fellow music lovers.
         </p>
       </Card>
 
       {/* Platform Statistics Section */}
-      <div className="w-full max-w-[900px] mb-8">
+      <div className="w-full max-w-[900px] xl:max-w-[1220px] mb-8">
         {loadingStats ? (
           <div className="text-center text-white/70">Loading stats...</div>
         ) : errorStats ? (
@@ -244,13 +242,20 @@ export default function Welcome() {
               value={formatNumber(stats.totalPlaylists)}
             />
             <div className="flex justify-center md:col-span-2 lg:col-span-1">
-              <div className="w-full max-w-[300px]"> {/* adjust max width as needed */}
+              <div
+                className={`w-full ${
+                  sidebarCollapsed
+                    ? "md:w-[300px]"
+                    : "md:w-[180px] xl:w-[200px]"
+                }`}
+              >
+                {" "}
                 <StatCard
                   icon={<FaUserCircle size={24} className="text-[#8a2be2]" />}
                   label="Active Users"
                   value={formatNumber(stats.mostActiveUsers)}
                 />
-               </div>
+              </div>
             </div>
           </div>
         ) : (
@@ -259,7 +264,7 @@ export default function Welcome() {
       </div>
 
       {/* Recent Activity Feed Section */}
-      <div className="w-full max-w-[900px] mb-8">
+      <div className="w-full max-w-[900px] xl:max-w-[1220px] mb-8">
         <div className="flex items-center justify-center gap-4 mb-4 w-full">
           <div className="flex-grow border-t border-white/10"></div>
           <h2 className="text-white font-semibold text-2xl whitespace-nowrap">

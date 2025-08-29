@@ -31,7 +31,7 @@ export default function History({ onSearch }: HistoryProps) {
       return;
     }
     console.log(
-      "History component: User is logged in, attempting to fetch history.",
+      "History component: User is logged in, attempting to fetch history."
     );
     fetchHistory();
   }, [user]);
@@ -49,7 +49,9 @@ export default function History({ onSearch }: HistoryProps) {
       }
 
       console.log(
-        `History component: Fetching from ${import.meta.env.VITE_API_URL}/search-history`,
+        `History component: Fetching from ${
+          import.meta.env.VITE_API_URL
+        }/search-history`
       );
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/search-history`,
@@ -57,7 +59,7 @@ export default function History({ onSearch }: HistoryProps) {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       console.log("History component: API response status:", res.status);
@@ -70,17 +72,17 @@ export default function History({ onSearch }: HistoryProps) {
           errorData = await res.json();
           console.error(
             "History component: Failed to fetch history, error data:",
-            errorData,
+            errorData
           );
         } catch (jsonError) {
           console.error(
             "History component: Failed to parse error JSON:",
-            jsonError,
+            jsonError
           );
         }
         setError(
           errorData.message ||
-            "Failed to fetch search history. Please try again.",
+            "Failed to fetch search history. Please try again."
         );
         setHistory([]);
       } else {
@@ -91,10 +93,10 @@ export default function History({ onSearch }: HistoryProps) {
     } catch (err) {
       console.error(
         "History component: An unexpected network error occurred during fetch:",
-        err,
+        err
       );
       setError(
-        "An unexpected network error occurred while fetching search history. Please check your connection.",
+        "An unexpected network error occurred while fetching search history. Please check your connection."
       );
       setHistory([]);
     } finally {
@@ -112,7 +114,9 @@ export default function History({ onSearch }: HistoryProps) {
       if (!token) throw new Error("Authentication token missing.");
 
       console.log(
-        `History component: Deleting item ${id} from ${import.meta.env.VITE_API_URL}/search-history/${id}`,
+        `History component: Deleting item ${id} from ${
+          import.meta.env.VITE_API_URL
+        }/search-history/${id}`
       );
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/search-history/${id}`,
@@ -121,12 +125,12 @@ export default function History({ onSearch }: HistoryProps) {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       console.log(
         "History component: Delete item response status:",
-        res.status,
+        res.status
       );
 
       if (res.ok) {
@@ -136,17 +140,16 @@ export default function History({ onSearch }: HistoryProps) {
         const errorData = await res.json();
         console.error(
           "History component: Failed to delete item, error data:",
-          errorData,
+          errorData
         );
         alert(
-          errorData.message ||
-            "Failed to delete search item. Please try again.",
+          errorData.message || "Failed to delete search item. Please try again."
         );
       }
     } catch (err) {
       console.error(
         "History component: An unexpected error occurred during delete item:",
-        err,
+        err
       );
       alert("An unexpected error occurred during the operation.");
     }
@@ -155,7 +158,7 @@ export default function History({ onSearch }: HistoryProps) {
   async function handleClearAllHistory() {
     if (
       !window.confirm(
-        "Are you sure you want to clear all your search history? This action cannot be undone.",
+        "Are you sure you want to clear all your search history? This action cannot be undone."
       )
     ) {
       return;
@@ -166,7 +169,9 @@ export default function History({ onSearch }: HistoryProps) {
       if (!token) throw new Error("Authentication token missing.");
 
       console.log(
-        `History component: Clearing all history from ${import.meta.env.VITE_API_URL}/search-history`,
+        `History component: Clearing all history from ${
+          import.meta.env.VITE_API_URL
+        }/search-history`
       );
       const res = await fetch(
         `${import.meta.env.VITE_API_URL}/search-history`,
@@ -175,12 +180,12 @@ export default function History({ onSearch }: HistoryProps) {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
 
       console.log(
         "History component: Clear all history response status:",
-        res.status,
+        res.status
       );
 
       if (res.ok) {
@@ -190,17 +195,17 @@ export default function History({ onSearch }: HistoryProps) {
         const errorData = await res.json();
         console.error(
           "History component: Failed to clear all history, error data:",
-          errorData,
+          errorData
         );
         alert(
           errorData.message ||
-            "Failed to clear all search history. Please try again.",
+            "Failed to clear all search history. Please try again."
         );
       }
     } catch (err) {
       console.error(
         "History component: An unexpected error occurred during clear all history:",
-        err,
+        err
       );
       alert("An unexpected error occurred during the operation.");
     }
@@ -262,7 +267,7 @@ export default function History({ onSearch }: HistoryProps) {
           {history.map((item) => (
             <Card
               key={item.id}
-              className="bg-white/5 border border-white/10 p-4 rounded-xl text-white relative flex items-center justify-between hover:bg-white/10 transition-colors cursor-pointer"
+              className="bg-slate-800/60 border border-white/10 p-4 rounded-xl text-white relative flex items-center justify-between hover:bg-slate-600/40 transition-colors cursor-pointer"
               onClick={() => handleHistoryItemClick(item.query)}
             >
               <div>

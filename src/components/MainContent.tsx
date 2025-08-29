@@ -85,7 +85,7 @@ export default function MainContent({
       case "results":
         return <Results query={searchQuery ?? ""} />;
       default:
-        return <Welcome />;
+        return <Welcome sidebarCollapsed={sidebarCollapsed} />;
     }
   };
 

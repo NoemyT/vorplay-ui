@@ -127,7 +127,7 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
   return (
     <>
       <div className="flex flex-col w-full h-full items-center">
-        <Card className="flex flex-col w-full max-w-[800px] bg-white/5 rounded-[20px] p-6 relative">
+        <Card className="flex flex-col w-full max-w-[820px] lg:max-w-[1020px] xl:max-w-[1220px] bg-slate-800/60 rounded-[20px] p-6 relative">
           <button
             onClick={handleGoBack}
             className="absolute top-4 left-6 text-white/70 hover:text-white bg-transparent p-2 rounded-full"
@@ -162,10 +162,10 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
                     onClick={() => handleTrackClick(track)}
                   >
                     <div>
-                      <h4 className="font-semibold text-base truncate">
+                      <h4 className="font-semibold text-base line-clamp-1">
                         {track.title}
                       </h4>
-                      <p className="text-sm opacity-70 truncate">
+                      <p className="text-sm opacity-70 line-clamp-1">
                         {artist.name} • {album.title}
                       </p>
                     </div>
