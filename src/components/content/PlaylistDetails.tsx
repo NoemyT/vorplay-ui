@@ -86,16 +86,8 @@ export default function PlaylistDetails({ playlistId }: PlaylistDetailsProps) {
       }
 
       if (Object.keys(payload).length > 0) {
-        const updatedPlaylist = await updatePlaylist(
-          token,
-          playlist.id,
-          payload
-        );
-        const normalizedUpdated = {
-          ...updatedPlaylist,
-          playlistTracks: updatedPlaylist.playlistTracks,
-        };
-        setPlaylist(normalizedUpdated);
+        await updatePlaylist(token, playlist.id, payload);
+        await loadPlaylistDetails();
       }
 
       setIsEditing(false);

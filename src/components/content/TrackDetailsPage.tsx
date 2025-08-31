@@ -378,7 +378,7 @@ export default function TrackDetailsPage({ trackId }: TrackDetailsPageProps) {
                       }
                       rows={4}
                       placeholder="Share your thoughts on this track..."
-                      className="w-full p-3 rounded-md bg-white/80 text-black placeholder-gray-500 focus:outline-none resize-none"
+                      className="auth-input-modern w-full p-3 rounded text-white placeholder-gray-500 focus:outline-none resize-none"
                     />
                     <p className="text-right text-xs text-white/70 mt-1">
                       {userComment.length}/{MAX_COMMENT_LENGTH}
