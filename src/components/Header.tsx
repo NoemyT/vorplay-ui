@@ -48,7 +48,7 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
 
   const handleSearch = (
     searchTerm: string,
-    setOpen?: (open: boolean) => void,
+    setOpen?: (open: boolean) => void
   ) => {
     if (searchTerm.trim()) {
       onSearch(searchTerm.trim());
@@ -131,7 +131,7 @@ export default function Header({ onSelectSection, onSearch }: HeaderProps) {
                 </span>
 
                 {dropdownOpen && (
-                  <div className="absolute right-0 mt-2 bg-slate-800 text-white rounded-lg shadow-xl w-40 text-sm border border-white/10">
+                  <div className="absolute right-0 mt-2 bg-slate-800 text-white rounded shadow-xl w-40 text-sm border border-white/10">
                     <ul className="flex flex-col py-2">
                       <li
                         onClick={() => onSelectSection("account")}

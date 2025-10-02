@@ -26,10 +26,8 @@ export default function LogIn() {
       const data = await login(email.trim(), password);
       localStorage.setItem("token", data.access_token);
 
-      // Get full user profile
       const fullUser = await fetchUserProfile(data.access_token);
       setUser(fullUser);
-      localStorage.setItem("user", JSON.stringify(fullUser));
 
       navigate("/");
     } catch (err) {

@@ -42,7 +42,6 @@ export default function SignUp() {
 
       const fullUser = await fetchUserProfile(data.access_token);
       setUser(fullUser);
-      localStorage.setItem("user", JSON.stringify(fullUser));
 
       navigate("/");
     } catch (err) {
@@ -54,7 +53,8 @@ export default function SignUp() {
 
   return (
     <div className="flex items-center justify-center min-h-screen px-4">
-      <Card className="auth-card-modern flex flex-col w-full max-w-[420px] rounded-[24px] p-8">{/* Background decorative elements */}
+      <Card className="auth-card-modern flex flex-col w-full max-w-[420px] rounded-[24px] p-8">
+        {/* Background decorative elements */}
         <div className="flex flex-col items-center gap-4 mb-8">
           <div className="relative">
             <div className="absolute inset-0 bg-[#8a2be2]/20 rounded-full blur-lg"></div>
@@ -68,10 +68,16 @@ export default function SignUp() {
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 font-extrabold text-2xl sm:text-3xl mb-2">
-              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">Sign up to</span>
-              <span className="bg-gradient-to-r from-[#8a2be2] to-[#a855f7] bg-clip-text text-transparent">Vorplay</span>
+              <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                Sign up to
+              </span>
+              <span className="bg-gradient-to-r from-[#8a2be2] to-[#a855f7] bg-clip-text text-transparent">
+                Vorplay
+              </span>
             </div>
-            <p className="text-white/60 text-sm">Join the ultimate music community</p>
+            <p className="text-white/60 text-sm">
+              Join the ultimate music community
+            </p>
           </div>
         </div>
 
@@ -124,7 +130,10 @@ export default function SignUp() {
 
         <div className="text-center mt-6 text-white/70 text-sm">
           Already have an account?{" "}
-          <Link to="/login" className="text-[#8a2be2] hover:text-[#a855f7] font-medium">
+          <Link
+            to="/login"
+            className="text-[#8a2be2] hover:text-[#a855f7] font-medium"
+          >
             Sign in
           </Link>
         </div>

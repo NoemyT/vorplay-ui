@@ -231,7 +231,6 @@ export default function MyAccount() {
     try {
       const updatedUser = await updateUserProfile(token, updateData);
       setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
       setMessage("Profile updated successfully!");
       setMessageType("success");
       setPassword("");
@@ -319,7 +318,6 @@ export default function MyAccount() {
       const result = await uploadProfilePicture(token, file);
       const updatedUser = { ...user, profilePicture: result.url };
       setUser(updatedUser);
-      localStorage.setItem("user", JSON.stringify(updatedUser));
       setMessage("Profile picture updated successfully!");
       setMessageType("success");
     } catch (err) {
