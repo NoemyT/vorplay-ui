@@ -44,7 +44,7 @@ export default function ResetPassword() {
 
     try {
       setLoading(true);
-      await reset(token, password.trim());
+      await reset(token.trim(), password.trim());
 
       navigate("/login", {
         state: { message: "Password reset successful! Please log in." },
