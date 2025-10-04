@@ -10,7 +10,8 @@ import logo from "../assets/vorp.png";
 export default function ResetPassword() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const token = searchParams.get("token");
+  const rawToken = searchParams.get("token");
+  const token = rawToken ? decodeURI(rawToken.trim()) : null;
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
