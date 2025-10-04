@@ -7,6 +7,8 @@ import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";
 import SignUp from "./pages/SignUp";
 import ErrorPage from "./pages/ErrorPage";
+import Recovery from "./pages/RecoverPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 import loadingGif from "./assets/bidoofious-bidoofiousfor1.gif";
 import placeholder from "./assets/placeholder.svg";
@@ -35,6 +37,8 @@ export default function AppWrapper() {
         { index: true, element: <Home /> },
         { path: "login", element: <LogIn /> },
         { path: "signup", element: <SignUp /> },
+        { path: "forgot-password", element: <Recovery /> },
+        { path: "reset-password", element: <ResetPassword /> },
       ],
     },
   ]);

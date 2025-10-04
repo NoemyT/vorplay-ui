@@ -45,6 +45,38 @@ export async function register(name: string, email: string, password: string) {
   }>;
 }
 
+export async function recover(email: string) {
+  const res = await fetch(`${API_BASE}/auth/forgot-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+
+  if (!res.ok) {
+    throw new Error("Something went wrong - try again later");
+  }
+
+  return res.json() as Promise<{ message: string }>;
+}
+
+export async function reset(token: string, newPassword: string) {
+  const res = await fetch(`${API_BASE}/auth/reset-password`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ token, password: newPassword }),
+  });
+
+  if (res.status === 400) {
+    throw new Error("Invalid or expired reset token");
+  }
+
+  if (!res.ok) {
+    throw new Error("Failed to reset password");
+  }
+
+  return res.json() as Promise<{ message: string }>;
+}
+
 export async function fetchUserProfile(token: string) {
   const res = await fetch(`${API_BASE}/users/me`, {
     headers: {
@@ -63,7 +95,7 @@ type UpdateUserPayload = Partial<User> & { password?: string };
 
 export async function updateUserProfile(
   token: string,
-  userData: UpdateUserPayload,
+  userData: UpdateUserPayload
 ) {
   const res = await fetch(`${API_BASE}/users/me`, {
     method: "PUT",

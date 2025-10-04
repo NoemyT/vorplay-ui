@@ -30,6 +30,11 @@ export default function SignUp() {
       return;
     }
 
+    if (password.trim().length < 6) {
+      setError("Password must be at least 6 characters long");
+      return;
+    }
+
     if (password !== confirm) {
       setError("Passwords do not match");
       return;

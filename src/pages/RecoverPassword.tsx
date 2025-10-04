@@ -1,39 +1,37 @@
 "use client";
 
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Card } from "../components/ui/Card";
-import { useAuth } from "../hooks/use-auth";
-import { login, fetchUserProfile } from "../lib/auth";
+import { useState } from "react";
+import { recover } from "../lib/auth";
 
 import logo from "../assets/vorp.png";
 
-export default function LogIn() {
-  const { setUser } = useAuth();
-  const navigate = useNavigate();
-
+export default function Recovery() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [sending, setSending] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
+    setSuccess(false);
+
+    if (!email.trim()) {
+      setError("Please enter your email");
+      return;
+    }
 
     try {
-      setLoading(true);
-      const data = await login(email.trim(), password);
-      localStorage.setItem("token", data.access_token);
+      setSending(true);
+      await recover(email.trim());
 
-      const fullUser = await fetchUserProfile(data.access_token);
-      setUser(fullUser);
-
-      navigate("/");
+      setSuccess(true);
     } catch (err) {
       setError((err as Error).message);
     } finally {
-      setLoading(false);
+      setSending(false);
     }
   }
 
@@ -55,14 +53,20 @@ export default function LogIn() {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 font-extrabold text-2xl sm:text-3xl mb-2">
               <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Log in to
+                Recover your
               </span>
               <span className="bg-gradient-to-r from-[#8a2be2] to-[#a855f7] bg-clip-text text-transparent">
-                Vorplay
+                password
               </span>
             </div>
-            <p className="text-white/60 text-sm">
-              Welcome back to your music vorpverse
+            <p
+              className={`${
+                success ? "text-green-400" : "text-white/60"
+              } text-sm`}
+            >
+              {success
+                ? "Check your email for reset instructions"
+                : "Enter your email to receive a password reset link"}
             </p>
           </div>
         </div>
@@ -76,22 +80,6 @@ export default function LogIn() {
               placeholder="Email"
               className="auth-input-modern w-full p-4 rounded-2xl text-white placeholder-white/50 focus:outline-none"
             />
-            <input
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              type="password"
-              placeholder="Password"
-              className="auth-input-modern w-full p-4 rounded-2xl text-white placeholder-white/50 focus:outline-none"
-            />
-
-            <div className="flex justify-end">
-              <Link
-                to="/forgot-password"
-                className="text-sm text-[#8a2be2] hover:text-[#a855f7]"
-              >
-                Forgot password?
-              </Link>
-            </div>
           </div>
 
           {error && (
@@ -102,20 +90,20 @@ export default function LogIn() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={sending}
             className="auth-button-modern text-white py-3.5 px-8 rounded-2xl font-semibold w-full disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {sending ? "Sending email..." : "Send Email"}
           </button>
         </form>
 
         <div className="text-center mt-6 text-white/70 text-sm">
-          Don't have an account?{" "}
+          Remembered your password?{" "}
           <Link
-            to="/signup"
+            to="/login"
             className="text-[#8a2be2] hover:text-[#a855f7] font-medium"
           >
-            Sign up
+            Log in
           </Link>
         </div>
       </Card>
