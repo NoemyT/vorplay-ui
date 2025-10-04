@@ -63,7 +63,7 @@ export async function reset(token: string, newPassword: string) {
   const res = await fetch(`${API_BASE}/auth/reset-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, password: newPassword }),
+    body: JSON.stringify({ token, newPassword }),
   });
 
   if (res.status === 400) {
