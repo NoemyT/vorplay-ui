@@ -1,15 +1,14 @@
-# Vorplay UI
+# 🎵 Vorplay UI
 
-Interface for Vorplay built with React, Vite, and Tailwind CSS.
+Frontend em React + Vite + TailwindCSS, integrando a API Vorplay com o objetivo de servir como interface para um site de mesmo nome.
 
-## 🚀 Getting Started
+---
 
-### Prerequisites
+## 📦 Instalação local
 
-- Node.js (>= 18 recommended)
-- npm (comes with Node.js)
+**Requisitos**
 
-### 📦 Installation
+- Node.js (>= 18)
 
 ```bash
 git clone https://github.com/NoemyT/vorplay-ui.git
@@ -17,34 +16,58 @@ cd vorplay-ui
 npm install
 ```
 
-### 🔧 Development
-
-To start the local dev server:
+Após a criação de um arquivo `.env` na raíz, com as variáveis disponíveis no arquivo `.env.example`. Você poderá executá-lo com:
 
 ```bash
 npm run dev
 ```
 
-This runs the app on http://localhost:5173 (default Vite port).
+**Obs.:** Caso você não tenha a api instalada e executando localmente ou o servidor da api não esteja disponível, a interface será disponibilizada de forma estática com funcionalidade limitada.
 
-### 🏗️ Production Build
+---
 
-To build the project for production:
+## 📚 Informações Acadêmicas
 
-```bash
-npm run build
-```
+**Disciplina**
 
-The output will be in the dist/ folder. You can serve it using a static file server like:
+Este projeto foi desenvolvido e utilizado na disciplina:
 
-```bash
-npx serve dist
-```
+**Desenvolvimento de Software para Web**
 
-### ⚙️ Environment Variables
+**Professor:** Alexandre de Andrade Barbosa
 
-VITE_API_URL=https://example.com/api (It's on the .env file)
+**Foco:** Aprendizagem voltada ao desenvolvimento de sistemas web a partir da apresentação de conceitos (html, css e JS) e Frameworks WEB
 
-### 👨🏻‍💻 Back-end
+**Instituição:** Universidade Federal de Alagoas (UFAL) - Campus Arapiraca
 
-[Caio Teixeira](https://github.com/CaioXTSY)
+👩‍💻 **Equipe**
+
+- Noemy Torres Pereira - Frontend, main dev do vorplay-ui
+- Caio Teixeira da silva - Backend, main dev do [vorplay-api](https://github.com/CaioXTSY/VorPlay-API) e contribuinte do vorplay-ui
+
+---
+
+## 🕛 Estado atual do projeto
+
+Em seu estado atual, o projeto implementa as seguintes funções:
+
+- Cadastro, Login, Recuperação e Redefinição de Senha
+- Busca e visualização de músicas, artistas, albums de artistas e usuários, baseados na api do Spotify para os três primeiros, e na base de dados da plataforma para o último
+- Visualização de perfil pessoal (com possibilidade de alteração de dados e exclusão de conta)
+- Visualização de perfil de outros usuários (com possibilidade de seguir/deixar de seguir)
+- Fazer ou remover avaliações músicais próprias, com sistema de nota (1 a 5 estrelas) e espaço para comentário
+- Favoritar ou desfavoritar músicas
+- Criar e gerenciar playlists
+- Visualizar e gerenciar histórico de buscas
+- Visualização de estatísticas da plataforma e atividade recente dos usuários
+- Visualização de avaliações próprias ou de outros usuários sobre uma música
+
+Além disso a interface implementada é responsiva para diferentes resoluções, permitindo uma boa experiência de usuário.
+
+---
+
+## 🎶 A plataforma
+
+A plataforma também pode ser utilizada diretamente (sem precisar instalar nada) a partir do link:
+
+- https://vorplay.caiots.dev/
