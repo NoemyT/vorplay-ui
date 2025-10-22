@@ -49,28 +49,20 @@ export default function AddToPlaylistModal({
       }
 
       const userPlaylists = await fetchUserPlaylists(token);
-      /* console.log(
-        "AddToPlaylistModal: Raw API response for fetchUserPlaylists:",
-        userPlaylists,
-      ); */
 
       const normalizedPlaylists = userPlaylists.map((playlist) => {
         const normalized = {
           ...playlist,
           playlistTracks: playlist.playlistTracks || [],
         };
-        /* console.log(
-          `AddToPlaylistModal: Normalized Playlist "${playlist.name}" (ID: ${playlist.id}) has ${normalized.playlistTracks.length} tracks. Tracks data:`,
-          normalized.playlistTracks,
-        ); */
         return normalized;
       });
 
       const availablePlaylists = normalizedPlaylists.filter(
         (playlist) =>
           !playlist.playlistTracks.some(
-            (pt) => pt.track.externalId === track.id,
-          ),
+            (pt) => pt.track.externalId === track.id
+          )
       );
 
       setPlaylists(availablePlaylists);

@@ -579,10 +579,10 @@ export default function MyAccount() {
             </form>
           )}
 
-          {/* Highest Rated Reviews Section */}
+          {/* Latest Highest Rated Reviews Section */}
           <div className="mb-8">
             <h3 className="flex items-center gap-2 text-xl font-bold text-white mb-4">
-              <FaStar className="text-[#8a2be2]" /> Highest Rated Reviews
+              <FaStar className="text-[#8a2be2]" /> Latest 5-star Reviews
             </h3>
             {reviews.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

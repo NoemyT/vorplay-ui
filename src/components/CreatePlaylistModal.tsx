@@ -97,8 +97,12 @@ export default function CreatePlaylistModal({
           <div className="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-br from-[#8a2be2] to-[#a855f7] rounded-full mb-3">
             <FaMusic size={18} className="text-white" />
           </div>
-          <h2 className="text-xl font-bold text-white mb-1">Create New Playlist</h2>
-          <p className="text-white/60 text-sm">Build your perfect music collection</p>
+          <h2 className="text-xl font-bold text-white mb-1">
+            Create New Playlist
+          </h2>
+          <p className="text-white/60 text-sm">
+            Build your perfect music collection
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4 w-full">
@@ -116,7 +120,7 @@ export default function CreatePlaylistModal({
               <span className="text-white/50">Choose a memorable name</span>
               <span className="text-white/60 font-mono">{name.length}/15</span>
             </div>
-            
+
             <textarea
               id="description"
               value={description}
@@ -128,18 +132,18 @@ export default function CreatePlaylistModal({
             />
             <div className="flex justify-between items-center text-xs px-1">
               <span className="text-white/50">Add some context</span>
-              <span className="text-white/60 font-mono">{description.length}/50</span>
+              <span className="text-white/60 font-mono">
+                {description.length}/50
+              </span>
             </div>
           </div>
 
-          {/* Error Message */}
           {error && (
             <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-3">
               <p className="text-center text-red-300 text-sm">{error}</p>
             </div>
           )}
 
-          {/* Action Buttons */}
           <div className="flex gap-3 pt-2">
             <button
               type="button"
