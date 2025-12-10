@@ -12,6 +12,9 @@ export default defineConfig(({ mode }) => {
       port: parseInt(env.VITE_PORT) || 3000,
       host: true,
       allowedHosts: ['vorplay.caiots.dev']
+    },
+    preview: {
+      allowedHosts: ['vorplay.caiots.dev']
     }
   }
 })
