@@ -168,7 +168,6 @@ export default function Sidebar({
         </button>
       </div>
 
-      {/* Mobile Sidebar Modal Overlay */}
       {mobileMenuOpen && (
         <div className="md:hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <Card className="mobile-sidebar-modal bg-slate-800/95 backdrop-blur-sm border border-white/10 w-full max-w-sm max-h-[80vh] overflow-y-auto">

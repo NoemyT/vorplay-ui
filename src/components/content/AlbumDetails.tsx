@@ -29,36 +29,19 @@ export default function AlbumDetails({ albumId, artistId }: AlbumDetailsProps) {
     async function loadAlbumDetails() {
       setLoading(true);
       setError(null);
-      /* console.log(
-        `AlbumDetails: Starting load for albumId: ${albumId}, artistId: ${artistId}`,
-      ); */
       try {
         const token = localStorage.getItem("token");
-
-        /* console.log(
-          `AlbumDetails: Fetching artist details for artistId: ${artistId}`,
-        ); */
         const artistData = await fetchArtistDetails(artistId);
         setArtist(artistData);
-        // console.log("AlbumDetails: Fetched artist details:", artistData);
-
-        /* console.log(
-          `AlbumDetails: Fetching artist albums for artistId: ${artistId}`,
-        ); */
         const artistAlbums = await fetchArtistAlbums(artistId);
-        // console.log("AlbumDetails: Fetched artist albums:", artistAlbums);
-
         const foundAlbum = artistAlbums.find((a) => a.id === albumId);
-        // console.log("AlbumDetails: Found album:", foundAlbum);
 
         if (!foundAlbum) {
           throw new Error("Album not found for this artist.");
         }
         setAlbum(foundAlbum);
 
-        // console.log(`AlbumDetails: Fetching tracks for albumId: ${albumId}`);
         const tracksData = await fetchTracksForAlbum(albumId, token || "");
-        // console.log("AlbumDetails: Fetched album tracks:", tracksData);
         setAlbumTracks(tracksData);
       } catch (err) {
         setError((err as Error).message || "Failed to load album details.");

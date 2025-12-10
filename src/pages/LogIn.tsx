@@ -40,7 +40,6 @@ export default function LogIn() {
   return (
     <div className="flex items-center justify-center min-h-screen px-4">
       <Card className="auth-card-modern flex flex-col w-full max-w-[420px] rounded-[24px] p-8">
-        {/* Background decorative elements */}
         <div className="flex flex-col items-center gap-4 mb-8">
           <div className="relative">
             <div className="absolute inset-0 bg-[#8a2be2]/20 rounded-full blur-lg"></div>

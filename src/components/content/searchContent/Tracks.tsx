@@ -60,7 +60,7 @@ export default function Tracks({ tracks, query }: TracksProps) {
   };
 
   const handleTrackAdded = () => {
-    // Playlist refresh logic if needed
+    // Refreshes the playlist after a track is added
   };
 
   const handleTrackClick = (track: TrackSummaryDto) => {

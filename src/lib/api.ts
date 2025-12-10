@@ -183,8 +183,6 @@ export async function createReview(
   token: string,
   payload: ReviewPayload
 ): Promise<Review> {
-  // console.log("API: Creating review with payload:", payload);
-
   const res = await fetch(`${API_BASE}/reviews`, {
     method: "POST",
     headers: {
@@ -194,16 +192,12 @@ export async function createReview(
     body: JSON.stringify(payload),
   });
 
-  // console.log("API: Create review response status:", res.status);
-
   if (!res.ok) {
     const errorData = await res.json();
-    // console.log("API: Create review error:", errorData);
     throw new Error(errorData.message || "Failed to create review.");
   }
 
   const result = await res.json();
-  // console.log("API: Created review:", result);
   return result;
 }
 
@@ -211,16 +205,12 @@ export async function deleteReviewApi(
   token: string,
   reviewId: number
 ): Promise<void> {
-  // console.log("API: Deleting review with ID:", reviewId);
-
   const res = await fetch(`${API_BASE}/reviews/${reviewId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-
-  // console.log("API: Delete review response status:", res.status);
 
   if (!res.ok) {
     let errorData;
@@ -229,11 +219,8 @@ export async function deleteReviewApi(
     } catch {
       errorData = { message: `HTTP ${res.status}: ${res.statusText}` };
     }
-    // console.log("API: Remove favorite error data:", errorData);
     throw new Error(errorData.message || "Failed to delete review.");
   }
-
-  // console.log("API: Successfully deleted review");
   return;
 }
 
@@ -301,7 +288,6 @@ export async function addFavorite(
     throw new Error(errorData.message || "Failed to add favorite.");
   }
   const data = await res.json();
-  // console.log("API: addFavorite response data:", data);
   return data;
 }
 
@@ -309,16 +295,12 @@ export async function removeFavorite(
   token: string,
   trackId: number
 ): Promise<void> {
-  // console.log(`API: Attempting to remove favorite with trackId: ${trackId}`);
-
   const res = await fetch(`${API_BASE}/favorites/${trackId}`, {
     method: "DELETE",
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-
-  // console.log(`API: Remove favorite response status: ${res.status}`);
 
   if (!res.ok) {
     let errorData;
@@ -327,11 +309,8 @@ export async function removeFavorite(
     } catch {
       errorData = { message: `HTTP ${res.status}: ${res.statusText}` };
     }
-    // console.log("API: Remove favorite error data:", errorData);
     throw new Error(errorData.message || "Failed to remove favorite.");
   }
-
-  // console.log("API: Successfully removed favorite");
   return;
 }
 
@@ -339,8 +318,6 @@ export async function fetchUserFavorites(
   token: string,
   userId: number
 ): Promise<Favorite[]> {
-  // console.log(`API: Fetching favorites for user ${userId}`);
-
   const res = await fetch(`${API_BASE}/favorites/user/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -349,15 +326,10 @@ export async function fetchUserFavorites(
 
   if (!res.ok) {
     const errorData = await res.json();
-    // console.log("API: Fetch favorites error:", errorData);
     throw new Error(errorData.message || "Failed to fetch user favorites.");
   }
 
   const data = await res.json();
-  /* console.log(
-    `API: Fetched ${data.length} favorites for user ${userId}:`,
-    data,
-  ); */
   data.forEach((fav: Favorite) => {
     if (typeof fav.id === "undefined" || fav.id === null) {
       console.warn(`Favorite item missing 'id' field:`, fav);
@@ -373,7 +345,6 @@ export async function uploadProfilePicture(
   token: string,
   file: File
 ): Promise<{ url: string }> {
-  // console.log("API: Uploading profile picture...");
   const formData = new FormData();
   formData.append("file", file);
 
@@ -385,8 +356,6 @@ export async function uploadProfilePicture(
     body: formData,
   });
 
-  // console.log("API: Upload profile picture response status:", res.status);
-
   if (!res.ok) {
     const errorData = await res.json();
     console.error("API: Upload profile picture error:", errorData);
@@ -394,23 +363,16 @@ export async function uploadProfilePicture(
   }
 
   const result = await res.json();
-  // console.log("API: Upload profile picture success:", result);
   return result;
 }
 
 export async function fetchProfilePictureByUserId(
   userId: number
 ): Promise<string> {
-  // console.log(`API: Fetching profile picture for user ID: ${userId}`);
   const res = await fetch(`${API_BASE}/users/profile-picture/user/${userId}`);
-
-  // console.log(`API: Fetch profile picture response status: ${res.status}`);
 
   if (!res.ok) {
     if (res.status === 404) {
-      /* console.log(
-        `Profile picture not found for user ${userId}, returning placeholder.`,
-      ); */
       return "/placeholder.svg?height=96&width=96";
     }
     const errorData = await res.json();
@@ -434,7 +396,6 @@ export async function fetchUserFollows(
   token: string,
   userId: number
 ): Promise<Follow[]> {
-  // console.log(`API: Fetching follows for user ID: ${userId}`);
   const res = await fetch(`${API_BASE}/follows/user/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
@@ -448,14 +409,11 @@ export async function fetchUserFollows(
   }
 
   const data = await res.json();
-  // console.log(`API: Fetched ${data.length} follows for user ${userId}:`, data);
   return data;
 }
 
 export async function fetchMyFollows(token: string): Promise<Follow[]> {
-  // console.log(`API: Fetching my follows...`);
   const res = await fetch(`${API_BASE}/follows`, {
-    // This is the "listMine" endpoint
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -468,7 +426,6 @@ export async function fetchMyFollows(token: string): Promise<Follow[]> {
   }
 
   const data = await res.json();
-  // console.log(`API: Fetched ${data.length} my follows:`, data);
   return data;
 }
 
@@ -477,9 +434,6 @@ export async function fetchArtistAllTracks(
   limit: number,
   offset: number
 ): Promise<{ items: TrackSummaryDto[]; total: number }> {
-  /* console.log(
-    `API: Fetching all tracks for artist ID: ${artistId} with limit=${limit}, offset=${offset}`,
-  ); */
   const res = await fetch(
     `${API_BASE}/artists/${artistId}/tracks?limit=${limit}&offset=${offset}`
   );
@@ -488,12 +442,10 @@ export async function fetchArtistAllTracks(
     throw new Error(errorData.message || "Failed to fetch all artist tracks.");
   }
   const data = await res.json();
-  // console.log("API: fetchArtistAllTracks raw response:", data);
   return { items: data.items || [], total: data.total || 0 };
 }
 
 export async function fetchArtistDetails(artistId: string): Promise<Artist> {
-  // console.log(`API: Fetching artist details for ID: ${artistId}`);
   const res = await fetch(`${API_BASE}/artists/${artistId}`);
   if (!res.ok) {
     const errorData = await res.json();
@@ -505,7 +457,6 @@ export async function fetchArtistDetails(artistId: string): Promise<Artist> {
 export async function fetchArtistTopTracks(
   artistId: string
 ): Promise<TrackSummaryDto[]> {
-  // console.log(`API: Fetching top tracks for artist ID: ${artistId}`);
   const res = await fetch(`${API_BASE}/artists/${artistId}/top-tracks`);
   if (!res.ok) {
     const errorData = await res.json();
@@ -518,9 +469,6 @@ export async function fetchArtistAlbums(
   artistId: string,
   limit = 20
 ): Promise<AlbumSummaryDto[]> {
-  /* console.log(
-    `API: Fetching albums for artist ID: ${artistId} with limit=${limit}`,
-  ); */
   const res = await fetch(
     `${API_BASE}/artists/${artistId}/albums?limit=${limit}`
   );
@@ -535,9 +483,6 @@ export async function fetchTracksForAlbum(
   albumId: string,
   token?: string
 ): Promise<AlbumTrackItemDto[]> {
-  /* console.log(
-    `API: Fetching tracks for album ID: ${albumId} from /tracks/${albumId}/tracks`,
-    ); */
   const headers: HeadersInit = {};
   if (token) {
     headers["Authorization"] = `Bearer ${token}`;
@@ -548,7 +493,6 @@ export async function fetchTracksForAlbum(
     throw new Error(errorData.message || "Failed to fetch album tracks.");
   }
   const data = await res.json();
-  // console.log("API: fetchTracksForAlbum raw response:", data);
   return data;
 }
 

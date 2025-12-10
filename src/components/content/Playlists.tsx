@@ -95,10 +95,6 @@ export default function Playlists() {
         return;
       }
 
-      /* console.log(
-        `Playlists.tsx: Attempting to delete playlist with ID: ${id}.`,
-      ); */
-
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/playlists/${id}`,
         {
@@ -108,10 +104,6 @@ export default function Playlists() {
           },
         }
       );
-
-      /* console.log(
-        `Playlists.tsx: Delete playlist (final step) response status: ${response.status}`,
-      ); */
 
       if (!response.ok) {
         const errorText = await response.text();
