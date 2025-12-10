@@ -10,7 +10,8 @@ export default defineConfig(({ mode }) => {
     plugins: [react()],
     server: {
       port: parseInt(env.VITE_PORT) || 3000,
-      host: true
+      host: true,
+      allowedHosts: ['vorplay.caiots.dev']
     }
   }
 })
